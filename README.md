@@ -1,4 +1,4 @@
 projet-ei5
 ==========
 
-REST Server NodeJS, written with Baptiste Gauduchon, designed for a project in my last year of engineering school
+REST Server NodeJS, written by Baptiste Gauduchon and Yann Jajkiewicz, designed for a project in our last year of engineering school
