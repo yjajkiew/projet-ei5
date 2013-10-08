@@ -351,25 +351,25 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
 void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
   // exploitation des parametres
   // il faut une pin
-  ...
+  aJsonObject *pin = aJson.getObjectItem(parametres, 'pin');
   if(pin==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"302",NULL));
     return;
   }
   // numéro de la pin à lire
-  ...
+  int pin2 = pin->valueint;
   // suivi
   Serial.print(F("pr pin="));
   Serial.println(pin2);
   // il faut un mode d'écriture
-  ...
+  aJsonObject *mod = aJson.getObjectItem(parametres, 'mod');
   if(mod==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"303",NULL));
     return;
   }
-  ...
+  String mod2 = mod->valuestring;
   // ce doit être a (analogique) ou b (binaire)
   if(strcmp(mod2,"a")!=0 && strcmp(mod2,"b")!=0){
     // réponse d'erreur
@@ -381,7 +381,10 @@ void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
   Serial.print(F("pw mod="));
   Serial.println(mod2);
   // on lit la pin
-  ...
+  pinMode(pin2, INPUT); 
+  int valeur;
+  if(strcmp(mod2,"b") == 0) valeur = digitalRead(pin2);
+  else valeur = analogRead(pin2);
   // on rend le résultat
   String json="{\"pin"+String(pin2)+"\":\""+valeur+"\"}";
   sendReponse(client, reponse(strId,"0",json));
