@@ -121,7 +121,7 @@ void traiterCommande(EthernetClient *client, String commande){
   }
   
   // attribut id
-  aJsonObject *id = aJson.getObjectItem(json, 'id');
+  aJsonObject *id = aJson.getObjectItem(json, "id");
   if(id==NULL){
     // suppression json
     aJson.deleteItem(json);
@@ -131,10 +131,11 @@ void traiterCommande(EthernetClient *client, String commande){
     return;
   }
   // on mémorise l'id
-  Sring strId = id->valuestring;
+  char strId[sizeof(id->valuestring)];
+  String(id->valuestring).toCharArray(strId, sizeof(strId));
   
   // attribut action
-  aJsonObject *action = aJson.getObjectItem(json, 'ac');
+  aJsonObject *action = aJson.getObjectItem(json, "ac");
   if(action==NULL){
     // suppression json
     aJson.deleteItem(json);
@@ -144,11 +145,13 @@ void traiterCommande(EthernetClient *client, String commande){
     return;
   }
   // on mémorise l'action
-  String strAction = action->valuestring:
-  
+  //String strAction = action->valuestring;
+  char strAction[sizeof(action->valuestring)];
+  String(action->valuestring).toCharArray(strAction, sizeof(strAction));
+
   
   // on récupère les parametres
-  aJsonObject *parametres = aJson.getObjectItem(json, 'pa');
+  aJsonObject *parametres = aJson.getObjectItem(json, "pa");
   if(parametres==NULL){
     // suppression json
     aJson.deleteItem(json);
@@ -159,6 +162,8 @@ void traiterCommande(EthernetClient *client, String commande){
   }
   // c'est bon - on traite l'action
   // echo
+  
+  
   if(strcmp("ec",strAction)==0){
     // traitement
     doEcho(client, strId);
@@ -214,8 +219,8 @@ int connecte(EthernetClient *client, IPAddress serveurIP, int serveurPort) {
 // lecture d'une commande du serveur
 String lireCommande(EthernetClient *client){
   String commande="";
-  while(client.available()) {
-    commande.append(client.read());
+  while((*client).available()) {
+    commande += (*client).read();
   }
   // on rend la commande
   return commande;
@@ -247,7 +252,7 @@ void doEcho(EthernetClient *client, char * strId){
 void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
   // exploitation des parametres
   // il faut une pin
-  aJsonObject *pin = aJson.getObjectItem(parametres, 'pin');
+  aJsonObject *pin = aJson.getObjectItem(parametres, "pin");
   if(pin==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"202",NULL));
@@ -259,7 +264,7 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
   Serial.println(led);
   
   // il faut la durée d'un clignotement
-  aJsonObject *dur = aJson.getObjectItem(parametres, 'dur');
+  aJsonObject *dur = aJson.getObjectItem(parametres, "dur");
   if(dur==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"211",NULL));
@@ -271,7 +276,7 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
   Serial.println(duree);
   
   // il faut le nombre de clignotements
-  aJsonObject *nb = aJson.getObjectItem(parametres, 'nb');
+  aJsonObject *nb = aJson.getObjectItem(parametres, "nb");
   if(nb==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"212",NULL));
@@ -299,7 +304,7 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
 // pinWrite
 void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
   // il faut une pin
-  aJsonObject *pin = aJson.getObjectItem(parametres, 'pin');
+  aJsonObject *pin = aJson.getObjectItem(parametres, "pin");
   if(pin==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"201",NULL));
@@ -311,7 +316,7 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
   Serial.print(F("pw pin="));
   Serial.println(pin2);
   // il faut une valeur
-  aJsonObject *val = aJson.getObjectItem(parametres, 'val');
+  aJsonObject *val = aJson.getObjectItem(parametres, "val");
   if(val==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"202",NULL));
@@ -323,13 +328,16 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
   Serial.print(F("pw val="));
   Serial.println(val2);
   // il faut un mode d'écriture
-  aJsonObject *mod = aJson.getObjectItem(parametres, 'mod');
+  aJsonObject *mod = aJson.getObjectItem(parametres, "mod");
   if(mod==NULL){
       // réponse d'erreur
       sendReponse(client, reponse(strId,"203",NULL));
       return;
   }
-  int mod2 = mod->valuestring;
+  
+  char mod2[sizeof(mod->valuestring)];
+  String(mod->valuestring).toCharArray(mod2, sizeof(mod2));
+  
   // ce doit être a (analogique) ou b (binaire)
   if(strcmp(mod2,"b")!=0 && strcmp(mod2,"a")!=0){
     // réponse d'erreur
@@ -351,7 +359,7 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
 void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
   // exploitation des parametres
   // il faut une pin
-  aJsonObject *pin = aJson.getObjectItem(parametres, 'pin');
+  aJsonObject *pin = aJson.getObjectItem(parametres, "pin");
   if(pin==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"302",NULL));
@@ -363,13 +371,15 @@ void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
   Serial.print(F("pr pin="));
   Serial.println(pin2);
   // il faut un mode d'écriture
-  aJsonObject *mod = aJson.getObjectItem(parametres, 'mod');
+  aJsonObject *mod = aJson.getObjectItem(parametres, "mod");
   if(mod==NULL){
     // réponse d'erreur
     sendReponse(client, reponse(strId,"303",NULL));
     return;
   }
-  String mod2 = mod->valuestring;
+  char mod2[sizeof(mod->valuestring)];
+  String(mod->valuestring).toCharArray(mod2, sizeof(mod2));
+  
   // ce doit être a (analogique) ou b (binaire)
   if(strcmp(mod2,"a")!=0 && strcmp(mod2,"b")!=0){
     // réponse d'erreur
@@ -393,7 +403,7 @@ void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
 // envoi réponse
 void sendReponse(EthernetClient *client, String message){
   // envoi de la réponse
-  client.println(message);
+  (*client).println(message);
   // suivi
   Serial.print(F("reponse="));
   Serial.println(message);
