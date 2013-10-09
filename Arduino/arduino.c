@@ -8,7 +8,7 @@ byte macArduino[] = { 0x90, 0xA2, 0xDA, 0x00, 0x1D, 0xA7 };
 String strMacArduino="90:A2:DA:00:1D:A7";
 IPAddress ipArduino(192,168,2,3); // l'adresse IP de l'Arduino
 String idArduino="192.168.2.3"; // son identifiant=IP
-String descriptionArduino="duemilanove"; // description de l'Arduino
+String descriptionArduino="Uno_Projet5"; // description de l'Arduino
 int portArduino=102; // port du serveur Arduino // le serveur Arduino travaillera sur le port 102
 EthernetServer server(portArduino);
 IPAddress ipServeurEnregistrement(192,168,2,1); // IP du serveur d'enregistrement
