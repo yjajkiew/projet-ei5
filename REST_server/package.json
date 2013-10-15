@@ -1,9 +1,9 @@
 {
-	"name": "restServer",
-	"description": "a REST Server in NodeJS for a last year in engineering school project",
-	"version": "0.0.1",
-	"private": true,
-	"dependencies": {
-		"express": "3.x"
-	}
+  "name": "metier",
+  "description": "Express url parsing handler",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.x"
+  }
 }
