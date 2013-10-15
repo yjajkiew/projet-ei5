@@ -119,7 +119,7 @@ void traiterCommande(EthernetClient *client, String commande){
     sendReponse(client,reponse(NULL,"100",NULL));
     return;
   }
-  
+
   // attribut id
   aJsonObject *id = aJson.getObjectItem(json, "id");
   if(id==NULL){
@@ -131,7 +131,7 @@ void traiterCommande(EthernetClient *client, String commande){
     return;
   }
   // on mémorise l'id
-  char strId[sizeof(id->valuestring)];
+  char strId[sizeof(id->valuestring)*2];
   String(id->valuestring).toCharArray(strId, sizeof(strId));
   
   // attribut action
@@ -146,9 +146,8 @@ void traiterCommande(EthernetClient *client, String commande){
   }
   // on mémorise l'action
   //String strAction = action->valuestring;
-  char strAction[sizeof(action->valuestring)];
+  char strAction[sizeof(action->valuestring)*2];
   String(action->valuestring).toCharArray(strAction, sizeof(strAction));
-
   
   // on récupère les parametres
   aJsonObject *parametres = aJson.getObjectItem(json, "pa");
@@ -218,10 +217,12 @@ int connecte(EthernetClient *client, IPAddress serveurIP, int serveurPort) {
   
 // lecture d'une commande du serveur
 String lireCommande(EthernetClient *client){
-  String commande="";
-  while((*client).available()) {
-    commande += (*client).read();
+  String commande;;
+  while(client->available()) {
+    char c = client->read();
+    commande += c;
   }
+  
   // on rend la commande
   return commande;
 }
@@ -259,7 +260,8 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
     return;
   }
   // valeur de la pin à eteindre
-  int led = pin->valueint;
+  String strLed = pin->valuestring;
+  int led = strLed.toInt();
   Serial.print(F("clignoter led="));
   Serial.println(led);
   
@@ -271,7 +273,8 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
     return;
   }
   // valeur de la durée
-  int duree = dur->valueint;
+  String strDuree = dur->valuestring;
+  int duree = strDuree.toInt();
   Serial.print(F("duree="));
   Serial.println(duree);
   
@@ -283,7 +286,8 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
     return;
   }
   // valeur du nombre de clignotements
-  int nbClignotements = nb->valueint;
+  String strNbClignotements = nb->valuestring;
+  int nbClignotements = strNbClignotements.toInt();
   Serial.print(F("nb="));
   Serial.println(nbClignotements);
   
@@ -311,7 +315,8 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
     return;
   }
   // numéro de la pin à écrire
-  int pin2 = pin->valueint;
+  String strPin = pin->valuestring;
+  int pin2 = strPin.toInt();
   // suivi
   Serial.print(F("pw pin="));
   Serial.println(pin2);
@@ -323,7 +328,8 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
     return;
   }
   // valeur à écrire
-  int val2 = val->valueint;
+  String strVal = val->valuestring;
+  int val2 = strVal.toInt();
   // suivi
   Serial.print(F("pw val="));
   Serial.println(val2);
@@ -351,7 +357,10 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
   Serial.println(mod2);
   // on écrit sur la pin
   pinMode(pin2, OUTPUT);
-  if(strcmp(mod2, "b")==0) digitalWrite(pin2, val2);
+  if(strcmp(mod2, "b")==0) {
+    if(val2) digitalWrite(pin2, HIGH);
+    else digitalWrite(pin2, LOW);
+  }
   else analogWrite(pin2, val2);
 }
     
@@ -366,7 +375,8 @@ void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
     return;
   }
   // numéro de la pin à lire
-  int pin2 = pin->valueint;
+  String strPin = pin->valuestring;
+  int pin2 = strPin.toInt();
   // suivi
   Serial.print(F("pr pin="));
   Serial.println(pin2);
@@ -403,7 +413,7 @@ void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
 // envoi réponse
 void sendReponse(EthernetClient *client, String message){
   // envoi de la réponse
-  (*client).println(message);
+  client->println(message);
   // suivi
   Serial.print(F("reponse="));
   Serial.println(message);
