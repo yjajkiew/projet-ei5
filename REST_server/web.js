@@ -13,11 +13,14 @@ var express = require('express');
 var util = require('util');
 var url = require('url');
 
+// Import other layers
+var metier = require('./metier');
+
 // Globals Variables 
 var server = express();
 
 
-////////////// URL REQUEST HANDLER
+//////// URL REQUEST HANDLER
 // Arduino list query
 server.get('/server-restServer/arduinos', function(req,res) {
 	util.log("Query : Arduino list");
@@ -28,6 +31,7 @@ server.get('/server-restServer/arduinos', function(req,res) {
 .get("/server-restServer/arduinos/blink/:idcommande/:ipArduino/:pin/:lenght/:number", function(req,res) {
 	// test : http://localhost:8080/server-restServer/arduinos/blink/cmd1/192.168.1.1/9/100/10
 	var p = req.params;
+	metier.urlToJson(p);
 	util.log("Query : LED blink [ " + p.idcommande + " , " + p.ipArduino + " , " + p.pin + " , " + p.lenght + " , " + p.number + " ]");
 	res.send("LED blink");
 })
@@ -42,21 +46,22 @@ server.get('/server-restServer/arduinos', function(req,res) {
 
 // Error in URL
 .use(
-	function(req,res) { 
+	function(req,res, next) { 
 		res.setHeader('Content-Type', 'text/plain');
 		res.send(404, 'Page introuvable !'); 
 		util.log("404 : wrong url [ " + url.parse(req.url).pathname + " ]");
+		next();	// go to next middleware
 	}
 );
 
 
-////////////// EVENTS
+//////// EVENTS
 server.on('close', function() { 
 	util.log('Connection closed');
 })
 
 
-////////////// LAUNCH SERVER (PORT 8080)
+//////// LAUNCH SERVER (PORT 8080)
 server.listen(8080);
 
 
