@@ -46,9 +46,8 @@ server.get(
 })
 
 // WRITE command
-.get(
+.get(	// test : http://localhost:8080/server-restServer/arduinos/pinWrite/1/192.168.1.1/9/write/1
 	"/server-restServer/arduinos/pinWrite/:idcommande/:idArduino/:pin/:mode/:val", function(req,res) {
-	// test : http://localhost:8080/server-restServer/arduinos/pinWrite/1/192.168.1.1/9/write/1
 	var p = req.params;
 	util.log("Query : Command [ " + "write" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
 	res.send(metier.write(p.idCommand, p.idArduino, p.pin, p.mode, p.valeur));
@@ -62,7 +61,7 @@ server.get(
     var params = JSON.stringify(req.body);
     // logs
 	util.log("Query : URL=[ " + p.command + " , " + p.idArduino + " ] ; POST=" + JSON.stringify(req.body));	// direct acces of the key 'id': req.body['id']
-	res.send(metier.command(p.idArduino, params));
+	res.send(metier.cmd(p.idArduino, params));
 })
 
 // ERROR : command not found

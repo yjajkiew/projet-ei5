@@ -13,6 +13,7 @@ var net = require('net');
 
 //////// CLIENT : send request to Arduino
 exports.send = function(ipArduino, jsonObject) {
+
 	return jsonObject;
 }
 
@@ -22,7 +23,8 @@ var PORT = 100;
 var arduinos = [];
 
 //registration server
-net.createServer(function(sock) {
+var server = net.createServer(function(sock) {
+
 	var data = ''; 
 	
 	// We have a connection - a socket object is assigned to the connection automatically
@@ -41,11 +43,37 @@ net.createServer(function(sock) {
 	.on('close', function(data) {
 		console.log('CLOSED: ' + sock.remoteAddress +' '+ sock.remotePort);
 	});
-    
-}).listen(PORT, HOST);
+});
 
-console.log('Server listening on ' + HOST +':'+ PORT);
+// launch server
+server.listen(PORT, HOST, function() {
+	util.log('Server listening on ' + HOST +':'+ PORT);
+});
 
+
+
+// handle server error
+server.on('error', function (err) {
+	switch (err.code) {
+		case 'EADDRINUSE' :
+			util.log('Network address already in use, retrying in 10 sec...');
+		    setTimeout(function () {
+			    server.close();
+			    server.listen(PORT, HOST);
+	    	},10000);
+			break;
+
+		case 'EADDRNOTAVAIL' :
+			util.log("Network interface not available ! Please check network config, retrying in 10 sec...");
+			setTimeout(function () {
+			    server.listen(PORT, HOST);
+	    	},10000);
+			break;
+		default:
+			util.log("Unhandled error : " + err);
+			break;
+	}
+});
 
 
 exports.getArduinos = function getArduinos() { //return arduinos array, containing string from arduinos' registrations
