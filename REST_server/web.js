@@ -19,46 +19,53 @@ var express = require('express'),
 
 
 //////// URL REQUEST HANDLER
+// use body parser
+server.use(express.bodyParser());
+
 // Arduino list query
-server.get('/server-restServer/arduinos', function(req,res) {
+server.get(
+	'/server-restServer/arduinos', function(req,res) {
 	util.log("Query : Arduino list");
 	res.send('Arduino list');
 })
 
 // LED blink query
-.get("/server-restServer/arduinos/blink/:idcommande/:ipArduino/:pin/:lenght/:number", function(req,res) {
-	// test : http://localhost:8080/server-restServer/arduinos/blink/cmd1/192.168.1.1/9/100/10
+.get(	// test : http://localhost:8080/server-restServer/arduinos/blink/cmd1/192.168.1.1/9/100/10
+	"/server-restServer/arduinos/blink/:idcommande/:idArduino/:pin/:lenght/:number", function(req,res) {
 	var p = req.params;
-	metier.urlToJson(p);
-	util.log("Query : LED blink [ " + p.idcommande + " , " + p.ipArduino + " , " + p.pin + " , " + p.lenght + " , " + p.number + " ]");
-	res.send("LED blink");
+	util.log("Query : LED blink [ " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.lenght + " , " + p.number + " ]");
+	res.send(metier.blink(p.idCommand, p.idArduino, p.pin, p.lenght, p.number));
 })
 
-// Send read command
-.get("/server-restServer/arduinos/read/:idcommande/:ipArduino/:pin/:mode/", function(req,res) {
-	// test : http://localhost:8080/server-restServer/arduinos/cmd1/1/192.168.1.1/9/write/1
+// READ command
+.get(	// test : http://localhost:8080/server-restServer/arduinos/pinRead/1/192.168.1.1/9/write
+	"/server-restServer/arduinos/pinRead/:idcommande/:idArduino/:pin/:mode", function(req,res) {
 	var p = req.params;
-	util.log("Query : Command [ " + "read" + " , " + p.idcommande + " , " + p.ipArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
-	res.send("Command");
+	util.log("Query : Command [ " + "read" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " ]");
+	res.send(metier.read(p.idCommand, p.idArduino, p.pin, p.mode););
 })
 
-// Send write command
-.get("/server-restServer/arduinos/write/:idcommande/:ipArduino/:pin/:mode/:val", function(req,res) {
-	// test : http://localhost:8080/server-restServer/arduinos/cmd1/1/192.168.1.1/9/write/1
+// WRITE command
+.get(
+	"/server-restServer/arduinos/pinWrite/:idcommande/:idArduino/:pin/:mode/:val", function(req,res) {
+	// test : http://localhost:8080/server-restServer/arduinos/pinWrite/1/192.168.1.1/9/write/1
 	var p = req.params;
-	util.log("Query : Command [ " + "write" + " , " + p.idcommande + " , " + p.ipArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
-	res.send("Command");
+	util.log("Query : Command [ " + "write" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
+	res.send(metier.write(p.idCommand, p.idArduino, p.pin, p.mode, p.valeur););
 })
 
-// Send command
-.get("/server-restServer/arduinos/:command/:ipArduino", function(req,res) {
-	// test : http://localhost:8080/server-restServer/arduinos/cmd1/192.168.1.1/
+// COMMAND (POST)
+.post(	// test : http://localhost:8080/server-restServer/arduinos/cmd1/192.168.1.1/
+	"/server-restServer/arduinos/:command/:idArduino", function(req, res) {
 	var p = req.params;
-	util.log("Query : Command [ " + p.command + " , " + p.ipArduino + " ]");
-	res.send("Command");
+	// parameters from POST
+    var params = JSON.stringify(req.body);
+    // logs
+	util.log("Query : URL=[ " + p.command + " , " + p.idArduino + " ] ; POST=" + JSON.stringify(req.body));	// direct acces of the key 'id': req.body['id']
+	res.send(metier.command(p.idArduino, params););
 })
 
-// Error : command not found
+// ERROR : command not found
 .use(
 	function(req,res, next) { 
 		// set content type
@@ -73,7 +80,7 @@ server.get('/server-restServer/arduinos', function(req,res) {
 );
 
 
-//////// EVENTS
+//////// EVENTS 
 server.on('close', function() { 
 	util.log('Connection closed');
 })
