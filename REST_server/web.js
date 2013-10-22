@@ -42,7 +42,7 @@ server.get(
 	"/server-restServer/arduinos/pinRead/:idcommande/:idArduino/:pin/:mode", function(req,res) {
 	var p = req.params;
 	util.log("Query : Command [ " + "read" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " ]");
-	res.send(metier.read(p.idCommand, p.idArduino, p.pin, p.mode););
+	res.send(metier.read(p.idCommand, p.idArduino, p.pin, p.mode));
 })
 
 // WRITE command
@@ -51,7 +51,7 @@ server.get(
 	// test : http://localhost:8080/server-restServer/arduinos/pinWrite/1/192.168.1.1/9/write/1
 	var p = req.params;
 	util.log("Query : Command [ " + "write" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
-	res.send(metier.write(p.idCommand, p.idArduino, p.pin, p.mode, p.valeur););
+	res.send(metier.write(p.idCommand, p.idArduino, p.pin, p.mode, p.valeur));
 })
 
 // COMMAND (POST)
@@ -62,7 +62,7 @@ server.get(
     var params = JSON.stringify(req.body);
     // logs
 	util.log("Query : URL=[ " + p.command + " , " + p.idArduino + " ] ; POST=" + JSON.stringify(req.body));	// direct acces of the key 'id': req.body['id']
-	res.send(metier.command(p.idArduino, params););
+	res.send(metier.command(p.idArduino, params));
 })
 
 // ERROR : command not found

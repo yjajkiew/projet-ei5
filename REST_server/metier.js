@@ -15,11 +15,14 @@ var util = require('util'),
 // Import other layers
 	dao = require('./dao');
 
-// Commande format : {"id":"1","ac":"cl","pa":{"pin":"8","dur":"100","nb":"10"}}
+
 //////// PUBLIC functions
 // get arduino list
 exports.arduinos = function() {
-	util.log("METIER : arduinos");
+	// build json object
+	var jsonObject = { id:idCommand, ac:"cl", pa:{pin:pin, dur:lenght, nb:number}};
+	// send to "dao" and return result to "web"
+	return dao.send(idArduino, JSON.stringify(jsonObject));
 }
 
 // LED blink
@@ -33,7 +36,7 @@ exports.blink = function(idCommand, idArduino, pin, lenght, number) {
 // READ command  {"id":"4","ac":"pr","pa":{"pin":"0","mod":"a"}}
 exports.read = function(idCommand, idArduino, pin, mode) {
 	// build json object
-	var jsonObject = { id:idCommand, ac:"pr", pa:{pin:pin, dur:lenght, nb:number}};
+	var jsonObject = { id:idCommand, ac:"pr", pa:{pin:pin, mod:mode}};
 	// send to "dao" and return result to "web"
 	return dao.send(idArduino, JSON.stringify(jsonObject));
 }
@@ -48,10 +51,9 @@ exports.write = function(idCommand, idArduino, pin, mode, value) {
 
 // command (in POST)
 exports.cmd = function(idArduino, parametres) {
-	// build json object
-	var jsonObject = { id:idCommand, ac:"cl", pa:{pin:pin, dur:lenght, nb:number}};
+	// json object already ready
 	// send to "dao" and return result to "web"
-	return dao.send(idArduino, JSON.stringify(jsonObject));
+	return dao.send(idArduino, JSON.stringify(parametres));
 }
 
 
