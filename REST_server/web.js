@@ -9,15 +9,13 @@
 
 
 // Import required modules
-var express = require('express');
-var util = require('util');
-var url = require('url');
-
+var express = require('express'),
+	util = require('util'),
+	url = require('url'),
 // Import other layers
-var metier = require('./metier');
-
+	metier = require('./metier'),
 // Globals Variables 
-var server = express();
+	server = express();
 
 
 //////// URL REQUEST HANDLER
@@ -36,21 +34,41 @@ server.get('/server-restServer/arduinos', function(req,res) {
 	res.send("LED blink");
 })
 
-// Send commands query
-.get("/server-restServer/arduinos/:command/:idcommande/:ipArduino/:pin/:mode/:val", function(req,res) {
+// Send read command
+.get("/server-restServer/arduinos/read/:idcommande/:ipArduino/:pin/:mode/", function(req,res) {
 	// test : http://localhost:8080/server-restServer/arduinos/cmd1/1/192.168.1.1/9/write/1
 	var p = req.params;
-	util.log("Query : Command [ " + p.command + " , " + p.idcommande + " , " + p.ipArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
+	util.log("Query : Command [ " + "read" + " , " + p.idcommande + " , " + p.ipArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
 	res.send("Command");
 })
 
-// Error in URL
+// Send write command
+.get("/server-restServer/arduinos/write/:idcommande/:ipArduino/:pin/:mode/:val", function(req,res) {
+	// test : http://localhost:8080/server-restServer/arduinos/cmd1/1/192.168.1.1/9/write/1
+	var p = req.params;
+	util.log("Query : Command [ " + "write" + " , " + p.idcommande + " , " + p.ipArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
+	res.send("Command");
+})
+
+// Send command
+.get("/server-restServer/arduinos/:command/:ipArduino", function(req,res) {
+	// test : http://localhost:8080/server-restServer/arduinos/cmd1/192.168.1.1/
+	var p = req.params;
+	util.log("Query : Command [ " + p.command + " , " + p.ipArduino + " ]");
+	res.send("Command");
+})
+
+// Error : command not found
 .use(
 	function(req,res, next) { 
+		// set content type
 		res.setHeader('Content-Type', 'text/plain');
-		res.send(404, 'Page introuvable !'); 
-		util.log("404 : wrong url [ " + url.parse(req.url).pathname + " ]");
-		next();	// go to next middleware
+		// create JSON answer
+		var jsonErrorObject = {"id":"1","er":"1000","et":{}};
+		// send serialized JSON to client
+		res.send(JSON.stringify(jsonErrorObject)); // http.statu = 200 ????
+		util.log("Wrong url [ " + url.parse(req.url).pathname + " ]");
+		//next();	// go to next middleware
 	}
 );
 

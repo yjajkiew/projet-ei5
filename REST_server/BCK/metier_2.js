@@ -22,22 +22,27 @@ exports.arduinos = function(parameters) {
 
 // LED blink
 exports.blink = function(paramters) {
+	// check : 5 parameters
+	if (count(parameters) == 5){
 
-}
+		// param1=int(1)
+		var regexPattern = /^Status: ([0-9\.]+) \(([a-zA-Z ]+)\)$/
+		var result = string.match(regex);
+		var statusNumber = result[1];
+		var statusString = result[2];
 
-// command (in POST)
-exports.cmd = function(paramters) {
+		// param2=string(xxx.xxx.xxx.xxx)
 
-}
+		// param3=int(1->13&0->5)
 
-// READ command
-exports.read = function(paramters) {
+		// param4=int(>0)
 
-}
+		// param5=int(>0)
+	}
 
-// WRITE command
-exports.write = function(paramters) {
+	
 
+	// send to "dao" & wait for answer befor return to "web"
 }
 
 
