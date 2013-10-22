@@ -26,11 +26,11 @@ server.use(express.bodyParser());
 server.get(
 	'/server-restServer/arduinos', function(req,res) {
 	util.log("Query : Arduino list");
-	res.send('Arduino list');
+	res.send(metier.arduinos());
 })
 
 // LED blink query
-.get(	// test : http://localhost:8080/server-restServer/arduinos/blink/cmd1/192.168.1.1/9/100/10
+.get(	// test : http://localhost:8080/server-restServer/arduinos/blink/1/192.168.1.1/9/100/10
 	"/server-restServer/arduinos/blink/:idcommande/:idArduino/:pin/:lenght/:number", function(req,res) {
 	var p = req.params;
 	util.log("Query : LED blink [ " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.lenght + " , " + p.number + " ]");
