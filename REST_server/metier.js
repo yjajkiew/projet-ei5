@@ -19,10 +19,16 @@ var util = require('util'),
 //////// PUBLIC functions
 // get arduino list
 exports.arduinos = function() {
-	// build json object
-	var jsonObject = { id:idCommand, ac:"cl", pa:{pin:pin, dur:lenght, nb:number}};
-	// send to "dao" and return result to "web"
-	return dao.send(idArduino, JSON.stringify(jsonObject));
+	util.log("METIER : arduinos");
+	var rawArduinos = dao.getArduinos();
+	var arduinos = [];
+	
+	rawArduinos.forEach(function(ard) {
+		var json = JSON.parse(ard); //transform data to json object
+		var obj = { id: json.id, port: json.port, description: json.desc, ip: json.ip, mac: json.mac }; //create json object using the expected format
+		arduinos.push(JSON.stringify(obj)); //transform json object into a string and put it into "arduinos" array
+	});
+	return arduinos;
 }
 
 // LED blink
