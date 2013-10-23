@@ -1,4 +1,4 @@
-//***********//
+//***********// 
 // Utilities //
 //***********//
 // => provide globaly accesible function for simple stuffs :

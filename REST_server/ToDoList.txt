@@ -3,13 +3,19 @@
 #############################
 
 1 - 'WEB' LAYER
+	[ ] -> Find a solution to get parameters from the 'POST' cmd
+	[ ] -> arduino answer not displayed, even if error ?
 
 
 2 - 'METIER' LAYER
+	[ ] -> find why JSON object aren't correclty parsed
+	[ ] -> handle exceptions
 
 
 3 - 'DAO' LAYER
+	[ ] -> succesfully send a request and get correct answer from arduino (blink) (EOL issue '\0' ????? check arduino code)
 	[ ] -> regroup error handling in an external function 
 	[X] -> check if arduino already in list befor adding 
-	[ ] -> check perdiodicaly if arduino still connected
-	[ ] -> 
+	[ ] -> check perdiodicaly if listed arduinos are still connected
+	[ ] -> check if port is correclty displayed when new arduino connect (1025 -> 102 ????)
+	[ ] -> put server & client in other files ?

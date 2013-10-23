@@ -31,7 +31,7 @@ server
 })
 
 // LED blink query
-.get(	// test : http://localhost:8080/server-restServer/arduinos/blink/1/192.168.1.1/9/100/10
+.get(	// test : http://localhost:8080/server-restServer/arduinos/blink/1/192.168.2.3/9/100/10
 	"/server-restServer/arduinos/blink/:idcommande/:idArduino/:pin/:lenght/:number", function(req,res) {
 	var p = req.params;
 	util.log("[WEB] Query : LED blink [ " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.lenght + " , " + p.number + " ]");
@@ -39,7 +39,7 @@ server
 })
 
 // READ command
-.get(	// test : http://localhost:8080/server-restServer/arduinos/pinRead/1/192.168.1.1/9/write
+.get(	// test : http://localhost:8080/server-restServer/arduinos/pinRead/1/192.168.2.3/9/write
 	"/server-restServer/arduinos/pinRead/:idcommande/:idArduino/:pin/:mode", function(req,res) {
 	var p = req.params;
 	util.log("[WEB] Query : Command [ " + "read" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " ]");
@@ -47,7 +47,7 @@ server
 })
 
 // WRITE command
-.get(	// test : http://localhost:8080/server-restServer/arduinos/pinWrite/1/192.168.1.1/9/write/1
+.get(	// test : http://localhost:8080/server-restServer/arduinos/pinWrite/1/192.168.2.3/9/write/1
 	"/server-restServer/arduinos/pinWrite/:idcommande/:idArduino/:pin/:mode/:val", function(req,res) {
 	var p = req.params;
 	util.log("[WEB] Query : Command [ " + "write" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
@@ -55,7 +55,7 @@ server
 })
 
 // COMMAND (POST)
-.post(	// test : http://localhost:8080/server-restServer/arduinos/cmd1/192.168.1.1/
+.post(	// test : http://localhost:8080/server-restServer/arduinos/cmd1/192.168.2.3/
 	"/server-restServer/arduinos/:command/:idArduino", function(req, res) {
 	var p = req.params;
 	// parameters from POST

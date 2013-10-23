@@ -33,7 +33,7 @@ exports.arduinos = function() {
 // LED blink
 exports.blink = function(idCommand, idArduino, pin, lenght, number) {
 	// build json object
-	var jsonObject = JSON.parse({id:idCommand, ac:'cl', pa:{pin:pin, dur:lenght, nb:number}});
+	var jsonObject = {id:idCommand, ac:'cl', pa:{pin:pin, dur:lenght, nb:number}};
 	util.log("[METIER] Blink : " + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
 	return dao.send(idArduino, JSON.stringify(jsonObject));
@@ -45,7 +45,7 @@ exports.read = function(idCommand, idArduino, pin, mode) {
 	var jsonObject = {id:idCommand, ac:"pr", pa:{pin:pin, mod:mode}};
 	util.log("[METIER] Read : " + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
-	return (dao.send(idArduino, JSON.stringify(jsonObject)));
+	return (JSON.stringify(dao.send(idArduino, JSON.stringify(jsonObject))));
 }
 
 // WRITE command

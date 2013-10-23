@@ -11,19 +11,19 @@
 // Imports modules:
 var util = require('util'),
 	net = require('net'),
-// variables:
-	HOST = '192.168.2.1',		// Registration server IP
- 	PORT = 100,					// Registration server PORT
-	arduinos = [],				// array containing connected arduinos properties, as JSON objects
-	isPresent,
-	currentArduino,
-	arduinoIp = '192.168.2.3',
-	arduinoPort = 102,
-	lastIndex = 0;
 
 
 
 //////// CLIENT : send request to Arduino
+
+// variables
+	currentArduino,
+	arduinoIp = '192.168.2.3',
+	arduinoPort = 102,
+	lastIndex = 0,
+	arduinoAnswer;
+
+// send JSON command to arduino
 exports.send = function(idArduino, jsonString) {
 	//return jsonObject;
 
@@ -34,19 +34,29 @@ exports.send = function(idArduino, jsonString) {
 
 	// Connect to Arduino server
 	var client = net.connect({host:arduinoIp, port:arduinoPort},function() { //'connect' listener
-		util.log('[DAO] Sending to Arduino @ ' + HOST + ":" + PORT);
-		var jsonObject = "{'id':'1', 'ac':'cl', 'pa':{'pin':'9', 'dur':'100', 'nb:10'}}";
+		//util.log('[DAO] Sending to Arduino @ ' + HOST + ":" + PORT);
+		var jsonObject = "{\"id\":\"1\", \"ac\":\"cl\", \"pa\":{\"pin\":\"9\", \"dur\":\"100\", \"nb:10\"}}";
+		util.log('[DAO] Sending ' + jsonObject + ' to Arduino @ ' + arduinoIp + ":" + arduinoPort);
 		client.write(jsonObject);
 	})
 
-	.on('data', function(data) {
-		util.log("[DAO] Received : " + data.toString());
+	.on('data', function(chunk) {
+		//if (/^\s*$/.test(chunk)) util.log('line is blank');
+		//while (arduinoAnswer.push(chunk)) {
+		//	arduinoAnswer.push(chunk);
+		//	util.log(chunk);
+		//}
+		while (chunk =! '') {
+			arduinoAnswer += chunk;
+			//util.log(chunk);
+		}
+		util.log(arduinoAnswer);
 		client.end();
-		return data;
 	})
 
 	.on('end', function() {
-		util.log('[DAO] Disconnected from Arduino');
+		util.log("[DAO] Disconnected from arduino, received : " + data.toString());
+		return arduinoAnswer;
 	})
 
 	.on('error', function(err) {
@@ -56,30 +66,18 @@ exports.send = function(idArduino, jsonString) {
 
 
 
-// find arduino by id (ip)
-var getArduinoProperties = function(idArduino) {
-	arduinos.forEach(function(arduino)
-	{
-		if (arduino.id == idArduino) {
-			util.log(JSON.stringify(arduino));
-			return arduino;
-		}
-	})
-}
-
-
-
 //////// SERVER : listen to arduinos
-//return arduinos array, containing string from arduinos' registrations
-exports.getArduinos = function getArduinos() {
-	return arduinos;
-};
+
+// variables:
+var	HOST = '192.168.2.1',		// Registration server IP
+ 	PORT = 100,					// Registration server PORT
+	arduinos = [],				// array containing connected arduinos properties, as JSON objects
+	isPresent,
+	data = ''; 
 
 //registration server
 var server = net.createServer(function(sock) {
 
-	var data = ''; 
-	
 	// We have a connection - a socket object is assigned to the connection automatically
 	util.log('[DAO] New Arduino : ' + sock.remoteAddress +':'+ sock.remotePort);
     
@@ -136,6 +134,26 @@ server.on('error', function(err) {	// NOTE : put in external handler for both cl
 server.listen(PORT, HOST, function() {
 	util.log('[DAO] Server listening for new Arduinos on ' + HOST +':'+ PORT);
 });
+
+
+
+//////// METHODES
+
+// find arduino by id (ip)
+var getArduinoProperties = function(idArduino) {
+	arduinos.forEach(function(arduino)
+	{
+		if (arduino.id == idArduino) {
+			util.log(JSON.stringify(arduino));
+			return arduino;
+		}
+	})
+}
+
+//return arduinos array, containing string from arduinos' registrations
+exports.getArduinos = function getArduinos() {
+	return arduinos;
+};
 
 
 
