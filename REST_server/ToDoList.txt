@@ -1,0 +1,15 @@
+#############################
+# Todo List for REST server #
+#############################
+
+1 - 'WEB' LAYER
+
+
+2 - 'METIER' LAYER
+
+
+3 - 'DAO' LAYER
+	[ ] -> regroup error handling in an external function 
+	[X] -> check if arduino already in list befor adding 
+	[ ] -> check perdiodicaly if arduino still connected
+	[ ] -> 

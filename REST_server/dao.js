@@ -15,6 +15,7 @@ var util = require('util'),
 	HOST = '192.168.2.1',		// Registration server IP
  	PORT = 100,					// Registration server PORT
 	arduinos = [],				// array containing connected arduinos properties, as JSON objects
+	isPresent,
 	currentArduino,
 	arduinoIp = '192.168.2.3',
 	arduinoPort = 102,
@@ -33,22 +34,23 @@ exports.send = function(idArduino, jsonString) {
 
 	// Connect to Arduino server
 	var client = net.connect({host:arduinoIp, port:arduinoPort},function() { //'connect' listener
-		util.log('sending to Arduino @ ' + HOST + ":" + PORT);
-		client.write(jsonString);
+		util.log('[DAO] Sending to Arduino @ ' + HOST + ":" + PORT);
+		var jsonObject = "{'id':'1', 'ac':'cl', 'pa':{'pin':'9', 'dur':'100', 'nb:10'}}";
+		client.write(jsonObject);
 	})
 
 	.on('data', function(data) {
-		util.log("received : " + data.toString());
+		util.log("[DAO] Received : " + data.toString());
 		client.end();
 		return data;
 	})
 
 	.on('end', function() {
-		util.log('Disconnected from Arduino');
+		util.log('[DAO] Disconnected from Arduino');
 	})
 
 	.on('error', function(err) {
-		util.log("Error while connecting to Arduino server : " + err.code);
+		util.log("[DAO] Error while connecting to Arduino server : " + err.code);
 	});
 }
 
@@ -79,28 +81,39 @@ var server = net.createServer(function(sock) {
 	var data = ''; 
 	
 	// We have a connection - a socket object is assigned to the connection automatically
-	util.log('New Arduino : ' + sock.remoteAddress +':'+ sock.remotePort);
+	util.log('[DAO] New Arduino : ' + sock.remoteAddress +':'+ sock.remotePort);
     
 	sock.on('data', function(chunk) { //called every time data is received
         	data += chunk;  //add data chunk to data  
 	})
 	
 	.on('end', function() { //called when eol character '\0' is received
-		arduinos.push(JSON.parse(data));
+		arduinos.forEach(function(ard) {
+			//check if arduino is already present
+			if (ard.id == data.id) {
+				isPresent = true;
+				util.log("[DAO] Arduino already registered");
+			}
+		});
+		// add current arduino if OK
+		if (!isPresent) {
+			arduinos.push(data);
+			util.log("[DAO] Arduino saved : " + JSON.stringify(arduinos[lastIndex]));
+		}
 	})
     
 	// Add a 'close' event handler to this instance of socket
 	.on('close', function(data) {
-		util.log('Arduino info : ' + JSON.stringify(arduinos[lastIndex]));
+		util.log('[DAO] Connection closed');
 		lastIndex++;
 	});
 });
 
 // handle server error
-server.on('error', function(err) {
+server.on('error', function(err) {	// NOTE : put in external handler for both client AND server !!!!
 	switch (err.code) {
 		case 'EADDRINUSE' :
-			util.log('Network address already in use, retrying in 10 sec...');
+			util.log('[DAO] Network address already in use, retrying in 10 sec...');
 		    setTimeout(function () {
 			    server.close();
 			    server.listen(PORT, HOST);
@@ -108,20 +121,20 @@ server.on('error', function(err) {
 			break;
 
 		case 'EADDRNOTAVAIL' :
-			util.log("Network interface not available ! Please check network config, retrying in 10 sec...");
+			util.log("[DAO] Network interface not available ! Please check network config, retrying in 10 sec...");
 			setTimeout(function () {
 			    server.listen(PORT, HOST);
 	    	},10000);
 			break;
 		default:
-			util.log("Unhandled error : " + err);
+			util.log("[DAO] Unhandled error in Arduino registration server : " + err);
 			break;
 	}
 });
 
 // launch server
 server.listen(PORT, HOST, function() {
-	util.log('Server listening for new Arduinos on ' + HOST +':'+ PORT);
+	util.log('[DAO] Server listening for new Arduinos on ' + HOST +':'+ PORT);
 });
 
 

@@ -22,10 +22,11 @@ var express = require('express'),
 // use body parser
 server.use(express.bodyParser());
 
+server
 // Arduino list query
-server.get(
+.get(	// test : http://localhost:8080/server-restServer/arduinos
 	'/server-restServer/arduinos', function(req,res) {
-	util.log("Query : Arduino list");
+	util.log("[WEB] Query : Arduino list");
 	res.send(metier.arduinos());
 })
 
@@ -33,7 +34,7 @@ server.get(
 .get(	// test : http://localhost:8080/server-restServer/arduinos/blink/1/192.168.1.1/9/100/10
 	"/server-restServer/arduinos/blink/:idcommande/:idArduino/:pin/:lenght/:number", function(req,res) {
 	var p = req.params;
-	util.log("Query : LED blink [ " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.lenght + " , " + p.number + " ]");
+	util.log("[WEB] Query : LED blink [ " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.lenght + " , " + p.number + " ]");
 	res.send(metier.blink(p.idCommand, p.idArduino, p.pin, p.lenght, p.number));
 })
 
@@ -41,7 +42,7 @@ server.get(
 .get(	// test : http://localhost:8080/server-restServer/arduinos/pinRead/1/192.168.1.1/9/write
 	"/server-restServer/arduinos/pinRead/:idcommande/:idArduino/:pin/:mode", function(req,res) {
 	var p = req.params;
-	util.log("Query : Command [ " + "read" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " ]");
+	util.log("[WEB] Query : Command [ " + "read" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " ]");
 	res.send(metier.read(p.idCommand, p.idArduino, p.pin, p.mode));
 })
 
@@ -49,7 +50,7 @@ server.get(
 .get(	// test : http://localhost:8080/server-restServer/arduinos/pinWrite/1/192.168.1.1/9/write/1
 	"/server-restServer/arduinos/pinWrite/:idcommande/:idArduino/:pin/:mode/:val", function(req,res) {
 	var p = req.params;
-	util.log("Query : Command [ " + "write" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
+	util.log("[WEB] Query : Command [ " + "write" + " , " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.mode + " , " + p.val + " ]");
 	res.send(metier.write(p.idCommand, p.idArduino, p.pin, p.mode, p.valeur));
 })
 
@@ -60,7 +61,7 @@ server.get(
 	// parameters from POST
     var params = JSON.stringify(req.body);
     // logs
-	util.log("Query : URL=[ " + p.command + " , " + p.idArduino + " ] ; POST=" + JSON.stringify(req.body));	// direct acces of the key 'id': req.body['id']
+	util.log("[WEB] Query : URL=[ " + p.command + " , " + p.idArduino + " ] ; POST=" + JSON.stringify(req.body));	// direct acces of the key 'id': req.body['id']
 	res.send(metier.cmd(p.idArduino, params));
 })
 
@@ -73,7 +74,7 @@ server.get(
 		var jsonErrorObject = {"id":"1","er":"1000","et":{}};
 		// send serialized JSON to client
 		res.send(JSON.stringify(jsonErrorObject)); // http.statu = 200 ????
-		util.log("Wrong url [ " + url.parse(req.url).pathname + " ]");
+		util.log("[WEB] Wrong url [ " + url.parse(req.url).pathname + " ]");
 		//next();	// go to next middleware
 	}
 );
@@ -81,8 +82,8 @@ server.get(
 
 //////// EVENTS 
 server.on('close', function() { 
-	util.log('Connection closed');
-})
+	util.log('[WEB] Connection closed');
+});
 
 
 //////// LAUNCH SERVER (PORT 8080)
