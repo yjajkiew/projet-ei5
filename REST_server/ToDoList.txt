@@ -13,7 +13,7 @@
 
 
 3 - 'DAO' LAYER
-	[ ] -> succesfully send a request and get correct answer from arduino (blink) (EOL issue '\0' ????? check arduino code)
+	[X] -> succesfully send a request and get correct answer from arduino (blink) (in daoClient_test.js)
 	[ ] -> regroup error handling in an external function 
 	[X] -> check if arduino already in list befor adding 
 	[ ] -> check perdiodicaly if listed arduinos are still connected
