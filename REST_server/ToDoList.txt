@@ -4,7 +4,7 @@
 
 1 - 'WEB' LAYER
 	[ ] -> Find a solution to get parameters from the 'POST' cmd
-	[ ] -> arduino answer not displayed, even if error ?
+	[X] -> arduino answer not displayed, even if error ? (used callback functions)
 
 
 2 - 'METIER' LAYER

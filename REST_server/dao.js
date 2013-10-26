@@ -23,7 +23,7 @@ var util = require('util'),
 	arduinoAnswer;
 
 // send JSON command to arduino
-exports.send = function(idArduino, jsonObject) {
+exports.send = function(idArduino, jsonObject, callback) {
 	// Get Arduino info
 	//currentArduino = getArduinoProperties(idArduino);
 	//arduinoIp = JSON.stringify(currentArduino.id);
@@ -42,14 +42,14 @@ exports.send = function(idArduino, jsonObject) {
 	})
 
 	.on('end', function() {
-		util.log("[DAO] Disconnected from arduino, received : " + arduinoAnswer);
-		return arduinoAnswer;
+		util.log("[DAO] Disconnected, received : " + arduinoAnswer);
+		callback(null, arduinoAnswer);
 	})
 
 	.on('error', function(err) {
 		util.log("[DAO] Error while connecting to Arduino server : " + err.code);
+		callback(err, null);
 	});
-	return arduinoAnswer;
 }
 
 
@@ -60,8 +60,8 @@ exports.send = function(idArduino, jsonObject) {
 var	HOST = '192.168.2.1',		// Registration server IP
  	PORT = 100,					// Registration server PORT
 	arduinos = [],				// array containing connected arduinos properties, as JSON objects
-	isPresent,					// boolean : arduino already present in table
-	data = ''; 					// string containing received chunks
+	data = '', 					// string containing received chunks
+	isPresent;
 
 //registration server
 var server = net.createServer(function(sock) {
@@ -70,10 +70,11 @@ var server = net.createServer(function(sock) {
 	util.log('[DAO] New Arduino : ' + sock.remoteAddress +':'+ sock.remotePort);
     
 	sock.on('data', function(chunk) { //called every time data is received
-        	data += chunk;  //add data chunk to data  
+    	data += chunk;  //add data chunk to data  
 	})
 	
 	.on('end', function() { //called when eol character '\0' is received
+		//arduinos = addArduino(arduinos, data);
 		arduinos.forEach(function(ard) {
 			//check if arduino is already present
 			if (ard.id == data.id) {
@@ -126,15 +127,23 @@ server.listen(PORT, HOST, function() {
 
 //////// METHODES
 
-// find arduino by id (ip)
-var getArduinoProperties = function(idArduino) {
-	arduinos.forEach(function(arduino)
-	{
-		if (arduino.id == idArduino) {
-			util.log(JSON.stringify(arduino));
-			return arduino;
+// add an arduino to the list
+var addArduino = function(arduinos, arduino) {
+	arduinos.forEach(function(ard) {
+		var isPresent;
+		//check if arduino is already present
+		if (ard.id == arduino.id) {
+			isPresent = true;
 		}
-	})
+		if (!isPresent) {
+			arduinos.push(arduino);
+			util.log("[DAO] Arduino saved : " + data);
+		}
+		else {
+			util.log("[DAO] Arduino already registered");
+		}
+	});
+	return arduinos;
 }
 
 //return arduinos array, containing string from arduinos' registrations

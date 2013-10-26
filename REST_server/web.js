@@ -35,7 +35,9 @@ server
 	"/server-restServer/arduinos/blink/:idcommande/:idArduino/:pin/:lenght/:number", function(req,res) {
 	var p = req.params;
 	util.log("[WEB] Query : LED blink [ " + p.idcommande + " , " + p.idArduino + " , " + p.pin + " , " + p.lenght + " , " + p.number + " ]");
-	res.send(metier.blink(p.idCommand, p.idArduino, p.pin, p.lenght, p.number));
+	metier.blink(p.idCommand, p.idArduino, p.pin, p.lenght, p.number, function(err, data) {
+		res.send(data);
+	});
 })
 
 // READ command
