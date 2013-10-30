@@ -23,7 +23,7 @@ var	arduinoPort = 102;
 var	arduinoAnswer = '';
 
 // send JSON command to arduino
-exports.send = function(idArduino, jsonObject, callback) {
+exports.send = function(idArduino, jsonString, callback) {
 	// Get Arduino info
 	//currentArduino = getArduinoProperties(idArduino);
 	//arduinoIp = JSON.stringify(currentArduino.id);
@@ -31,9 +31,8 @@ exports.send = function(idArduino, jsonObject, callback) {
 
 	// Connect to Arduino server
 	var client = net.connect({host:arduinoIp, port:arduinoPort},function() { //'connect' listener
-		var jsonString = "{\"id\":\"1\",\"ac\":\"cl\",\"pa\":{\"pin\":\"9\",\"dur\":\"100\",\"nb\":\"10\"}}";
-		//util.log('[DAO] Sending ' + jsonString + ' to Arduino @ ' + arduinoIp + ":" + arduinoPort);
-		client.write(jsonObject);
+		util.log('[DAO] Sending ' + jsonString + ' to Arduino @ ' + arduinoIp + ":" + arduinoPort);
+		client.write(jsonString);
 	})
 
 	.on('data', function(chunk) {	// NOTE : arduino need to register itself befor beeing able to respond to query !
@@ -53,7 +52,6 @@ exports.send = function(idArduino, jsonObject, callback) {
 		callback(err, null);
 	});
 }
-
 
 
 //////// SERVER : listen to arduinos
