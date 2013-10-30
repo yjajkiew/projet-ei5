@@ -3,12 +3,12 @@
 #############################
 
 1 - 'WEB' LAYER
-	[ ] -> Find a solution to get parameters from the 'POST' cmd
+	[ ] -> Find a solution to get parameters from the 'POST' cmd in raw JSON
 	[X] -> arduino answer not displayed, even if error ? (used callback functions)
 
 
 2 - 'METIER' LAYER
-	[ ] -> find why JSON object aren't correclty parsed
+	[X] -> find why JSON object aren't correclty parsed (Error in variables name in web.js.....)
 	[ ] -> handle exceptions
 
 
@@ -19,3 +19,6 @@
 	[ ] -> check perdiodicaly if listed arduinos are still connected
 	[ ] -> check if port is correclty displayed when new arduino connect (1025 -> 102 ????)
 	[ ] -> put server & client in other files ?
+
+4 - 'UTILITIES'
+	[ ] -> Arduino info persitency : save state in DB ?

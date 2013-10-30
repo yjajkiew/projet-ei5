@@ -11,9 +11,9 @@
 
 
 // Imports modules
-var util = require('util'),
+var util = require('util');
 // Import other layers
-	dao = require('./dao');
+var	dao = require('./dao');
 
 
 // get arduino list
@@ -23,7 +23,7 @@ exports.arduinos = function() {
 	// re-build the JSON the way we want it
 	arduinos.forEach(function(ard) {
 		//create json object using the expected format
-		var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,ip:ard.ip,mac:ard.mac}; 
+		var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,ip:ard.ip,mac:ard.mac};
 		arduinosTable.push(jsonArduino);	// stringify ??? -> test with client
 	});
 	//send back to [WEB]
@@ -35,9 +35,9 @@ exports.arduinos = function() {
 exports.blink = function(idCommand, idArduino, pin, lenght, number, callback) {
 	// build json object
 	var jsonObject = {id:idCommand,ac:"cl",pa:{pin:pin,dur:lenght,nb:number}};
-	util.log("[METIER] Blink : " + JSON.stringify(jsonObject));
+	util.log('[METIER] Blink : ' + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
-	dao.send(idArduino, jsonObject, function(err, data) {
+	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
 		callback(err, data);
 	});
 }
@@ -46,7 +46,7 @@ exports.blink = function(idCommand, idArduino, pin, lenght, number, callback) {
 exports.read = function(idCommand, idArduino, pin, mode, callback) {
 	// build json object
 	var jsonObject = {id:idCommand,ac:"pr",pa:{pin:pin,mod:mode}};
-	util.log("[METIER] Read : " + JSON.stringify(jsonObject));
+	util.log('[METIER] Read : ' + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
 	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
 		callback(err, data);
@@ -57,7 +57,7 @@ exports.read = function(idCommand, idArduino, pin, mode, callback) {
 exports.write = function(idCommand, idArduino, pin, mode, value, callback) {
 	// build json object
 	var jsonObject = {id:idCommand,ac:"pw",pa:{pin:pin,mod:mode,val:value}};
-	util.log("[METIER] Write : " + JSON.stringify(jsonObject));
+	util.log('[METIER] Write : ' + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
 	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
 		callback(err, data);
@@ -67,7 +67,7 @@ exports.write = function(idCommand, idArduino, pin, mode, value, callback) {
 // command (in POST)
 exports.cmd = function(idArduino, parametres, callback) {
 	// json object already ready
-	util.log("[METIER] Command : " + JSON.stringify(jsonObject));
+	util.log('[METIER] Command : '	 + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
 	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
 		callback(err, data);

@@ -9,18 +9,18 @@
 
 
 // Imports modules:
-var util = require('util'),
-	net = require('net'),
+var util = require('util');
+var	net = require('net');
 
 
 
 //////// CLIENT : send request to Arduino
 
 // variables
-	currentArduino,
-	arduinoIp = '192.168.2.3',
-	arduinoPort = 102,
-	arduinoAnswer;
+var	currentArduino;
+var	arduinoIp = '192.168.2.3';
+var	arduinoPort = 102;
+var	arduinoAnswer = '';
 
 // send JSON command to arduino
 exports.send = function(idArduino, jsonObject, callback) {
@@ -32,8 +32,8 @@ exports.send = function(idArduino, jsonObject, callback) {
 	// Connect to Arduino server
 	var client = net.connect({host:arduinoIp, port:arduinoPort},function() { //'connect' listener
 		var jsonString = "{\"id\":\"1\",\"ac\":\"cl\",\"pa\":{\"pin\":\"9\",\"dur\":\"100\",\"nb\":\"10\"}}";
-		util.log('[DAO] Sending ' + jsonString + ' to Arduino @ ' + arduinoIp + ":" + arduinoPort);
-		client.write(jsonString);
+		//util.log('[DAO] Sending ' + jsonString + ' to Arduino @ ' + arduinoIp + ":" + arduinoPort);
+		client.write(jsonObject);
 	})
 
 	.on('data', function(chunk) {	// NOTE : arduino need to register itself befor beeing able to respond to query !
@@ -42,12 +42,14 @@ exports.send = function(idArduino, jsonObject, callback) {
 	})
 
 	.on('end', function() {
-		util.log("[DAO] Disconnected, received : " + arduinoAnswer);
+		arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');
+		util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
 		callback(null, arduinoAnswer);
+		arduinoAnswer = '';
 	})
 
 	.on('error', function(err) {
-		util.log("[DAO] Error while connecting to Arduino server : " + err.code);
+		util.log('[DAO] Error while connecting to Arduino server : ' + err.code);
 		callback(err, null);
 	});
 }
@@ -57,11 +59,11 @@ exports.send = function(idArduino, jsonObject, callback) {
 //////// SERVER : listen to arduinos
 
 // variables:
-var	HOST = '192.168.2.1',		// Registration server IP
- 	PORT = 100,					// Registration server PORT
-	arduinos = [],				// array containing connected arduinos properties, as JSON objects
-	data = '', 					// string containing received chunks
-	isPresent;
+var	HOST = '192.168.2.1';		// Registration server IP
+var	PORT = 100;					// Registration server PORT
+var	arduinos = [];				// array containing connected arduinos properties, as JSON objects
+var	data = '';					// string containing received chunks
+var	isPresent;
 
 //registration server
 var server = net.createServer(function(sock) {
@@ -70,7 +72,7 @@ var server = net.createServer(function(sock) {
 	util.log('[DAO] New Arduino : ' + sock.remoteAddress +':'+ sock.remotePort);
     
 	sock.on('data', function(chunk) { //called every time data is received
-    	data += chunk;  //add data chunk to data  
+    	data += chunk;  //add data chunk to data
 	})
 	
 	.on('end', function() { //called when eol character '\0' is received
@@ -79,14 +81,16 @@ var server = net.createServer(function(sock) {
 			//check if arduino is already present
 			if (ard.id == data.id) {
 				isPresent = true;
-				util.log("[DAO] Arduino already registered");
+				util.log('[DAO] Arduino already registered');
 			}
 		});
 		// add current arduino if OK
 		if (!isPresent) {
 			arduinos.push(data);
-			util.log("[DAO] Arduino saved : " + data);
+			data = data.replace(/(\r\n|\n|\r)/gm,'');
+			util.log('[DAO] Arduino saved : ' + data);
 		}
+		data = '';
 	})
     
 	// Add a 'close' event handler to this instance of socket
@@ -107,13 +111,13 @@ server.on('error', function(err) {	// NOTE : put in external handler for both cl
 			break;
 
 		case 'EADDRNOTAVAIL' :
-			util.log("[DAO] Network interface not available ! Please check network config, retrying in 10 sec...");
+			util.log('[DAO] Network interface not available ! Please check network config, retrying in 10 sec...');
 			setTimeout(function () {
 			    server.listen(PORT, HOST);
 	    	},10000);
 			break;
 		default:
-			util.log("[DAO] Unhandled error in Arduino registration server : " + err);
+			util.log('[DAO] Unhandled error in Arduino registration server : ' + err);
 			break;
 	}
 });
@@ -137,10 +141,10 @@ var addArduino = function(arduinos, arduino) {
 		}
 		if (!isPresent) {
 			arduinos.push(arduino);
-			util.log("[DAO] Arduino saved : " + data);
+			util.log('[DAO] Arduino saved : ' + data);
 		}
 		else {
-			util.log("[DAO] Arduino already registered");
+			util.log('[DAO] Arduino already registered');
 		}
 	});
 	return arduinos;
@@ -150,6 +154,3 @@ var addArduino = function(arduinos, arduino) {
 exports.getArduinos = function getArduinos() {
 	return arduinos;
 };
-
-
-
