@@ -27,7 +27,7 @@ server
 .get(	// test : http://localhost:8080/server-restServer/arduinos
 	'/server-restServer/arduinos', function(req,res) {
 	util.log('[WEB] Query : Arduino list');
-	res.send(metier.arduinos())	;
+	res.send(metier.arduinos());
 })
 
 // LED blink query
@@ -36,12 +36,6 @@ server
 	var p = req.params;
 	util.log('[WEB] Query : LED blink [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.lenght + ' , ' + p.number + ' ]');
 	metier.blink(p.idCommand, p.idArduino, p.pin, p.lenght, p.number, function(err, data) {
-		// if (err === null) {
-		// 	res.send(data);
-		// }
-		// else {
-		// 	util.log('Error : ' + err);
-		// }
 		res.send(data);
 	});
 })

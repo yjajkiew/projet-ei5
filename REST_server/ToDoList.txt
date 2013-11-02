@@ -5,15 +5,18 @@
 1 - 'WEB' LAYER
 	[ ] -> Find a solution to get parameters from the 'POST' cmd in raw JSON
 	[X] -> arduino answer not displayed, even if error ? (used callback functions)
+	[ ] -> Callback not working for arduinos list, only return is working ??????? wtf ???
 
 
 2 - 'METIER' LAYER
 	[X] -> find why JSON object aren't correclty parsed (Error in variables name in web.js.....)
+	[X] -> find why callback function doesn't work for read / write function (error in the 'WEB' layer, call to function wasn't good)
 	[ ] -> handle exceptions
 
 
 3 - 'DAO' LAYER
 	[X] -> succesfully send a request and get correct answer from arduino (blink) (in daoClient_test.js)
+	[ ] -> get arudino IP / PORT automatically from the arduino table & arduino ID
 	[ ] -> regroup error handling in an external function 
 	[X] -> check if arduino already in list befor adding 
 	[ ] -> check perdiodicaly if listed arduinos are still connected
@@ -21,4 +24,4 @@
 	[ ] -> put server & client in other files ?
 
 4 - 'UTILITIES'
-	[ ] -> Arduino info persitency : save state in DB ?
+	[ ] -> Arduino info persitency : save states in DB ?
