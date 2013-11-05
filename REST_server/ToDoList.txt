@@ -3,7 +3,7 @@
 #############################
 
 1 - 'WEB' LAYER
-	[ ] -> Find a solution to get parameters from the 'POST' cmd in raw JSON
+	[X] -> Find a solution to get parameters from the 'POST' cmd in raw JSON (using different POST app in Chrome)
 	[X] -> arduino answer not displayed, even if error ? (used callback functions)
 	[ ] -> Callback not working for arduinos list, only return is working ??????? wtf ???
 
@@ -12,6 +12,7 @@
 	[X] -> find why JSON object aren't correclty parsed (Error in variables name in web.js.....)
 	[X] -> find why callback function doesn't work for read / write function (error in the 'WEB' layer, call to function wasn't good)
 	[ ] -> handle exceptions
+	[ ] -> check data from the 'POST' cmd
 
 
 3 - 'DAO' LAYER

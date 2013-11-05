@@ -63,11 +63,33 @@ exports.write = function(idCommand, idArduino, pin, mode, value, callback) {
 }
 
 // command (in POST)
-exports.cmd = function(idArduino, parametres, callback) {
-	// json object already ready
-	util.log('[METIER] Command : '	 + JSON.stringify(jsonObject));
-	// send to "dao" and return result to "web"
-	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-		callback(err, data);
-	});
+exports.cmd = function(idArduino, jsonObjectList, callback) {
+	// iterating trought list of comands
+	for (var index in jsonObjectList) {
+		util.log('[METIER] Command : '	 + jsonObjectList[index]);
+		switch(jsonObjectList[index].ac) {
+			case "pw" :
+				util.log('[METIER] post : pw');
+				// build JSON object
+				var jsonObject = {id:"1",ac:"pw",pa:jsonObjectList[index].pa}; //jsonObjectList[index].id
+				util.log('[METIER] Json object : ' + JSON.stringify(jsonObject));
+				// send to DAO
+				dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+					callback(err, data);
+				});
+				break;
+			case 'pr' :
+				util.log('[METIER] post : pr');
+				break;
+			case 'cl' :
+				util.log('[METIER] post : cl');
+				break
+			default :
+				util.log('[METIER] post : no action founded !')
+		}
+		// send to "dao" and return result to "web"
+		dao.send(idArduino, jsonString, function(err, data) {
+			callback(err, data);
+		});
+	}
 }

@@ -21,6 +21,7 @@ var	server = express();
 //////// URL REQUEST HANDLER
 // use body parser
 server.use(express.bodyParser());
+// server.use(express.bodyDecoder());
 
 server
 // Arduino list query
@@ -64,11 +65,12 @@ server
 // COMMAND (POST)
 .post(	// test : http://localhost:8080/server-restServer/arduinos/cmd1/192.168.2.3/
 	'/server-restServer/arduinos/:command/:idArduino', function(req, res) {
+	// parameters from URL
 	var p = req.params;
 	// parameters from POST
-    var params = JSON.stringify(req.body);
+    var params = req.body;
     // logs
-	util.log('[WEB] Query : URL=[ ' + p.command + ' , ' + p.idArduino + ' ] ; POST=' + JSON.stringify(req.body));	// direct acces of the key 'id': req.body['id']
+	util.log('[WEB] Query : URL=[ ' + p.command + ' , ' + p.idArduino + ' ] ; POST=' + JSON.stringify(params));	// direct acces of the key 'id': req.body['id']
 	metier.cmd(p.idArduino, params, function(err, data) {
 		res.send(data);
 	});
