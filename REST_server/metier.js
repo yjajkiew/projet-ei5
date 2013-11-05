@@ -71,8 +71,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 			case "pw" :
 				util.log('[METIER] post : pw');
 				// build JSON object
-				var jsonObject = {id:"1",ac:"pw",pa:jsonObjectList[index].pa}; //jsonObjectList[index].id
-				util.log('[METIER] Json object : ' + JSON.stringify(jsonObject));
+				var jsonObject = {id:jsonObjectList[index].id,ac:"pw",pa:jsonObjectList[index].pa};
 				// send to DAO
 				dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
 					callback(err, data);
@@ -80,16 +79,28 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 				break;
 			case 'pr' :
 				util.log('[METIER] post : pr');
+				// build JSON object
+				var jsonObject = {id:jsonObjectList[index].id,ac:"pr",pa:jsonObjectList[index].pa};
+				// send to DAO
+				dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+					callback(err, data);
+				});
 				break;
 			case 'cl' :
 				util.log('[METIER] post : cl');
+				// build JSON object
+				var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
+				// send to DAO
+				dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+					callback(err, data);
+				});
 				break
 			default :
 				util.log('[METIER] post : no action founded !')
 		}
 		// send to "dao" and return result to "web"
-		dao.send(idArduino, jsonString, function(err, data) {
-			callback(err, data);
-		});
+		// dao.send(idArduino, jsonString, function(err, data) {
+		// 	callback(err, data);
+		// });
 	}
 }
