@@ -28,6 +28,7 @@ server
 	'/server-restServer/arduinos', function(req,res) {
 	util.log('[WEB] Query : Arduino list');
 	res.send(metier.arduinos())	;
+	next();
 })
 
 // LED blink query
@@ -36,12 +37,6 @@ server
 	var p = req.params;
 	util.log('[WEB] Query : LED blink [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.lenght + ' , ' + p.number + ' ]');
 	metier.blink(p.idCommand, p.idArduino, p.pin, p.lenght, p.number, function(err, data) {
-		// if (err === null) {
-		// 	res.send(data);
-		// }
-		// else {
-		// 	util.log('Error : ' + err);
-		// }
 		res.send(data);
 	});
 })
@@ -82,15 +77,15 @@ server
 // ERROR : command not found
 .use(
 	function(req,res, next) {
-		if (req.url != '/favicon.ico') {	// get ride of favicon query from browser
-			// set content type
+		// set content type
 		res.setHeader('Content-Type', 'text/plain');
-		// create JSON answer
-		var jsonErrorObject = {"id":"1","er":"1000","et":{}};	// send back error code specific to REST server
-		// send serialized JSON to client
-		res.send(JSON.stringify(jsonErrorObject)); // http.statu = 200 ????
-		util.log('[WEB] Wrong url [ ' + url.parse(req.url).pathname + ' ]');
-		//next();	// go to next middleware
+		if (req.url != '/favicon.ico') {	// get ride of favicon query from browser
+			// create JSON answer
+			var jsonErrorObject = {"id":"1","er":"1000","et":{}};	// send back error code specific to REST server
+			// send serialized JSON to client
+			res.send(JSON.stringify(jsonErrorObject)); // http.statu = 200 ????
+			util.log('[WEB] Wrong url [ ' + url.parse(req.url).pathname + ' ]');
+			//next();	// go to next middleware
 		}
 	}
 );

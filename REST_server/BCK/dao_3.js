@@ -31,15 +31,15 @@ var	data = '';					// string containing received chunks
 
 // send JSON command to arduino
 exports.send = function(idArduino, jsonString, callback) {
-
+	
 	// Get Arduino info
 	// getObjectIndex(arduinos, idArduino, function(err, data) {
 	// 	arduino = data;
 	// });
-	util.log('Arduinos [0]=' + JSON.stringify(arduinos[0]));
+	util.log('Arduinos [0]=' + arduinos[0]);
 	arduinos.forEach(function(ard) {
-		util.log('ard : ' + JSON.stringify(ard));
-		util.log('ard.id : ' + ard.id);
+		util.log('ard : ' + ard);
+		util.log('ard.id : ' + JSON.stringify(ard.id));
 		util.log('idArduino : ' + idArduino);
 		if (ard.id === idArduino) {
 			util.log('founded');
@@ -91,13 +91,12 @@ var server = net.createServer(function(sock) {
 	
 	.on('end', function() { //called when eol character '\0' is received
 		data = data.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars
-		data = JSON.parse(data);	// parse JSON object
 		if(objectInTable(arduinos, data)) {
 			util.log('[DAO] Arduino already registered');
 		}
 		else {
 			arduinos.push(data);
-			util.log('[DAO] Arduino saved : ' + JSON.stringify(data));
+			util.log('[DAO] Arduino saved : ' + data);
 		}
 		data = '';
 	})

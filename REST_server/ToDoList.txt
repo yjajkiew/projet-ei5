@@ -20,6 +20,7 @@
 	[ ] -> regroup error handling in an external function 
 	[X] -> check if arduino already in list befor adding 
 	[ ] -> check perdiodicaly if listed arduinos are still connected
+	[ ] -> check data from arduino : good formating, security issue ?
 	[ ] -> check if port is correclty displayed when new arduino connect (1025 -> 102 ????)
 	[ ] -> put server & client in other files ?
 
