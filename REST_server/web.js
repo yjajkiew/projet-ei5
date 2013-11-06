@@ -10,12 +10,12 @@
 
 // Import required modules
 var express = require('express');
-var	util = require('util');
-var	url = require('url');
-// Import other layers
-var	metier = require('./metier');
+var util 	= require('util');
+var url 	= require('url');
+// Import work layer
+var metier 	= require('./metier');
 // Globals Variables 
-var	server = express();
+var server 	= express();
 
 
 //////// URL REQUEST HANDLER
@@ -68,8 +68,8 @@ server
 	// parameters from URL
 	var p = req.params;
 	// parameters from POST
-    var params = req.body;
-    // logs
+	var params = req.body;
+	// logs
 	util.log('[WEB] Query : URL=[ ' + p.command + ' , ' + p.idArduino + ' ] ; POST=' + JSON.stringify(params));	// direct acces of the key 'id': req.body['id']
 	metier.cmd(p.idArduino, params, function(err, data) {
 		res.send(data);
