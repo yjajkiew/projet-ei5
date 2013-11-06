@@ -3,11 +3,9 @@ Node.JS REST server - Arduino
 
 1 - Objectives :
 ----------------
-Code the Arduino to work as needed.
-
-Build the REST server to interface with the Arduino board with Ethernet Shield, and the client server wich provide the client-facing UI.
-
-It must implement defined interfaces for each sides : Client & Arduino.
+* Code the Arduino to work as needed.
+* Build the REST server to interface with the Arduino board with Ethernet Shield, and the client server wich provide the client-facing UI.
+* It must implement defined interfaces for each sides : Client & Arduino.
 
 
 2 - What it do :
