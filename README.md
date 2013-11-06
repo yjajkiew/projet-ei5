@@ -1,4 +1,4 @@
-Project : Node.JS REST server - Arduino
+Node.JS REST server - Arduino
 =======================================
 
 1 - Objectives :
