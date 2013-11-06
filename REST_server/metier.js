@@ -71,29 +71,35 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 			case "pw" :
 				util.log('[METIER] post : pw');
 				// build JSON object
-				var jsonObject = {id:jsonObjectList[index].id,ac:"pw",pa:jsonObjectList[index].pa};
-				// send to DAO
-				dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-					callback(err, data);
-				});
+				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.mod && jsonObjectList[index].pa.val) {
+					var jsonObject = {id:jsonObjectList[index].id,ac:"pw",pa:jsonObjectList[index].pa};
+					// send to DAO
+					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+						callback(err, data);
+					});	
+				}
 				break;
 			case 'pr' :
 				util.log('[METIER] post : pr');
-				// build JSON object
-				var jsonObject = {id:jsonObjectList[index].id,ac:"pr",pa:jsonObjectList[index].pa};
-				// send to DAO
-				dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-					callback(err, data);
-				});
+				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.mod) {
+					// build JSON object
+					var jsonObject = {id:jsonObjectList[index].id,ac:"pr",pa:jsonObjectList[index].pa};
+					// send to DAO
+					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+						callback(err, data);
+					});
+				}
 				break;
 			case 'cl' :
 				util.log('[METIER] post : cl');
-				// build JSON object
-				var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
-				// send to DAO
-				dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-					callback(err, data);
-				});
+				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.dur && jsonObjectList[index].pa.nb) {
+					// build JSON object
+					var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
+					// send to DAO
+					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+						callback(err, data);
+					});
+				}
 				break
 			default :
 				util.log('[METIER] post : no action founded !')
