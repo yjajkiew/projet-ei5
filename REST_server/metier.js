@@ -20,13 +20,15 @@ var	dao = require('./dao');
 exports.arduinos = function() {
 	var arduinos = dao.getArduinos();
 	var arduinosTable = [];
+	var jsonObject;
 	
 	arduinos.forEach(function(ard) {
 		//create json object using the expected format
 		var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,ip:ard.ip,mac:ard.mac}; 
-		arduinosTable.push(JSON.stringify(jsonArduino));	// stringify ??? -> test with client
+		arduinosTable.push(jsonArduino);	// stringify ??? -> test with client
 	});
-	return arduinos;
+	jsonObject = {data:arduinosTable};	
+	return JSON.stringify(jsonObject);
 }
 
 // LED blink

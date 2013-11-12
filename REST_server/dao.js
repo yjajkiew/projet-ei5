@@ -63,7 +63,7 @@ exports.send = function(idArduino, jsonString, callback) {
 
 
 
-//////// SERVER : listen to arduinos
+//////// SERVER : registration of the arduinos
 
 //registration server
 var server = net.createServer(function(sock) {
@@ -105,7 +105,7 @@ server.on('error', function(err) {	// NOTE : put in external handler for both cl
 			break;
 
 		case 'EADDRNOTAVAIL' :
-			util.log('[DAO] Network interface not available ! Please check network config, retrying in 10 sec...');
+			util.log('[DAO] Network interface not available ! Check network config, retrying in 10 sec...');
 			setTimeout(function () {
 			    server.listen(PORT, HOST);
 	    	},10000);
@@ -125,39 +125,39 @@ server.listen(PORT, HOST, function() {
 
 //////// METHODES
 
-//return arduinos array, containing string from arduinos' registrations
+// return arduinos array, containing string from arduinos' registrations
 exports.getArduinos = function() {
 	return arduinos;
 };
 
 // check if connexions to arduino are still alive
-// setInterval(function (err) {
-// 	if (arduinos.count > 0) {
-// 		arduinos.forEach(function(arduino) {
-// 			var answer = '';
-// 			var client = net.connect({host:arduino.id, port:arduino.port},function() {
-// 				util.log('[DAO] Checking arduino : ' + arduino.id + ':' + arduino.port);
-// 				client.write('someStupidStuff');
-// 			})
+setInterval(function (err) {
+	if (arduinos.count > 0) {
+		arduinos.forEach(function(arduino) {
+			var answer = '';
+			var client = net.connect({host:arduino.id, port:arduino.port},function() {
+				util.log('[DAO] Checking arduino : ' + arduino.id + ':' + arduino.port);
+				client.write('someStupidStuff');
+			})
 
-// 			.on('data', function(chunk) {
-// 				answer+=chunk;
-// 				client.end();
-// 			})
+			.on('data', function(chunk) {
+				answer+=chunk;
+				client.end();
+			})
 
-// 			.on('end', function() {
-// 				answer = answer.replace(/(\r\n|\n|\r)/gm,'');
-// 				util.log('[DAO] Ok, answer : ' + answer);
-// 				answer = '';
-// 			})
+			.on('end', function() {
+				answer = answer.replace(/(\r\n|\n|\r)/gm,'');
+				util.log('[DAO] Ok, answer : ' + answer);
+				answer = '';
+			})
 
-// 			.on('error', function(err) {
-// 				util.log('[DAO] Not responding, removing : ' + arduino.id);
-// 				arduinos.remove(arduino.id);
-// 			});
-// 		})
-// 	}
-// 	else {
-// 		util.log('[DAO] No arduino connected');
-// 	}
-// },10000);
+			.on('error', function(err) {
+				util.log('[DAO] Not responding, removing : ' + arduino.id);
+				arduinos.remove(arduino.id);
+			});
+		})
+	}
+	else {
+		util.log('[DAO] No arduino connected');
+	}
+},10000);
