@@ -43,11 +43,11 @@ exports.send = function(idArduino, jsonString, callback) {
 	// Receive data from Arduino
 	.on('data', function(chunk) {	// NOTE : arduino need to register itself befor beeing able to respond to query !
 		arduinoAnswer+=chunk;
-		client.end();
 	})
 
 	// 'End' event, save data
 	.on('end', function() {
+		client.end();
 		arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars
 		util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
 		callback(null, arduinoAnswer);
@@ -131,33 +131,33 @@ exports.getArduinos = function() {
 };
 
 // check if connexions to arduino are still alive
-setInterval(function (err) {
-	if (arduinos.count > 0) {
-		arduinos.forEach(function(arduino) {
-			var answer = '';
-			var client = net.connect({host:arduino.id, port:arduino.port},function() {
-				util.log('[DAO] Checking arduino : ' + arduino.id + ':' + arduino.port);
-				client.write('someStupidStuff');
-			})
+// setInterval(function (err) {
+// 	if (arduinos.count > 0) {
+// 		arduinos.forEach(function(arduino) {
+// 			var answer = '';
+// 			var client = net.connect({host:arduino.id, port:arduino.port},function() {
+// 				util.log('[DAO] Checking arduino : ' + arduino.id + ':' + arduino.port);
+// 				client.write('someStupidStuff');
+// 			})
 
-			.on('data', function(chunk) {
-				answer+=chunk;
-				client.end();
-			})
+// 			.on('data', function(chunk) {
+// 				answer+=chunk;
+// 				client.end();
+// 			})
 
-			.on('end', function() {
-				answer = answer.replace(/(\r\n|\n|\r)/gm,'');
-				util.log('[DAO] Ok, answer : ' + answer);
-				answer = '';
-			})
+// 			.on('end', function() {
+// 				answer = answer.replace(/(\r\n|\n|\r)/gm,'');
+// 				util.log('[DAO] Ok, answer : ' + answer);
+// 				answer = '';
+// 			})
 
-			.on('error', function(err) {
-				util.log('[DAO] Not responding, removing : ' + arduino.id);
-				arduinos.remove(arduino.id);
-			});
-		})
-	}
-	else {
-		util.log('[DAO] No arduino connected');
-	}
-},10000);
+// 			.on('error', function(err) {
+// 				util.log('[DAO] Not responding, removing : ' + arduino.id);
+// 				arduinos.remove(arduino.id);
+// 			});
+// 		})
+// 	}
+// 	else {
+// 		util.log('[DAO] No arduino connected');
+// 	}
+// },10000);

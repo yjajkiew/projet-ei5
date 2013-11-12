@@ -32,7 +32,7 @@ server
 })
 
 // LED blink query
-.get(	// test : http://localhost:8080/rest/arduinos/blink/1/192.168.2.3/9/100/10
+.get(	// test : http://localhost:8080/REST/arduinos/blink/1/192.168.2.3/9/100/10
 	'/rest/arduinos/blink/:idCommand/:idArduino/:pin/:lenght/:number', function(req,res) {
 	var p = req.params;
 	util.log('[WEB] Query : LED blink [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.lenght + ' , ' + p.number + ' ]');
