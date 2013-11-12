@@ -34,31 +34,38 @@ exports.send = function(idArduino, jsonString, callback) {
 	// Get Arduino info
 	arduino = arduinos.item(idArduino);
 
-	// Connect to Arduino server
-	var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
-		util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
-		client.write(jsonString);
-	})
+	// check if arduino exist
+	if (arduino != undefined) {
+		// Connect to Arduino server
+		var client = net.connect({host:arduino.ip, port:arduino.port},function() { //'connect' listener
+			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
+			client.write(jsonString);
+		})
 
-	// Receive data from Arduino
-	.on('data', function(chunk) {	// NOTE : arduino need to register itself befor beeing able to respond to query !
-		arduinoAnswer+=chunk;
-	})
+		// Receive data from Arduino
+		.on('data', function(chunk) {	// NOTE : arduino need to register itself befor beeing able to respond to query !
+			arduinoAnswer+=chunk;
+			client.end();
+		})
 
-	// 'End' event, save data
-	.on('end', function() {
-		client.end();
-		arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars
-		util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
-		callback(null, arduinoAnswer);
-		arduinoAnswer = '';
-	})
+		// 'End' event, save data
+		.on('end', function() {
+			arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars
+			util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
+			callback(null, arduinoAnswer);
+			arduinoAnswer = '';
+		})
 
-	// 
-	.on('error', function(err) {
-		util.log('[DAO] Error while connecting to Arduino server : ' + err.code);
-		callback(err.code, null);
-	});
+		// 
+		.on('error', function(err) {
+			util.log('[DAO] Error while connecting to Arduino server : ' + err.code);
+			callback(err.code, {data:{"id":"1","er":"3000","et":{}}});
+		});
+	}
+	else {
+		var jsonErrorObject = {data:{"id":"1","er":"4000","et":{}}};
+		callback(NULL, jsonErrorObject);
+	}
 }
 
 
@@ -78,11 +85,12 @@ var server = net.createServer(function(sock) {
 	.on('end', function() { //called when eol character '\0' is received
 		data = data.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars
 		data = JSON.parse(data);					// parse JSON object
+		
 		if(arduinos.add(data.id, data) === undefined) {
 			util.log('[DAO] Arduino already registered');
 		}
 		else {
-			util.log('[DAO] Arduino saved [' + data.id + ' ; ' + JSON.stringify(data) + ']');
+			util.log('[DAO] Arduino saved : ' + JSON.stringify(data));
 		}
 		data = '';
 	})

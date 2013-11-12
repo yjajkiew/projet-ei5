@@ -32,7 +32,7 @@ server
 })
 
 // LED blink query
-.get(	// test : http://localhost:8080/REST/arduinos/blink/1/192.168.2.3/9/100/10
+.get(	// test : http://localhost:8080/rest/arduinos/blink/1/192.168.2.3/9/100/10
 	'/rest/arduinos/blink/:idCommand/:idArduino/:pin/:lenght/:number', function(req,res) {
 	var p = req.params;
 	util.log('[WEB] Query : LED blink [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.lenght + ' , ' + p.number + ' ]');
@@ -82,8 +82,9 @@ server
 		res.setHeader('Content-Type', 'text/plain');
 		if (req.url != '/favicon.ico') {	// get ride of favicon query from browser
 			// create JSON answer
-			var jsonErrorObject = {"id":"1","er":"1000","et":{}};	// send back error code specific to REST server
+			var jsonErrorObject = {data:{"id":"1","er":"1000","et":{}}};	// send back error code specific to REST server
 			// send serialized JSON to client
+			// res.status(404);
 			res.send(JSON.stringify(jsonErrorObject)); // http.statu = 200 ????
 			util.log('[WEB] Wrong url [ ' + url.parse(req.url).pathname + ' ]');
 			//next();	// go to next middleware

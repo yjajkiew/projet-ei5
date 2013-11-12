@@ -2,19 +2,20 @@ exports.collection = function()
 {
 	this.count=0;
 	this.collection={};
+	this.id=0;
 
 	this.add=function(key,item)
 	{
 		if(this.collection[key]!=undefined) return undefined;
 		this.collection[key]=item;
-		return ++this.count
+		return ++this.count;
 	}
 	
 	this.remove=function(key)
 	{
 		if(this.collection[key]==undefined) return undefined;
-		delete this.collection[key]
-		return --this.count
+		delete this.collection[key];
+		return --this.count;
 	}
 	
 	this.item=function(key)

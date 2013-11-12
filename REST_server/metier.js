@@ -20,14 +20,13 @@ var	dao = require('./dao');
 exports.arduinos = function() {
 	var arduinos = dao.getArduinos();
 	var arduinosTable = [];
-	var jsonObject;
 	
 	arduinos.forEach(function(ard) {
-		//create json object using the expected format
-		var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,ip:ard.ip,mac:ard.mac}; 
-		arduinosTable.push(jsonArduino);	// stringify ??? -> test with client
+		// build the expected arduino
+		var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,ip:ard.id,mac:ard.mac};
+		arduinosTable.push(jsonArduino);
 	});
-	jsonObject = {data:arduinosTable};	
+	var jsonObject = {data:arduinosTable};	
 	return JSON.stringify(jsonObject);
 }
 
@@ -38,7 +37,13 @@ exports.blink = function(idCommand, idArduino, pin, lenght, number, callback) {
 	util.log('[METIER] Blink : ' + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
 	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-		callback(err, data);
+		data = JSON.parse(data);
+		var jsonOriginal = NULL;
+		if(!data.er) {
+			jsonOriginal = data;
+		}
+		var jsonReturn = {data:{id:data.id, erreur:data.er, etat:data.et, json:jsonOriginal}};
+		callback(err, JSON.stringify(jsonReturn));
 	});
 }
 
@@ -49,7 +54,13 @@ exports.read = function(idCommand, idArduino, pin, mode, callback) {
 	util.log('[METIER] Read : ' + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
 	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-		callback(err, data);
+		data = JSON.parse(data);
+		var jsonOriginal = NULL;
+		if(!data.er) {
+			jsonOriginal = data;
+		}
+		var jsonReturn = {data:{id:data.id, erreur:data.er, etat:data.et, json:jsonOriginal}};
+		callback(err, JSON.stringify(jsonReturn));
 	});
 }
 
@@ -60,7 +71,13 @@ exports.write = function(idCommand, idArduino, pin, mode, value, callback) {
 	util.log('[METIER] Write : ' + JSON.stringify(jsonObject));
 	// send to "dao" and return result to "web"
 	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-		callback(err, data);
+		data = JSON.parse(data);
+		var jsonOriginal = NULL;
+		if(!data.er) {
+			jsonOriginal = data;
+		}
+		var jsonReturn = {data:{id:data.id, erreur:data.er, etat:data.et, json:jsonOriginal}};
+		callback(err, JSON.stringify(jsonReturn));
 	});
 }
 
@@ -77,8 +94,14 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"pw",pa:jsonObjectList[index].pa};
 					// send to DAO
 					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-						callback(err, data);
-					});	
+						data = JSON.parse(data);
+						var jsonOriginal = NULL;
+						if(!data.er) {
+							jsonOriginal = data;
+						}
+						var jsonReturn = {data:{id:data.id, erreur:data.er, etat:data.et, json:jsonOriginal}};
+						callback(err, JSON.stringify(jsonReturn));
+					});
 				}
 				break;
 			case 'pr' :
@@ -88,7 +111,13 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"pr",pa:jsonObjectList[index].pa};
 					// send to DAO
 					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-						callback(err, data);
+						data = JSON.parse(data);
+						var jsonOriginal = NULL;
+						if(!data.er) {
+							jsonOriginal = data;
+						}
+						var jsonReturn = {data:{id:data.id, erreur:data.er, etat:data.et, json:jsonOriginal}};
+						callback(err, JSON.stringify(jsonReturn));
 					});
 				}
 				break;
@@ -99,12 +128,20 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
 					// send to DAO
 					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-						callback(err, data);
+						var jsonOriginal = NULL;
+						if(!data.er) {
+							jsonOriginal = data;
+						}
+						var jsonReturn = {data:{id:data.id, erreur:data.er, etat:data.et, json:jsonOriginal}};
+						callback(err, JSON.stringify(jsonReturn));
 					});
 				}
 				break
 			default :
-				util.log('[METIER] post : no action founded !')
+				util.log('[METIER] POST command : no action founded !');
+				// create JSON answer
+				var jsonErrorObject = {data:{"id":"1","er":"2000","et":{}}};
+				callback(NULL, jsonErrorObject);
 		}
 		// send to "dao" and return result to "web"
 		// dao.send(idArduino, jsonString, function(err, data) {
