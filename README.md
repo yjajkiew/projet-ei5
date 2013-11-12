@@ -8,20 +8,20 @@ Node.JS REST server - Arduino
 * It must implement defined interfaces for each sides : Client & Arduino.
 
 
-2 - What it do :
+2 - What it does :
 ----------------
 
-1. The server Handle request from the client, from URL or POST data ;
-2. It firstly check thoose request and build the appropriated JSON object ;
-3. It secondly send thoose JSON object trought TCP to Arduino, and wait for the answer (JSON object) ;
-4. It finally send back the answer to the client.
+1. The server handles requests from the client, from URL or POST data ;
+2. It firstly checks those requests and builds the appropriate JSON object ;
+3. It secondly sends those JSON objects trought TCP to Arduino, and waits for the answer (JSON object) ;
+4. It finally sends back the answer to the client.
 
 
 3 - How it Works :
 ------------------
 **Work in progress**
  
-We've choosen to separate the server's functionnality in 3 different 'Layers' :
+We've choosen to separate the server's functionnalities in 3 different 'Layers' :
  * 'web.js' : handle web request ;
  * 'metier.js' (formaly 'work.js') : build JSON from request ;
  * 'dao.js' : Arduino registration & communication ;
