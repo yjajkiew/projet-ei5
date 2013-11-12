@@ -132,7 +132,8 @@ void traiterCommande(EthernetClient *client, String commande){
   }
   // on mémorise l'id
   char strId[sizeof(id->valuestring)*2];
-  String(id->valuestring).toCharArray(strId, sizeof(strId));
+  String(id->valuestring).toCharArray(strId, sizeof(strId)); 
+  //char *strId = id->valuestring;
   
   // attribut action
   aJsonObject *action = aJson.getObjectItem(json, "ac");
@@ -146,8 +147,9 @@ void traiterCommande(EthernetClient *client, String commande){
   }
   // on mémorise l'action
   //String strAction = action->valuestring;
-  char strAction[sizeof(action->valuestring)*2];
-  String(action->valuestring).toCharArray(strAction, sizeof(strAction));
+  /*char strAction[sizeof(action->valuestring)*2];
+  String(action->valuestring).toCharArray(strAction, sizeof(strAction));*/
+  char *strAction = action->valuestring; 
   
   // on récupère les parametres
   aJsonObject *parametres = aJson.getObjectItem(json, "pa");
@@ -217,7 +219,7 @@ int connecte(EthernetClient *client, IPAddress serveurIP, int serveurPort) {
   
 // lecture d'une commande du serveur
 String lireCommande(EthernetClient *client){
-  String commande;;
+  String commande;
   while(client->available()) {
     char c = client->read();
     commande += c;
@@ -239,6 +241,7 @@ String reponse(String id, String erreur, String etat){
   if(etat==NULL) etat="{}";
   // construction de la réponse
   String reponse="{\"id\":\""+id+"\",\"er\":\""+erreur+"\",\"et\":"+etat+"}";
+  //String reponse = "{\"id\":\""+id+"\",\"er\":\""+erreur+"\",\"et\":\""+etat+"\"}";
   // résultat
   return reponse;
 }
