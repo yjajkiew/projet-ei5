@@ -29,7 +29,7 @@ void loop()
 {
   boolean enregistrementFait=false;
   // tant que l'arduino ne s'est pas enregistré auprès du serveur, on ne peut rien faire
-  while(! enregistrementFait){
+  while(!enregistrementFait){
     // on se connecte au serveur d'enregistrement
     Serial.println(F("Connexion au serveur d'enregistrement..."));
     if (connecte(&clientArduino,ipServeurEnregistrement,portServeurEnregistrement)) {
@@ -67,7 +67,7 @@ void loop()
     Serial.println(freeRam());
     // on attend un client
     EthernetClient client=server.available(); 
-    while(! client ){
+    while(!client ){
       delay(1);
       client=server.available();
     }
@@ -132,8 +132,15 @@ void traiterCommande(EthernetClient *client, String commande){
   }
   // on mémorise l'id
   char strId[sizeof(id->valuestring)*2];
-  String(id->valuestring).toCharArray(strId, sizeof(strId)); 
-  //char *strId = id->valuestring;
+  String(id->valuestring).toCharArray(strId, sizeof(strId));
+  /* get last digit if id is an ip => causes problems because of lack of memory
+  int index = String(id->valuestring).lastIndexOf('.');
+  String subString = String(id->valuestring).substring(index+1);
+  char strId[sizeof(subString)*2];
+  subString.toCharArray(strId, sizeof(strId));
+  Serial.print("Debug: id = ");
+  Serial.println(strId);
+  */
   
   // attribut action
   aJsonObject *action = aJson.getObjectItem(json, "ac");
@@ -146,9 +153,6 @@ void traiterCommande(EthernetClient *client, String commande){
     return;
   }
   // on mémorise l'action
-  //String strAction = action->valuestring;
-  /*char strAction[sizeof(action->valuestring)*2];
-  String(action->valuestring).toCharArray(strAction, sizeof(strAction));*/
   char *strAction = action->valuestring; 
   
   // on récupère les parametres
@@ -161,10 +165,9 @@ void traiterCommande(EthernetClient *client, String commande){
     // retour
   return;
   }
+  
   // c'est bon - on traite l'action
-  // echo
-  
-  
+  //echo
   if(strcmp("ec",strAction)==0){
     // traitement
     doEcho(client, strId);
@@ -173,6 +176,7 @@ void traiterCommande(EthernetClient *client, String commande){
     // retour
     return;
   }
+  
   // clignotement
   if(strcmp("cl",strAction)==0){
     // traitement
@@ -182,6 +186,7 @@ void traiterCommande(EthernetClient *client, String commande){
     // retour
     return;
   }
+  
   // pinWrite
   if(strcmp("pw",strAction)==0){
     // traitement
@@ -191,6 +196,7 @@ void traiterCommande(EthernetClient *client, String commande){
     // retour
     return;
   }
+  
   // pinRead
   if(strcmp("pr",strAction)==0){
     // traitement
@@ -200,6 +206,7 @@ void traiterCommande(EthernetClient *client, String commande){
     // retour
     return;
   }
+  
   // ici, l'action n'est pas reconnue
   // suppression json
   aJson.deleteItem(json);
@@ -211,11 +218,9 @@ void traiterCommande(EthernetClient *client, String commande){
   
   // connexion au serveur
 int connecte(EthernetClient *client, IPAddress serveurIP, int serveurPort) {
-  // on se connecte au serveur après 1 seconde d'attente
-  delay(1000);
+  delay(1000); // on se connecte au serveur après 1 seconde d'attente
   return client->connect(serveurIP, serveurPort);
 }
-  
   
 // lecture d'une commande du serveur
 String lireCommande(EthernetClient *client){
@@ -224,11 +229,8 @@ String lireCommande(EthernetClient *client){
     char c = client->read();
     commande += c;
   }
-  
-  // on rend la commande
-  return commande;
+  return commande; // on rend la commande
 }
-
 
 // formatage json de la réponse au client
 String reponse(String id, String erreur, String etat){
@@ -241,15 +243,13 @@ String reponse(String id, String erreur, String etat){
   if(etat==NULL) etat="{}";
   // construction de la réponse
   String reponse="{\"id\":\""+id+"\",\"er\":\""+erreur+"\",\"et\":"+etat+"}";
-  //String reponse = "{\"id\":\""+id+"\",\"er\":\""+erreur+"\",\"et\":\""+etat+"\"}";
   // résultat
   return reponse;
 }
 
 // echo
 void doEcho(EthernetClient *client, char * strId){
-  // on fait l'écho
-  sendReponse(client, reponse(strId,"0",NULL));
+  sendReponse(client, reponse(strId,"0",NULL)); // on fait l'écho
 }
 
 //clignoter
@@ -313,8 +313,7 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
   // il faut une pin
   aJsonObject *pin = aJson.getObjectItem(parametres, "pin");
   if(pin==NULL){
-    // réponse d'erreur
-    sendReponse(client, reponse(strId,"201",NULL));
+    sendReponse(client, reponse(strId,"201",NULL)); // réponse d'erreur
     return;
   }
   // numéro de la pin à écrire
@@ -326,8 +325,7 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
   // il faut une valeur
   aJsonObject *val = aJson.getObjectItem(parametres, "val");
   if(val==NULL){
-    // réponse d'erreur
-    sendReponse(client, reponse(strId,"202",NULL));
+    sendReponse(client, reponse(strId,"202",NULL)); // réponse d'erreur
     return;
   }
   // valeur à écrire
@@ -339,18 +337,15 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
   // il faut un mode d'écriture
   aJsonObject *mod = aJson.getObjectItem(parametres, "mod");
   if(mod==NULL){
-      // réponse d'erreur
-      sendReponse(client, reponse(strId,"203",NULL));
+      sendReponse(client, reponse(strId,"203",NULL)); // réponse d'erreur
       return;
   }
   
-  char mod2[sizeof(mod->valuestring)];
-  String(mod->valuestring).toCharArray(mod2, sizeof(mod2));
+  char* mod2 = mod->valuestring;
   
   // ce doit être a (analogique) ou b (binaire)
   if(strcmp(mod2,"b")!=0 && strcmp(mod2,"a")!=0){
-    // réponse d'erreur
-    sendReponse(client, reponse(strId,"204",NULL));
+    sendReponse(client, reponse(strId,"204",NULL)); // réponse d'erreur
     return;
   }
   // c'est bon pas d'erreur
@@ -367,7 +362,7 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
   else analogWrite(pin2, val2);
 }
     
-    //pinRead
+//pinRead
 void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
   // exploitation des parametres
   // il faut une pin
@@ -386,12 +381,10 @@ void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
   // il faut un mode d'écriture
   aJsonObject *mod = aJson.getObjectItem(parametres, "mod");
   if(mod==NULL){
-    // réponse d'erreur
-    sendReponse(client, reponse(strId,"303",NULL));
+    sendReponse(client, reponse(strId,"303",NULL)); // réponse d'erreur
     return;
   }
-  char mod2[sizeof(mod->valuestring)];
-  String(mod->valuestring).toCharArray(mod2, sizeof(mod2));
+  char* mod2 = mod->valuestring;
   
   // ce doit être a (analogique) ou b (binaire)
   if(strcmp(mod2,"a")!=0 && strcmp(mod2,"b")!=0){
@@ -421,7 +414,6 @@ void sendReponse(EthernetClient *client, String message){
   Serial.print(F("reponse="));
   Serial.println(message);
 }
-
 
 // mémoire libre
 int freeRam ()
