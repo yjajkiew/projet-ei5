@@ -28,7 +28,12 @@ server
 	.get(	// test : http://localhost:8080/rest/arduinos
 		'/rest/arduinos', function(req,res) {
 		util.log('[WEB] Query : Arduino list');
-		res.send(metier.arduinos());
+		metier.arduinos(function(arduinos) {
+			res.send(arduinos);
+		});
+		metier.arduinos(function(arduinos) {
+			res.send(arduinos);
+		});
 	})
 
 	// LED blink query
@@ -69,6 +74,7 @@ server
 
 	// COMMAND (POST)
 	.post(	// test : http://localhost:8080/rest/arduinos/cmd1/192.168.2.3/
+			// json in post (pr + pw + cl) : [{"id":"1","pa":{"val":"0","pin":"8","mod":"b"},"ac":"pw"}, {"id":"2","pa":{"pin":"8","mod":"a"},"ac":"pr"}, {"id":"3","ac":"cl","pa":{"pin":"8","dur":"100","nb":"10"}}]
 		'/rest/arduinos/:command/:idArduino', function(req, res) {
 		// parameters from URL
 		var p = req.params;

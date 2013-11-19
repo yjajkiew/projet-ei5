@@ -17,18 +17,23 @@ var	dao = require('./dao');
 
 
 // get arduino list
-exports.arduinos = function() {
-	var arduinos = dao.getArduinos();
+exports.arduinos = function(callback) {
 	var arduinosTable = [];
 	var jsonObject;
-	
-	arduinos.forEach(function(ard) {
-		//create json object using the expected format
-		var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,ip:ard.id,mac:ard.mac}; 
-		arduinosTable.push(jsonArduino);
+
+	// get arduino from [DAO]
+	dao.getArduinos(function(arduinosCollection) {
+		// build the table
+		arduinosCollection.forEach(function(ard) {
+			//create json object using the expected format
+			var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,ip:ard.id,mac:ard.mac}; 
+			arduinosTable.push(jsonArduino);
+		});
 	});
-	jsonObject = {data:arduinosTable};	
-	return JSON.stringify(jsonObject);
+	// bulid JSON object
+	jsonObject = {data:arduinosTable};
+	// send it back
+	callback(JSON.stringify(jsonObject));
 }
 
 // LED blink
@@ -119,7 +124,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 }
 
 
-// send callback (communication with DAO : single call)
+// send callback (communication with DAO : single function)
 function sendToDao(idArduino, jsonObject, callback) {
 	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
 

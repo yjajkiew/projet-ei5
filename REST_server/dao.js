@@ -39,6 +39,10 @@ exports.send = function(idArduino, jsonString, callback) {
 
 		// Connect to Arduino server
 		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
+			// set the socket timeout
+			// setTimeout(5000, function() {
+			// 	client.end();
+			// });
 			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
 			client.write(jsonString);
 		})
@@ -51,22 +55,26 @@ exports.send = function(idArduino, jsonString, callback) {
 
 		// 'End' event, save data
 		.on('end', function() {
-			arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars
-			util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
+			arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
 			callback(null, arduinoAnswer);
+			util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
 			arduinoAnswer = '';
 		})
 
-		// 
+		// error handling
 		.on('error', function(err) {
-			// deleting arduino on error
-			util.log('[DAO] Error while connecting to Arduino server : ' + err.code);
-			util.log('[DAO] Arduino not responding, removing : ' + arduino.id);
-
-			// send back error message
+			// send back error message & deleting arduino
 			var errorMessage = 'Error while sending json to Arduino : ' + err.code;
 			callback(errorMessage, null);
-			arduinos.remove(arduino.id);
+
+			// logging
+			util.log(errorMessage);
+			if (arduinos.remove(arduino.id) === undefined) {
+				util.log('[DAO] arduino : ' + arduino.id +  ' already removed from collection ');
+			}
+			else {
+				util.log('[DAO] Arduino not responding, removing from collection: ' + arduino.id);
+			}
 		});
 	}
 	else {
@@ -78,9 +86,8 @@ exports.send = function(idArduino, jsonString, callback) {
 
 
 
-//////// SERVER : registration of the arduinos
+//////// SERVER : arduinos registration
 
-//registration server
 var server = net.createServer(function(sock) {
 
 	// We have a connection - a socket object is assigned to the connection automatically
@@ -91,7 +98,7 @@ var server = net.createServer(function(sock) {
 	})
 	
 	.on('end', function() { //called when eol character '\0' is received
-		data = data.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars
+		data = data.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
 		data = JSON.parse(data);					// parse JSON object
 		
 		if(arduinos.add(data.id, data) === undefined) {
@@ -142,38 +149,14 @@ server.listen(PORT, HOST, function() {
 //////// METHODES
 
 // return arduinos array, containing string from arduinos' registrations
-exports.getArduinos = function() {
-	return arduinos;
+exports.getArduinos = function(callback) {
+	// var errorMessage = null;
+	// // if collection is empty
+	// if (!arduinosCollection.count > 0) {
+	// 	errorMessage = 'no arduinos in the collection';
+	// }
+	// // return to [metier]
+
+	// return the colleciton to [METIER]
+	callback(arduinos);
 };
-
-// check if connexions to arduino are still alive
-// setInterval(function (err) {
-// 	if (arduinos.count > 0) {
-// 		arduinos.forEach(function(arduino) {
-// 			var answer = '';
-// 			var client = net.connect({host:arduino.id, port:arduino.port},function() {
-// 				util.log('[DAO] Checking arduino : ' + arduino.id + ':' + arduino.port);
-// 				client.write('someStupidStuff');
-// 			})
-
-// 			.on('data', function(chunk) {
-// 				answer+=chunk;
-// 				client.end();
-// 			})
-
-// 			.on('end', function() {
-// 				answer = answer.replace(/(\r\n|\n|\r)/gm,'');
-// 				util.log('[DAO] Ok, answer : ' + answer);
-// 				answer = '';
-// 			})
-
-// 			.on('error', function(err) {
-// 				util.log('[DAO] Not responding, removing : ' + arduino.id);
-// 				arduinos.remove(arduino.id);
-// 			});
-// 		})
-// 	}
-// 	else {
-// 		util.log('[DAO] No arduino connected');
-// 	}
-// },10000);
