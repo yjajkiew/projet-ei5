@@ -64,8 +64,9 @@ exports.send = function(idArduino, jsonString, callback) {
 		// error handling
 		.on('error', function(err) {
 			// send back error message & deleting arduino
-			var errorMessage = 'Error while sending json to Arduino : ' + err.code;
+			var errorMessage = '[DAO] Error while sending json to Arduino : ' + err.code;
 			callback(errorMessage, null);
+			util.log(errorMessage);
 
 			// logging
 			util.log(errorMessage);
@@ -79,8 +80,9 @@ exports.send = function(idArduino, jsonString, callback) {
 	}
 	else {
 		// arduino not in the collection, send back error message
-		var errorMessage = 'Arduino not connected / not in the collection, try to reset)';
+		var errorMessage = '[DAO] Arduino not connected / not in the collection, try to re-connect / reset)';
 		callback(errorMessage, null);
+		util.log(errorMessage);
 	}
 }
 

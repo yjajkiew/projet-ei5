@@ -76,10 +76,9 @@ exports.write = function(idCommand, idArduino, pin, mode, value, callback) {
 exports.cmd = function(idArduino, jsonObjectList, callback) {
 	// iterating trought list of comands
 	for (var index in jsonObjectList) {
-		util.log('[METIER] Command : '	 + jsonObjectList[index]);
 		switch(jsonObjectList[index].ac) {
 			case "pw" :
-				util.log('[METIER] post : pw');
+				util.log('[METIER] command : pw');
 				// build JSON object
 				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.mod && jsonObjectList[index].pa.val) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"pw",pa:jsonObjectList[index].pa};
@@ -92,7 +91,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 				break;
 
 			case 'pr' :
-				util.log('[METIER] post : pr');
+				util.log('[METIER] command : pr');
 				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.mod) {
 					// build JSON object
 					var jsonObject = {id:jsonObjectList[index].id,ac:"pr",pa:jsonObjectList[index].pa};
@@ -105,7 +104,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 				break;
 
 			case 'cl' :
-				util.log('[METIER] post : cl');
+				util.log('[METIER] command : cl');
 				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.dur && jsonObjectList[index].pa.nb) {
 					// build JSON object
 					var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
