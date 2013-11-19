@@ -13,6 +13,7 @@
 	[X] -> find why callback function doesn't work for read / write function (error in the 'WEB' layer, call to function wasn't good)
 	[ ] -> handle exceptions
 	[ ] -> check data from the 'POST' cmd
+	[ ] -> change JSON return trame
 
 
 3 - 'DAO' LAYER

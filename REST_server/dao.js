@@ -36,8 +36,9 @@ exports.send = function(idArduino, jsonString, callback) {
 
 	// check if arduino exist
 	if (arduino != undefined) {
+
 		// Connect to Arduino server
-		var client = net.connect({host:arduino.ip, port:arduino.port},function() { //'connect' listener
+		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
 			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
 			client.write(jsonString);
 		})
@@ -58,13 +59,20 @@ exports.send = function(idArduino, jsonString, callback) {
 
 		// 
 		.on('error', function(err) {
+			// deleting arduino on error
 			util.log('[DAO] Error while connecting to Arduino server : ' + err.code);
-			callback(err.code, {data:{"id":"1","er":"3000","et":{}}});
+			util.log('[DAO] Arduino not responding, removing : ' + arduino.id);
+
+			// send back error message
+			var errorMessage = 'Error while sending json to Arduino : ' + err.code;
+			callback(errorMessage, null);
+			arduinos.remove(arduino.id);
 		});
 	}
 	else {
-		var jsonErrorObject = {data:{"id":"1","er":"4000","et":{}}};
-		callback(NULL, jsonErrorObject);
+		// arduino not in the collection, send back error message
+		var errorMessage = 'Arduino not connected / not in the collection, try to reset)';
+		callback(errorMessage, null);
 	}
 }
 
@@ -113,7 +121,7 @@ server.on('error', function(err) {	// NOTE : put in external handler for both cl
 			break;
 
 		case 'EADDRNOTAVAIL' :
-			util.log('[DAO] Network interface not available ! Check network config, retrying in 10 sec...');
+			util.log('[DAO] Arduino not connected ! Check network config, retrying in 10 sec...');
 			setTimeout(function () {
 			    server.listen(PORT, HOST);
 	    	},10000);

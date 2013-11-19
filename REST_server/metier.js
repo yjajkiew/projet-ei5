@@ -36,18 +36,10 @@ exports.blink = function(idCommand, idArduino, pin, lenght, number, callback) {
 	// build json object
 	var jsonObject = {id:idCommand,ac:"cl",pa:{pin:pin,dur:lenght,nb:number}};
 	util.log('[METIER] Blink : ' + JSON.stringify(jsonObject));
+
 	// send to "dao" and return result to "web"
-	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-		data = JSON.parse(data);
-		var originalJson;
-		var returnJson;
-		
-		if(!data.er) originalJson = data;
-		else originalJson = null;
-		
-		returnJson = {data:{id:data.id, erreur:data.er, etat:data.et, json:originalJson}};
-		
-		callback(err, JSON.stringify(returnJson));
+	sendToDao(idArduino, jsonObject, function(err, data) {
+		callback(err, data);
 	});
 }
 
@@ -56,18 +48,10 @@ exports.read = function(idCommand, idArduino, pin, mode, callback) {
 	// build json object
 	var jsonObject = {id:idCommand,ac:"pr",pa:{pin:pin,mod:mode}};
 	util.log('[METIER] Read : ' + JSON.stringify(jsonObject));
+
 	// send to "dao" and return result to "web"
-	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-		data = JSON.parse(data);
-		var originalJson;
-		var returnJson;
-		
-		if(!data.er) originalJson = data;
-		else originalJson = null;
-		
-		returnJson = {data:{id:data.id, erreur:data.er, etat:data.et, json:originalJson}};
-		
-		callback(err, JSON.stringify(returnJson));
+	sendToDao(idArduino, jsonObject, function(err, data) {
+		callback(err, data);
 	});
 }
 
@@ -76,18 +60,10 @@ exports.write = function(idCommand, idArduino, pin, mode, value, callback) {
 	// build json object
 	var jsonObject = {id:idCommand,ac:"pw",pa:{pin:pin,mod:mode,val:value}};
 	util.log('[METIER] Write : ' + JSON.stringify(jsonObject));
+	
 	// send to "dao" and return result to "web"
-	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-		data = JSON.parse(data);
-		var originalJson;
-		var returnJson;
-		
-		if(!data.er) originalJson = data;
-		else originalJson = null;
-		
-		returnJson = {data:{id:data.id, erreur:data.er, etat:data.et, json:originalJson}};
-		
-		callback(err, JSON.stringify(returnJson));
+	sendToDao(idArduino, jsonObject, function(err, data) {
+		callback(err, data);
 	});
 }
 
@@ -102,67 +78,58 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 				// build JSON object
 				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.mod && jsonObjectList[index].pa.val) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"pw",pa:jsonObjectList[index].pa};
-					// send to DAO
-					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-						data = JSON.parse(data);
-						var originalJson;
-						var returnJson;
-		
-						if(!data.er) originalJson = data;
-						else originalJson = null;
-		
-						returnJson = {data:{id:data.id, erreur:data.er, etat:data.et, json:originalJson}};
-		
-						callback(err, JSON.stringify(returnJson));
-					});	
+					
+					// send to "dao" and return result to "web"
+					sendToDao(idArduino, jsonObject, function(err, data) {
+						callback(err, data);
+					});
 				}
 				break;
+
 			case 'pr' :
 				util.log('[METIER] post : pr');
 				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.mod) {
 					// build JSON object
 					var jsonObject = {id:jsonObjectList[index].id,ac:"pr",pa:jsonObjectList[index].pa};
-					// send to DAO
-					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-						data = JSON.parse(data);
-						var originalJson;
-						var returnJson;
-		
-						if(!data.er) originalJson = data;
-						else originalJson = null;
-		
-						returnJson = {data:{id:data.id, erreur:data.er, etat:data.et, json:originalJson}};
-		
-						callback(err, JSON.stringify(returnJson));
+					
+					// send to "dao" and return result to "web"
+					sendToDao(idArduino, jsonObject, function(err, data) {
+						callback(err, data);
 					});
 				}
 				break;
+
 			case 'cl' :
 				util.log('[METIER] post : cl');
 				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.dur && jsonObjectList[index].pa.nb) {
 					// build JSON object
 					var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
-					// send to DAO
-					dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-						data = JSON.parse(data);
-						var originalJson;
-						var returnJson;
-		
-						if(!data.er) originalJson = data;
-						else originalJson = null;
-		
-						returnJson = {data:{id:data.id, erreur:data.er, etat:data.et, json:originalJson}};
-		
-						callback(err, JSON.stringify(returnJson));
+					
+					// send to "dao" and return result to "web"
+					sendToDao(idArduino, jsonObject, function(err, data) {
+						callback(err, data);
 					});
 				}
 				break
+
 			default :
 				util.log('[METIER] post : no action founded !')
 		}
-		// send to "dao" and return result to "web"
-		// dao.send(idArduino, jsonString, function(err, data) {
-		// 	callback(err, data);
-		// });
 	}
+}
+
+
+// send callback (communication with DAO : single call)
+function sendToDao(idArduino, jsonObject, callback) {
+	dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+
+		// if data exist, build the answer
+		if (data != null) {
+			data = JSON.parse(data);
+			data = JSON.stringify({data:{id:data.id, erreur:data.er, etat:data.et, json:data}});
+		}
+
+		// send back err & data
+		callback(err, data);
+	});
 }

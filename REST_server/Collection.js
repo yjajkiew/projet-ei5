@@ -2,7 +2,6 @@ exports.collection = function()
 {
 	this.count=0;
 	this.collection={};
-	this.id=0;
 
 	this.add=function(key,item)
 	{
@@ -20,6 +19,7 @@ exports.collection = function()
 	
 	this.item=function(key)
 	{
+		if(this.collection[key]==undefined) return undefined;
 		return this.collection[key];
 	}
  
