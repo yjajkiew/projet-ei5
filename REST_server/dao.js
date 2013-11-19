@@ -39,10 +39,6 @@ exports.send = function(idArduino, jsonString, callback) {
 
 		// Connect to Arduino server
 		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
-			// set the socket timeout
-			// setTimeout(5000, function() {
-			// 	client.end();
-			// });
 			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
 			client.write(jsonString);
 		})
@@ -101,13 +97,16 @@ var server = net.createServer(function(sock) {
 	
 	.on('end', function() { //called when eol character '\0' is received
 		data = data.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
-		data = JSON.parse(data);					// parse JSON object
-		
-		if(arduinos.add(data.id, data) === undefined) {
-			util.log('[DAO] Arduino already registered');
-		}
-		else {
-			util.log('[DAO] Arduino saved : ' + JSON.stringify(data));
+		try {
+			data = JSON.parse(data);	// parse JSON object
+			if(arduinos.add(data.id, data) === undefined) {
+				util.log('[DAO] Arduino already registered');
+			}
+			else {
+				util.log('[DAO] Arduino saved : ' + JSON.stringify(data));
+			}
+		}catch(err) {
+			util.log('[DAO] Error while parsing arduino JSON registration data : ' + err.message)
 		}
 		data = '';
 	})
@@ -119,7 +118,7 @@ var server = net.createServer(function(sock) {
 });
 
 // handle server error
-server.on('error', function(err) {	// NOTE : put in external handler for both client AND server !!!!
+server.on('error', function(err) {
 	switch (err.code) {
 		case 'EADDRINUSE' :
 			util.log('[DAO] Network address already in use, retrying in 10 sec...');

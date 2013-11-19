@@ -129,8 +129,20 @@ function sendToDao(idArduino, jsonObject, callback) {
 
 		// if data exist, build the answer
 		if (data != null) {
-			data = JSON.parse(data);
-			data = JSON.stringify({data:{id:data.id, erreur:data.er, etat:data.et, json:data}});
+			try {
+				data = JSON.parse(data);
+				if (data.er == '0') {
+					data = JSON.stringify({data:{id:data.id, erreur:data.er, etat:data.et, json:null}});
+				}
+				else {
+					data = JSON.stringify({data:{id:data.id, erreur:data.er, etat:data.et, json:data}});
+				}
+			} catch(err) {
+				var errorMessage = err + '[METIER] Error while parsing data from arduino : ' + err.message;
+				util.log(errorMessage);
+				err = JSON.stringify({data:{message:errorMessage}});
+				data = null;
+			}
 		}
 
 		// send back err & data
