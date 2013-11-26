@@ -131,4 +131,9 @@ function checkError(err, data, callback) {
 }
 
 //////// LAUNCH SERVER (PORT 8080)
-server.listen(8080);
+try {
+	server.listen(8080);
+} catch(err) {
+	util.log('[WEB] Error while ');
+}
+
