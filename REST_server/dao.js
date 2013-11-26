@@ -59,12 +59,11 @@ exports.send = function(idArduino, jsonString, callback) {
 
 		// error handling
 		.on('error', function(err) {
-			// send back error message & deleting arduino
+			// send back error message & log
 			var errorMessage = '[DAO] Error while sending json to Arduino : ' + err.code;
 			callback(errorMessage, null);
-			util.log(errorMessage);
 
-			// logging
+			// delete arduino
 			util.log(errorMessage);
 			if (arduinos.remove(arduino.id) === undefined) {
 				util.log('[DAO] arduino : ' + arduino.id +  ' already removed from collection ');
@@ -129,7 +128,7 @@ server.on('error', function(err) {
 			break;
 
 		case 'EADDRNOTAVAIL' :
-			util.log('[DAO] Arduino not connected ! Check network config, retrying in 10 sec...');
+			util.log('[DAO] Network unreachable ! Check network config, retrying in 10 sec...');
 			setTimeout(function () {
 			    server.listen(PORT, HOST);
 	    	},10000);
@@ -151,13 +150,56 @@ server.listen(PORT, HOST, function() {
 
 // return arduinos array, containing string from arduinos' registrations
 exports.getArduinos = function(callback) {
-	// var errorMessage = null;
-	// // if collection is empty
-	// if (!arduinosCollection.count > 0) {
-	// 	errorMessage = 'no arduinos in the collection';
-	// }
-	// // return to [metier]
-
-	// return the colleciton to [METIER]
 	callback(arduinos);
 };
+
+
+// Send heartbeat to connected arduino (in collection)
+var timer = setInterval(function() {
+	// if aruduino collection is empty
+	if (arduinos.count === 0) {
+		util.log('[DAO-HearBeat] No arduino in Collection');
+	}
+	else {
+		// process trought arduinos
+		arduinos.forEach(function(arduino) {
+
+			// Connect to Arduino server
+			var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
+				// build json object
+				var jsonObject = {id:"1",ac:"ec",pa:{}};
+				var jsonString = JSON.stringify(jsonObject);
+				util.log('[DAO-HearBeat] Sending ECHO to Arduino @ ' + arduino.id + ":" + arduino.port);
+				client.write(jsonString);
+			})
+
+			// Receive data from Arduino
+			.on('data', function(chunk) {	// NOTE : arduino need to register itself befor beeing able to respond to query !
+				arduinoAnswer+=chunk;
+				client.end();
+			})
+
+			// 'End' event, just log
+			.on('end', function() {
+				arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
+				util.log('[DAO-HearBeat] ECHO OK');
+				arduinoAnswer = '';
+			})
+
+			// 'error' event, remove arduino
+			.on('error', function(err) {
+				// log message
+				var errorMessage = '[DAO-HearBeat] Error while ECHO to Arduino : ' + err.code;
+				util.log(errorMessage);
+
+				// delete arduino
+				if (arduinos.remove(arduino.id) === undefined) {
+					util.log('[DAO-HearBeat] arduino : ' + arduino.id +  ' already removed from collection ');
+				}
+				else {
+					util.log('[DAO-HearBeat] Arduino not responding, removing from collection: ' + arduino.id);
+				}
+			});
+		});
+	}
+}, 2000);
