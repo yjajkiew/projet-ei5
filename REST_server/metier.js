@@ -84,7 +84,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"pw",pa:jsonObjectList[index].pa};
 					
 					// send to "dao" and return result to "web"
-					sendToDao(idArduino, jsonObject, function(err, data) {
+					sendCmdToDao(idArduino, jsonObject, function(err, data) {
 						callback(err, data);
 					});
 				}
@@ -97,7 +97,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"pr",pa:jsonObjectList[index].pa};
 					
 					// send to "dao" and return result to "web"
-					sendToDao(idArduino, jsonObject, function(err, data) {
+					sendCmdToDao(idArduino, jsonObject, function(err, data) {
 						callback(err, data);
 					});
 				}
@@ -110,7 +110,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
 					
 					// send to "dao" and return result to "web"
-					sendToDao(idArduino, jsonObject, 0, function(err, data) {
+					sendCmdToDao(idArduino, jsonObject, 0, function(err, data) {
 						callback(err, data);
 					});
 				}
@@ -148,4 +148,30 @@ function sendToDao(idArduino, jsonObject, callback) {
 		// send back err & data
 		callback(err, data);
 	});
+}
+
+function sendCmdToDao(idArduino, jsonObject, callback) {
+        dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+
+        // if data exist, build the answer
+        if (data != null) {
+                try {
+                        data = JSON.parse(data);
+                        if (data.er == '0') {
+                                data = JSON.stringify({data:[{id:data.id, erreur:data.er, etat:data.et, json:null}]});
+                        }
+                        else {
+                                data = JSON.stringify({data:[{id:data.id, erreur:data.er, etat:data.et, json:data}]});
+                        }
+                } catch(err) {
+                        var errorMessage = err + '[METIER] Error while parsing data from arduino : ' + err.message;
+                        util.log(errorMessage);
+                        err = JSON.stringify({data:{message:errorMessage}});
+                        data = null;
+                }
+        }
+
+        // send back err & data
+        callback(err, data);
+        });
 }
