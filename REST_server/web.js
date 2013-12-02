@@ -16,13 +16,13 @@ var url 	= require('url');
 var metier 	= require('./metier');
 // Globals Variables 
 var server 	= express();
+var myArgs 	= process.argv.slice(2);	// get ride of the first two argument (1:node ; 2:path)
 var PORT 	= 8080;
 
 
 //////// URL REQUEST HANDLER
 // use body parser
 server.use(express.bodyParser());
-// server.use(express.bodyDecoder());
 
 server
 // Arduino list query
@@ -94,7 +94,7 @@ server
 	.use(
 		function(req,res) {
 			// set content type
-			res.setHeader('Content-Type', 'text/plain');
+			//res.setHeader('Content-Type', 'text/plain');
 			if (req.url != '/favicon.ico') {	// get ride of favicon query from browser
 				// build error message
 				var errorMessage = 'Wrong URL request : ' + url.parse(req.url).pathname;
@@ -113,8 +113,8 @@ server
 	})
 
 	// On errors
-	.on('error', function() {
-		util.log ('[WEB] Error while launching REST server : ' + error.code);
+	.on('error', function(err) {
+		util.log ('[WEB] Error on connection : ' + err.code);
 	});
 
 
@@ -133,8 +133,11 @@ function checkError(err, data, callback) {
 
 //////// LAUNCH SERVER (PORT 8080)
 try {
+	// launch server
 	server.listen(PORT);
+	// log
+	util.log('[WEB] Server launched on port ' + PORT);
 } catch(err) {
-	util.log('[WEB] Error while ');
+	util.log('[WEB] Error while lanching server : ');
 }
 
