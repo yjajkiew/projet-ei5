@@ -16,6 +16,7 @@ var url 	= require('url');
 var metier 	= require('./metier');
 // Globals Variables 
 var server 	= express();
+var PORT 	= 8080;
 
 
 //////// URL REQUEST HANDLER
@@ -132,7 +133,7 @@ function checkError(err, data, callback) {
 
 //////// LAUNCH SERVER (PORT 8080)
 try {
-	server.listen(8080);
+	server.listen(PORT);
 } catch(err) {
 	util.log('[WEB] Error while ');
 }

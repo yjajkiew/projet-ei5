@@ -158,7 +158,7 @@ exports.getArduinos = function(callback) {
 var timer = setInterval(function() {
 	// if aruduino collection is empty
 	if (arduinos.count === 0) {
-		util.log('[DAO-HearBeat] No arduino in Collection');
+		util.log('[DAO-HearBeat] No arduino connected');
 	}
 	else {
 		// process trought arduinos
@@ -202,4 +202,4 @@ var timer = setInterval(function() {
 			});
 		});
 	}
-}, 2000);
+}, 10000);

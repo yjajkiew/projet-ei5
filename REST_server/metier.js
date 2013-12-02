@@ -110,7 +110,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
 					
 					// send to "dao" and return result to "web"
-					sendToDao(idArduino, jsonObject, function(err, data) {
+					sendToDao(idArduino, jsonObject, 0, function(err, data) {
 						callback(err, data);
 					});
 				}
