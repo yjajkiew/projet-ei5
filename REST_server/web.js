@@ -15,7 +15,7 @@ var url 	= require('url');
 // Import work layer
 var metier 	= require('./metier');
 // Globals Variables 
-var server 	= express();
+var server 	= new express();
 //var myArgs 	= process.argv.slice(2);	// get ride of the first two argument (1:node ; 2:path)
 var PORT 	= process.argv[2] || 8080;
 
@@ -32,13 +32,10 @@ server
 		metier.arduinos(function(arduinos) {
 			res.send(arduinos);
 		});
-		metier.arduinos(function(arduinos) {
-			res.send(arduinos);
-		});
 	})
 
 	// LED blink query
-	.get(	// test : http://localhost:8080/rest/arduinos/blink/192.168.2.3/192.168.2.3/9/100/10
+	.get(	// test : http://localhost:8080/rest/arduinos/blink/192.168.2.3/192.168.2.3/8/100/10
 		'/rest/arduinos/blink/:idCommand/:idArduino/:pin/:lenght/:number', function(req,res) {
 		var p = req.params;
 		util.log('[WEB] Query : LED blink [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.lenght + ' , ' + p.number + ' ]');
@@ -50,7 +47,7 @@ server
 	})
 
 	// READ command
-	.get(	// test : http://localhost:8080/rest/arduinos/pinRead/192.168.2.3/192.168.2.3/9/a
+	.get(	// test : http://localhost:8080/rest/arduinos/pinRead/192.168.2.3/192.168.2.3/8/b
 		'/rest/arduinos/pinRead/:idCommand/:idArduino/:pin/:mode', function(req,res) {
 		var p = req.params;
 		util.log('[WEB] Query : Command [ ' + 'read' + ' , ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.mode + ' ]');
@@ -62,7 +59,7 @@ server
 	})
 
 	// WRITE command
-	.get(	// test : http://localhost:8080/rest/arduinos/pinWrite/192.168.2.3/192.168.2.3/9/a/1
+	.get(	// test : http://localhost:8080/rest/arduinos/pinWrite/192.168.2.3/192.168.2.3/8/b/1
 		'/rest/arduinos/pinWrite/:idCommand/:idArduino/:pin/:mode/:val', function(req,res) {
 		var p = req.params;
 		util.log('[WEB] Query : Command [ ' + 'write' + ' , ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.mode + ' , ' + p.val + ' ]');

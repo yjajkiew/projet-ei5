@@ -138,7 +138,7 @@ function sendToDao(idArduino, jsonObject, callback) {
 					data = JSON.stringify({data:{id:data.id, erreur:data.er, etat:data.et, json:data}});
 				}
 			} catch(err) {
-				var errorMessage = err + '[METIER] Error while parsing data from arduino : ' + err.message;
+				var errorMessage = err + '[METIER] Error while parsing JSON from arduino : ' + err.message;
 				util.log(errorMessage);
 				err = JSON.stringify({data:{message:errorMessage}});
 				data = null;

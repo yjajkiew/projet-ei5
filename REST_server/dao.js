@@ -88,7 +88,7 @@ exports.send = function(idArduino, jsonString, callback) {
 var server = net.createServer(function(sock) {
 
 	// We have a connection - a socket object is assigned to the connection automatically
-	util.log('[DAO] New Arduino : ' + sock.remoteAddress +':'+ sock.remotePort);
+	//util.log('[DAO] New Arduino : ' + sock.remoteAddress +':'+ sock.remotePort);
     
 	sock.on('data', function(chunk) { //called every time data is received
     	data += chunk;  //add data chunk to data
@@ -105,7 +105,7 @@ var server = net.createServer(function(sock) {
 				util.log('[DAO] Arduino saved : ' + JSON.stringify(data));
 			}
 		}catch(err) {
-			util.log('[DAO] Error while parsing arduino JSON registration data : ' + err.message)
+			util.log('[DAO] Error while parsing arduino JSON registration : ' + err.message)
 		}
 		data = '';
 	})
@@ -205,4 +205,4 @@ var timer = setInterval(function() {
 			});
 		});
 	}
-}, 10000);
+}, 30000);
