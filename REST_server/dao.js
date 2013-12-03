@@ -112,7 +112,7 @@ var server = net.createServer(function(sock) {
     
 	// Add a 'close' event handler to this instance of socket
 	.on('close', function(data) {
-		util.log('[DAO] Connection closed');
+		//	util.log('[DAO] Connection closed');
 	});
 });
 
@@ -163,13 +163,14 @@ var timer = setInterval(function() {
 	else {
 		// process trought arduinos
 		arduinos.forEach(function(arduino) {
+			var heartbeatText = '';
 
 			// Connect to Arduino server
 			var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
 				// build json object
 				var jsonObject = {id:"1",ac:"ec",pa:{}};
 				var jsonString = JSON.stringify(jsonObject);
-				util.log('[DAO-HearBeat] Sending ECHO to Arduino @ ' + arduino.id + ":" + arduino.port);
+				heartbeatText += '[DAO-HearBeat] Sending ECHO to Arduino @ ' + arduino.id + ":" + arduino.port;
 				client.write(jsonString);
 			})
 
@@ -182,8 +183,10 @@ var timer = setInterval(function() {
 			// 'End' event, just log
 			.on('end', function() {
 				arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
-				util.log('[DAO-HearBeat] ECHO OK');
+				heartbeatText += ' => OK !';
 				arduinoAnswer = '';
+				//log 
+				util.log(heartbeatText);
 			})
 
 			// 'error' event, remove arduino

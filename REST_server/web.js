@@ -16,8 +16,8 @@ var url 	= require('url');
 var metier 	= require('./metier');
 // Globals Variables 
 var server 	= express();
-var myArgs 	= process.argv.slice(2);	// get ride of the first two argument (1:node ; 2:path)
-var PORT 	= 8080;
+//var myArgs 	= process.argv.slice(2);	// get ride of the first two argument (1:node ; 2:path)
+var PORT 	= process.argv[2] || 8080;
 
 
 //////// URL REQUEST HANDLER
@@ -132,12 +132,8 @@ function checkError(err, data, callback) {
 }
 
 //////// LAUNCH SERVER (PORT 8080)
-try {
-	// launch server
-	server.listen(PORT);
+server.listen(PORT, function() {
 	// log
 	util.log('[WEB] Server launched on port ' + PORT);
-} catch(err) {
-	util.log('[WEB] Error while lanching server : ');
-}
+});
 
