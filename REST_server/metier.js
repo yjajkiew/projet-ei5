@@ -77,6 +77,9 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 	// iterating trought list of comands
 	for (var index in jsonObjectList) {
 		switch(jsonObjectList[index].ac) {
+			//
+			// REMARK : use "typeof var == number/string/boolean/undefined" to check var type
+			//
 			case "pw" :
 				util.log('[METIER] command : pw');
 				// build JSON object
@@ -87,6 +90,10 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					sendCmdToDao(idArduino, jsonObject, function(err, data) {
 						callback(err, data);
 					});
+				}
+				else {
+					var errMessage = 'Invalide Pin Write POST command !';
+					callback(errMessage,null);
 				}
 				break;
 
@@ -110,7 +117,7 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 					var jsonObject = {id:jsonObjectList[index].id,ac:"cl",pa:jsonObjectList[index].pa};
 					
 					// send to "dao" and return result to "web"
-					sendCmdToDao(idArduino, jsonObject, 0, function(err, data) {
+					sendCmdToDao(idArduino, jsonObject, function(err, data) {
 						callback(err, data);
 					});
 				}

@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+    <title>REST Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="js/jquery.mobile-1.3.2/jquery.mobile-1.3.2.css">
+    <!-- <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css"> -->
+    <!-- <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script> -->
+    <script src="js/jquery-2.0.3.js"></script>
+    <!-- need to be included before jQmobile to achive drop-down view formating -->
+    <script src="js/myScript.js"></script>
+    <script src="js/jquery.mobile-1.3.2/jquery.mobile-1.3.2.js"></script>
+    <!-- <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script> -->
+</head>
+<body>
+
+    <!-- Page : Main menu - #main -->
+    <div data-role="page" id="main" >
+        <div data-role="header">
+            <h2>REST Client  --  Main menu</h2>
+        </div><!-- /header -->
+        <div data-role="content">
+            <div id="mainMenu">
+                <h1> Actions : </h1>
+                <ul data-role="listview" data-inset="true" data-filter="false">
+                    <li><a href="#blink" data-prefetch>Blink</a></li>
+                    <li><a href="#read" data-prefetch>Pin read</a></li>
+                    <li><a href="#write" data-prefetch>Pin write</a></li>
+                    <li><a href="#post" data-prefetch>POST command</a></li>
+                </ul>
+            </div>
+        </div><!-- /content -->
+        <div data-role="footer"></br>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+
+    <!-- Page : Blink - #blink -->
+    <div data-role="page" id="blink">
+        <div data-role="header">
+            <a href="#main" data-icon="back">Back</a>
+            <h1>Blink</h1>
+        </div><!-- /header -->
+        <div data-role="content">
+            <div id="test"> </div>
+            <div id="arduinos">
+                <h2> Choose arduino : </h2>
+                <!-- <label for="select-choice-1" class="select"></label> -->
+                <select name="arduinos" id="arduinos">
+                    <option value="ard1">ard1</option>
+                    <option value="ard2">ard2</option>
+                </select>
+            </div><!-- arduino list -->
+            <div id="parameters">
+                <h2> Choose parameters : </h2>
+                <div data-role="fieldcontain">
+                    <label for="name">Pin : </label>
+                    <input type="number" name="name" id="name" value=""  />
+                </div> 
+                <div data-role="fieldcontain">
+                    <label for="name"> Length : </label>
+                    <input type="number" name="name" id="name" value=""  />
+                </div>  
+                <div data-role="fieldcontain">
+                    <label for="name">Numbers of blink : </label>
+                    <input type="number" name="name" id="name" value=""  />
+                </div> 
+            </div>
+            <div id="actions">
+                <h2> Actions : </h2>
+                <div data-role="controlgroup" data-type="horizontal">
+                    <a href="#main" data-role="button" data-theme="a">Back</a>
+                    <a href="" data-role="button" data-theme="c">Reset</a>
+                    <a href="" data-role="button" data-theme="b">Send</a>
+                </div>
+            </div> <!-- action bottom buttons -->
+        </div><!-- /content -->
+        <div data-role="footer"></br>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+
+    <!-- Page : Pin Read - #read -->
+    <div data-role="page" id="read">
+        <div data-role="header">
+            <a href="#main" data-icon="back">Back</a>
+            <h1>Pin Read</h1>
+        </div><!-- /header -->
+        <div data-role="content">
+            <div id="arduinos">
+                <h2> Choose arduino : </h2>
+                <!-- <label for="select-choice-1" class="select"></label> -->
+                <select name="arduinos" id="arduinos">
+                    <option value="ard1">ard1</option>
+                    <option value="ard2">ard2</option>
+                </select>
+            </div><!-- arduino list -->
+            <div id="parameters">
+                <h2> Choose parameters : </h2>
+                <div data-role="fieldcontain">
+                    <label for="name">Pin to read : </label>
+                    <input type="number" name="name" id="name" value=""  />
+                </div> 
+                <div data-role="fieldcontain">
+                    <label for="mode" class="select">Select mode : </label>
+                    <select name="mode" id="mode">
+                       <option value="binaire">Binaire</option>
+                       <option value="analogique">Analogique</option>
+                    </select>
+                </div>
+            </div>
+            <div id="actions">
+                <h2> Actions : </h2>
+                <div data-role="controlgroup" data-type="horizontal">
+                    <a href="#main" data-role="button" data-theme="a">Back</a>
+                    <a href="" data-role="button" data-theme="c">Reset</a>
+                    <a href="" data-role="button" data-theme="b">Send</a>
+                </div>
+            </div>
+        </div><!-- /content -->
+        <div data-role="footer"></br>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+
+    <!-- Page : Pin Write - #write -->
+    <div data-role="page" id="write">
+        <div data-role="header">
+            <a href="#main" data-icon="back">Back</a>
+            <h1>Pin Write</h1>
+        </div><!-- /header -->
+        <div data-role="content">
+            <div id="arduinos">
+                <h2> Choose arduino : </h2>
+                <!-- <label for="select-choice-1" class="select"></label> -->
+                <select name="arduinos" id="arduinos">
+                    <option value="ard1">ard1</option>
+                    <option value="ard2">ard2</option>
+                </select>
+            </div><!-- arduino list -->
+            <div id="parameters">
+                <h2> Choose parameters : </h2>
+                <div data-role="fieldcontain">
+                    <label for="name">Pin to rite : </label>
+                    <input type="number" name="name" id="name" value=""  />
+                </div> 
+                <div data-role="fieldcontain">
+                    <label for="mode" class="select">Select mode : </label>
+                    <select name="mode" id="mode">
+                       <option value="binaire">Binaire</option>
+                       <option value="analogique">Analogique</option>
+                    </select>
+                </div>
+                <div data-role="fieldcontain">
+                    <label for="name">Value to write: </label>
+                    <input type="number" name="name" id="name" value=""  />
+                </div> 
+            </div>
+            <div id="actions">
+                <h2> Actions : </h2>
+                <div data-role="controlgroup" data-type="horizontal">
+                    <a href="#main" data-role="button" data-theme="a">Back</a>
+                    <a href="" data-role="button" data-theme="c">Reset</a>
+                    <a href="" data-role="button" data-theme="b">Send</a>
+                </div>
+            </div>
+        </div><!-- /content -->
+        <div data-role="footer"></br>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+
+    <!-- Page : Post Command - #post -->
+    <div data-role="page" id="post">
+        <div data-role="header">
+            <a href="#main" data-icon="back">Back</a>
+            <h2>POST Command</h2>
+        </div><!-- /header -->
+        <div data-role="content">
+            <div id="arduinos">
+                <h2> Choose arduino : </h2>
+                <!-- <label for="select-choice-1" class="select"></label> -->
+                <select name="arduinos" id="arduinos">
+                    <option value="ard1">ard1</option>
+                    <option value="ard2">ard2</option>
+                </select>
+            </div><!-- arduino list -->
+            <div id="parameters">
+                <h2> Choose parameters : </h2>
+                <div data-role="fieldcontain">
+                    <label for="jsonString">JSON to send : </label>
+                    <input type="text" name="jsonString" id="jsonString" value=""  />
+                </div> 
+            </div>
+            <div id="actions">
+                <h2> Actions : </h2>
+                <div data-role="controlgroup" data-type="horizontal">
+                    <a href="#main" data-role="button" data-theme="a">Back</a>
+                    <a href="" data-role="button" data-theme="c">Reset</a>
+                    <a href="" data-role="button" data-theme="b">Send</a>
+                </div>
+            </div>
+        </div><!-- /content -->
+        <div data-role="footer"></br>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+</body>
+</html>

@@ -72,7 +72,7 @@ server
 
 	// COMMAND (POST)
 	.post(	// test : http://localhost:8080/rest/arduinos/192.168.2.3/192.168.2.3/
-			// json in post (pr + pw + cl) : [{"id":"1","pa":{"val":"0","pin":"8","mod":"b"},"ac":"pw"}, {"id":"2","pa":{"pin":"8","mod":"a"},"ac":"pr"}, {"id":"3","ac":"cl","pa":{"pin":"8","dur":"100","nb":"10"}}]
+			// json in post (pw + pr + cl) : [{"id":"1","pa":{"val":"0","pin":"8","mod":"b"},"ac":"pw"}, {"id":"2","pa":{"pin":"8","mod":"a"},"ac":"pr"}, {"id":"3","ac":"cl","pa":{"pin":"8","dur":"100","nb":"10"}}]
 		'/rest/arduinos/:command/:idArduino', function(req, res) {
 		// parameters from URL
 		var p = req.params;
