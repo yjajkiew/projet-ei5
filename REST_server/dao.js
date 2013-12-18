@@ -170,7 +170,7 @@ var timer = setInterval(function() {
 				// build json object
 				var jsonObject = {id:"1",ac:"ec",pa:{}};
 				var jsonString = JSON.stringify(jsonObject);
-				heartbeatText += '[DAO-HearBeat] Sending ECHO to Arduino @ ' + arduino.id + ":" + arduino.port;
+				heartbeatText += '[DAO-HearBeat] Checking Arduino @ ' + arduino.id + ":" + arduino.port;
 				client.write(jsonString);
 			})
 
@@ -192,8 +192,8 @@ var timer = setInterval(function() {
 			// 'error' event, remove arduino
 			.on('error', function(err) {
 				// log message
-				var errorMessage = '[DAO-HearBeat] Error while ECHO to Arduino : ' + err.code;
-				util.log(errorMessage);
+				// var errorMessage = '[DAO-HearBeat] Error while ECHO to Arduino : ' + err.code;
+				// util.log(errorMessage);
 
 				// delete arduino
 				if (arduinos.remove(arduino.id) === undefined) {
