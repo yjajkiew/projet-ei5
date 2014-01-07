@@ -158,7 +158,7 @@ exports.getArduinos = function(callback) {
 var timer = setInterval(function() {
 	// if aruduino collection is empty
 	if (arduinos.count === 0) {
-		util.log('[DAO-HearBeat] No arduino connected');
+		util.log('[DAO-HeartBeat] No arduino connected');
 	}
 	else {
 		// process trought arduinos
@@ -170,7 +170,7 @@ var timer = setInterval(function() {
 				// build json object
 				var jsonObject = {id:"1",ac:"ec",pa:{}};
 				var jsonString = JSON.stringify(jsonObject);
-				heartbeatText += '[DAO-HearBeat] Checking Arduino @ ' + arduino.id + ":" + arduino.port;
+				heartbeatText += '[DAO-HeartBeat] Checking Arduino @ ' + arduino.id + ":" + arduino.port;
 				client.write(jsonString);
 			})
 
@@ -197,10 +197,10 @@ var timer = setInterval(function() {
 
 				// delete arduino
 				if (arduinos.remove(arduino.id) === undefined) {
-					util.log('[DAO-HearBeat] arduino : ' + arduino.id +  ' already removed from collection ');
+					util.log('[DAO-HeartBeat] arduino : ' + arduino.id +  ' already removed from collection ');
 				}
 				else {
-					util.log('[DAO-HearBeat] Arduino not responding, removing from collection: ' + arduino.id);
+					util.log('[DAO-HeartBeat] Arduino not responding, removing from collection: ' + arduino.id);
 				}
 			});
 		});

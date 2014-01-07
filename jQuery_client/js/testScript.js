@@ -9,12 +9,6 @@ $(document).bind('mobileinit', function(){
     // $( ".myButton" ).bind( "click", function(event, ui) {
     //     alert("some text");
     // });
-    //$("#test").hide();
 });
 
-
-$(function() {
-	$('#texteJQ').html('Hello world. Ce texte est affiche par jQuery.'); 
-});
-
-$('#test').html('jquery replacement');
+//$('#test').html('jquery replacement');
