@@ -45,13 +45,17 @@
 
         <div data-role="content">
             <div class="arduinos">
-                <h2> Choose arduino : </h2>                
-                <select data-inline="true" name="arduinos" id="arduinosList"></select>
-                <input type="button" data-inline="true" data-icon="refresh" value="Refresh" name="refreshArduinoList" id="refreshArduinoList"/>                
+                <h2>Choose arduino :</h2>                
+                <select data-inline="true" name="arduinosListBlink" id="arduinosListBlink"> </select>
+                <input type="button" data-inline="true" data-icon="refresh" value="Refresh" name="blinkRefresh" id="blinkRefresh"/>                
             </div><!-- /arduino list -->
 
             <div class="parameters">
                 <h2> Choose parameters : </h2>
+                <div data-role="fieldcontain">
+                    <label for="name">Command ID : </label>
+                    <input type="number" name="cmdIdBlink" id="cmdIdBlink" value="1"  />
+                </div>
                 <div data-role="fieldcontain">
                     <label for="pinBlink">Pin : </label>
                     <input type="number" name="pinBlink" id="pinBlink" value="8" />
@@ -70,12 +74,14 @@
                 <h2> Actions : </h2>
                 <div data-role="controlgroup" data-type="horizontal">
                     <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                    <input type="button" data-theme="c" name="resetBlink" id="resetBlink" data-icon="delete" data-iconpos="right"   value="Reset parameters"/>
+                    <input type="button" data-theme="c" name="resetBlink" id="resetBlink" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
                     <input type="button" data-theme="b" name="doBlink" id="doBlink" data-icon="check" data-iconpos="right" value="Do blink"/>
                 </div>
             </div> <!-- /action bottom buttons -->
             <h2>Result :</h2>
             <div class="result">
+                <div id="blinkResult">
+                </div>
             </div>
         </div><!-- /content -->
         <div data-role="footer"></br>
@@ -91,27 +97,39 @@
         </div><!-- /header -->
         <div data-role="content">
             <div class="arduinos">
+                <h2>Choose arduino :</h2>                
+                <select data-inline="true" name="arduinosListRead" id="arduinosListRead"> </select>
+                <input type="button" data-inline="true" data-icon="refresh" value="Refresh" name="readRefresh" id="readRefresh"/> 
             </div><!-- /arduino list -->
             <div class="parameters">
                 <h2> Choose parameters : </h2>
                 <div data-role="fieldcontain">
+                    <label for="name">Command ID : </label>
+                    <input type="number" name="cmdIdRead" id="cmdIdRead" value="1"  />
+                </div>
+                <div data-role="fieldcontain">
                     <label for="name">Pin to read : </label>
-                    <input type="number" name="name" id="name" value=""  />
+                    <input type="number" name="pinRead" id="pinRead" value="8"  />
                 </div> 
                 <div data-role="fieldcontain">
                     <label for="mode" class="select">Select mode : </label>
-                    <select name="mode" id="mode">
-                       <option value="binaire">Binaire</option>
-                       <option value="analogique">Analogique</option>
+                    <select name="modeRead" id="modeRead">
+                       <option value="b">Binaire</option>
+                       <option value="a">Analogique</option>
                     </select>
                 </div>
             </div>
             <div class="actions">
                 <h2> Actions : </h2>
                 <div data-role="controlgroup" data-type="horizontal">
-                    <a href="#main" data-role="button" data-theme="a">Back</a>
-                    <a href="" data-role="button" data-theme="c">Reset</a>
-                    <a href="" data-role="button" data-theme="b">Send</a>
+                    <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
+                    <input type="button" data-theme="c" name="resetRead" id="resetRead" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                    <input type="button" data-theme="b" name="doPinRead" id="doPinRead" data-icon="check" data-iconpos="right" value="Read"/>
+                </div>
+            </div><!-- /action bottom buttons -->
+            <h2>Result :</h2>
+            <div class="result">
+                <div id="readResult">
                 </div>
             </div>
         </div><!-- /content -->
@@ -128,31 +146,43 @@
         </div><!-- /header -->
         <div data-role="content">
             <div class="arduinos">
+                <h2>Choose arduino :</h2>                
+                <select data-inline="true" name="arduinosListWrite" id="arduinosListWrite"> </select>
+                <input type="button" data-inline="true" data-icon="refresh" value="Refresh" name="writeRefresh" id="writeRefresh"/> 
             </div><!-- /arduino list -->
             <div class="parameters">
                 <h2> Choose parameters : </h2>
                 <div data-role="fieldcontain">
-                    <label for="name">Pin to rite : </label>
-                    <input type="number" name="name" id="name" value=""  />
+                    <label for="name">Command ID : </label>
+                    <input type="number" name="cmdIdWrite" id="cmdIdWrite" value="1"  />
+                </div>
+                <div data-role="fieldcontain">
+                    <label for="name">Pin to write : </label>
+                    <input type="number" name="pinWrite" id="pinWrite" value="8"  />
                 </div> 
                 <div data-role="fieldcontain">
                     <label for="mode" class="select">Select mode : </label>
-                    <select name="mode" id="mode">
-                       <option value="binaire">Binaire</option>
-                       <option value="analogique">Analogique</option>
+                    <select name="modeWrite" id="modeWrite">
+                       <option value="b">Binaire</option>
+                       <option value="a">Analogique</option>
                     </select>
                 </div>
                 <div data-role="fieldcontain">
                     <label for="name">Value to write: </label>
-                    <input type="number" name="name" id="name" value=""  />
+                    <input type="number" name="valueWrite" id="valueWrite" value="1"  />
                 </div> 
             </div>
             <div class="actions">
                 <h2> Actions : </h2>
                 <div data-role="controlgroup" data-type="horizontal">
-                    <a href="#main" data-role="button" data-theme="a">Back</a>
-                    <a href="" data-role="button" data-theme="c">Reset</a>
-                    <a href="" data-role="button" data-theme="b">Send</a>
+                    <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
+                    <input type="button" data-theme="c" name="resetWrite" id="resetWrite" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                    <input type="button" data-theme="b" name="doPinWrite" id="doPinWrite" data-icon="check" data-iconpos="right" value="Write"/>
+                </div>
+            </div><!-- /action bottom buttons -->
+            <h2>Result :</h2>
+            <div class="result">
+                <div id="writeResult">
                 </div>
             </div>
         </div><!-- /content -->
@@ -169,20 +199,32 @@
         </div><!-- /header -->
         <div data-role="content">
             <div class="arduinos">
+                <h2>Choose arduino :</h2>                
+                <select data-inline="true" name="arduinosListPost" id="arduinosListPost"> </select>
+                <input type="button" data-inline="true" data-icon="refresh" value="Refresh" name="postRefresh" id="postRefresh"/> 
             </div><!-- /arduino list -->
             <div class="parameters">
                 <h2> Choose parameters : </h2>
                 <div data-role="fieldcontain">
+                    <label for="name">Command ID : </label>
+                    <input type="number" name="cmdIdPost" id="cmdIdPost" value="1"  />
+                </div>
+                <div data-role="fieldcontain">
                     <label for="jsonString">JSON to send : </label>
-                    <input type="text" name="jsonString" id="jsonString" value=""  />
+                    <input type="text" name="jsonStringPost" id="jsonStringPost" value='[{"id":"1","pa":{"val":"0","pin":"8","mod":"b"},"ac":"pw"}, {"id":"2","pa":{"pin":"8","mod":"a"},"ac":"pr"}, {"id":"3","ac":"cl","pa":{"pin":"8","dur":"100","nb":"10"}}]'/>
                 </div> 
             </div>
             <div class="actions">
                 <h2> Actions : </h2>
                 <div data-role="controlgroup" data-type="horizontal">
-                    <a href="#main" data-role="button" data-theme="a">Back</a>
-                    <a href="" data-role="button" data-theme="c">Reset</a>
-                    <a href="" data-role="button" data-theme="b">Send</a>
+                    <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
+                    <input type="button" data-theme="c" name="resetPost" id="resetPost" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                    <input type="button" data-theme="b" name="doPost" id="doPost" data-icon="check" data-iconpos="right" value="POST"/>
+                </div>
+            </div><!-- /action bottom buttons -->
+            <h2>Result :</h2>
+            <div class="result">
+                <div id="postResult">
                 </div>
             </div>
         </div><!-- /content -->
