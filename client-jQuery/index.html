@@ -7,14 +7,15 @@
     <link rel="stylesheet" href="js/jquery.mobile-1.4.0/jquery.mobile-1.4.0.css">
     <!-- <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css"> -->
     <!-- <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script> -->
-    <script src="js/jquery-2.0.3.js"></script>
+    <script type="text/javascript" src="js/jquery-2.0.3.js"></script>
     <!-- need to be included before jQmobile to enable drop-down view formating -->
-    <script src="js/jqmInit.js"></script>
-    <script src="js/jquery.mobile-1.4.0/jquery.mobile-1.4.0.js"></script>
+    <script type="text/javascript" src="js/jqmInit.js"></script>
+    <script type="text/javascript" src="js/jquery.mobile-1.4.0/jquery.mobile-1.4.0.js"></script>
+    <script type="text/javascript" src="js/jquery-validation-1.11.1/jquery.validate.min.js"></script>
     <!-- <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script> -->
 </head>
-<body>
 
+<body>
     <!-- Page : Main menu - #main -->
     <div data-role="page" id="main" data-theme="b">
         <div data-role="header">
@@ -45,44 +46,42 @@
 
         <div data-role="content">
             <div class="arduinos">
-                <h2>Choose arduino :</h2>                
+                <h2>Choose arduino :</h2>
+                <input type="button" data-inline="true" data-icon="refresh" value="Refresh" name="blinkRefresh" id="blinkRefresh"/>             
                 <select data-inline="true" name="arduinosListBlink" id="arduinosListBlink"> </select>
-                <input type="button" data-inline="true" data-icon="refresh" value="Refresh" name="blinkRefresh" id="blinkRefresh"/>                
             </div><!-- /arduino list -->
-
-            <div class="parameters">
+            <hr />
+            <form id="blinkParameters">
                 <h2> Choose parameters : </h2>
                 <div data-role="fieldcontain">
                     <label for="name">Command ID : </label>
-                    <input type="number" name="cmdIdBlink" id="cmdIdBlink" value="1"  />
-                </div>
-                <div data-role="fieldcontain">
+                    <input type="number" name="cmdIdBlink" id="cmdIdBlink" value="1" />
+                    <br /><br />
                     <label for="pinBlink">Pin : </label>
                     <input type="number" name="pinBlink" id="pinBlink" value="8" />
-                </div> 
-                <div data-role="fieldcontain">
+                    <br /><br />
                     <label for="lenghtBlink"> Length : </label>
                     <input type="number" name="lenghtBlink" id="lenghtBlink" value="100" />
-                </div>  
-                <div data-role="fieldcontain">
+                    <br /><br />
                     <label for="nbBlink">Numbers of blink : </label>
                     <input type="number" name="nbBlink" id="nbBlink" value="10" />
-                </div> 
-            </div> <!-- /parameters -->
-
-            <div class="actions">
-                <h2> Actions : </h2>
-                <div data-role="controlgroup" data-type="horizontal">
-                    <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                    <input type="button" data-theme="c" name="resetBlink" id="resetBlink" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
-                    <input type="button" data-theme="b" name="doBlink" id="doBlink" data-icon="check" data-iconpos="right" value="Do blink"/>
                 </div>
-            </div> <!-- /action bottom buttons -->
+                <hr />
+                <div class="actions">
+                    <h2> Actions : </h2>
+                    <div data-role="controlgroup" data-type="horizontal">
+                        <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
+                        <input type="button" name="resetBlink" id="resetBlink" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                        <input type="button" name="doBlink" id="doBlink" data-icon="check" data-iconpos="right" value="Do blink"/>
+                    </div>
+                </div> <!-- /action bottom buttons -->
+            </form> <!-- /parameters -->
+            <hr />
             <h2>Result :</h2>
             <div class="result">
                 <div id="blinkResult">
                 </div>
-            </div>
+            </div> <!-- result -->
         </div><!-- /content -->
         <div data-role="footer"></br>
         </div><!-- /footer -->
@@ -123,8 +122,8 @@
                 <h2> Actions : </h2>
                 <div data-role="controlgroup" data-type="horizontal">
                     <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                    <input type="button" data-theme="c" name="resetRead" id="resetRead" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
-                    <input type="button" data-theme="b" name="doPinRead" id="doPinRead" data-icon="check" data-iconpos="right" value="Read"/>
+                    <input type="button" name="resetRead" id="resetRead" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                    <input type="button" name="doPinRead" id="doPinRead" data-icon="check" data-iconpos="right" value="Read"/>
                 </div>
             </div><!-- /action bottom buttons -->
             <h2>Result :</h2>
@@ -176,8 +175,8 @@
                 <h2> Actions : </h2>
                 <div data-role="controlgroup" data-type="horizontal">
                     <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                    <input type="button" data-theme="c" name="resetWrite" id="resetWrite" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
-                    <input type="button" data-theme="b" name="doPinWrite" id="doPinWrite" data-icon="check" data-iconpos="right" value="Write"/>
+                    <input type="button" name="resetWrite" id="resetWrite" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                    <input type="button" name="doPinWrite" id="doPinWrite" data-icon="check" data-iconpos="right" value="Write"/>
                 </div>
             </div><!-- /action bottom buttons -->
             <h2>Result :</h2>
@@ -218,8 +217,8 @@
                 <h2> Actions : </h2>
                 <div data-role="controlgroup" data-type="horizontal">
                     <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                    <input type="button" data-theme="c" name="resetPost" id="resetPost" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
-                    <input type="button" data-theme="b" name="doPost" id="doPost" data-icon="check" data-iconpos="right" value="POST"/>
+                    <input type="button" name="resetPost" id="resetPost" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                    <input type="button" name="doPost" id="doPost" data-icon="check" data-iconpos="right" value="POST"/>
                 </div>
             </div><!-- /action bottom buttons -->
             <h2>Result :</h2>
@@ -231,8 +230,7 @@
         <div data-role="footer"></br>
         </div><!-- /footer -->
     </div><!-- /page -->
-<script 
-    src="js/myScript.js">
+<script type="text/javascript" src="js/myScript.js">
 </script><!-- /scripts -->
 </body>
 </html>

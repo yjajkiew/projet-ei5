@@ -139,6 +139,7 @@ function checkError(err, data, callback) {
 	}
 }
 
+
 //////// LAUNCH SERVER (PORT 8080)
 server.listen(PORT, function() {
 	// log

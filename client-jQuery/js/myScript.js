@@ -14,7 +14,7 @@ var baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH;
 $(function() {
 	$(document).ready (function() {
 		// get arduino list from REST Server
-		// WARNING => need to refresh all the drop-down list here !!!!!+
+		// WARNING => need to refresh all the drop-down list here !!!!! 4 request, not really great...
 		getArduinoList("#arduinosListBlink");
 		getArduinoList("#arduinosListRead");
 		getArduinoList("#arduinosListWrite");
@@ -27,19 +27,11 @@ $(function() {
 // BUTTONS : //
 ///////////////
 
-// $( ".refreshArduinoList" ).bind( "click", function(event, ui) {
-// 	// fill drop down list with arduinos
-// 	getArduinoList($(this).parents(".dropdown"));
-// });
-
 // BLINK Page refresh button
 $( "#blinkRefresh" ).bind( "click", function(event, ui) {
 	// fill drop down list with arduinos
 	getArduinoList("#arduinosListBlink");
 	console.log('Blink refresh button click event');
-
-	// bind data
-	// DropdownList.DataBind()
 });
 
 // READ Page refresh button
@@ -63,7 +55,7 @@ $( "#postRefresh" ).bind( "click", function(event, ui) {
 	console.log('Post refresh button click event');
 });
 
-// Do blink button
+//Do blink button
 $( "#doBlink" ).bind( "click", function(event, ui) {
 	var idCmd = $("#cmdIdBlink").val();
 	var idArduino = $("#arduinosListBlink option:selected").val();
@@ -73,6 +65,16 @@ $( "#doBlink" ).bind( "click", function(event, ui) {
 	console.log('[BLINK] idArduino : ' + idArduino + " - pin blink: " + pin + " - lenght: " + lenght + " - nb blink: " + nbBlink);
 	doBlink(idCmd, idArduino, pin, lenght, nbBlink);
 });
+
+// $( "#doBlink" ).submit(function( data, event ) {
+// 	alert("it worked !");
+// 	event.preventDefault();
+// });
+
+// $("form#doBlink").on('submit', function(data, event) {
+//     alert("test");
+//     event.preventDefault()
+// });
 
 // Do Pin READ button
 $( "#doPinRead" ).bind( "click", function(event, ui) {
@@ -105,6 +107,7 @@ $( "#doPost" ).bind( "click", function(event, ui) {
 });
 
 
+
 ////////////////
 // METHODES : //
 ////////////////
@@ -133,6 +136,19 @@ function getArduinoList(idList) {
 	// $(idList).trigger("chosen:updated");
 }
 
+// $('input#doBlink').click( function() {
+//     $.ajax({
+//         url: 'some-url',
+//         type: 'post',
+//         dataType: 'json',
+//         data: $('form#myForm').serialize(),
+//         success: function(data) {
+//                    // ... do something with the data...
+//                  }
+//     });
+// });
+
+
 function doBlink(idCmd, idArduino, pin, lenght, nbBlink) { // http://localhost:8080/rest/arduinos/blink/192.168.2.3/192.168.2.3/8/100/10
 	if (idArduino == null) {
 		alert("[DOBLINK] Wrong arduino ID : " + idArduino);
@@ -144,7 +160,7 @@ function doBlink(idCmd, idArduino, pin, lenght, nbBlink) { // http://localhost:8
 		// send request to REST server
 		$.getJSON(requestUrl, function(data) {
 			// $('#resultDisplay').html(JSON.stringify(data));
-			$( "div.result" ).html(JSON.stringify(data));
+			$( "#blinkResult" ).html(JSON.stringify(data));
 			console.log("[DOBLINK] json answer : " + JSON.stringify(data));
 		});
 	}
@@ -184,7 +200,6 @@ function doPinWrite(idCmd, idArduino, pin, mode, value) { // http://localhost:80
 		});
 	}
 }
-
 		
 function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/arduinos/192.168.2.3/192.168.2.3/
 	if (idArduino == null) {
@@ -217,3 +232,24 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 		});		
 	}
 }
+
+// redefinition des messages d'erreur pour la validation jQuery
+$.extend(jQuery.validator.messages, {
+	required: "votre message",
+	remote: "votre message",
+	email: "votre message",
+	url: "votre message",
+	date: "votre message",
+	dateISO: "votre message",
+	number: "votre message",
+	digits: "votre message",
+	creditcard: "votre message",
+	equalTo: "votre message",
+	accept: "votre message",
+	maxlength: jQuery.validator.format("votre message {0} caractéres."),
+	minlength: jQuery.validator.format("votre message {0} caractéres."),
+	rangelength: jQuery.validator.format("votre message  entre {0} et {1} caractéres."),
+	range: jQuery.validator.format("votre message  entre {0} et {1}."),
+	max: jQuery.validator.format("votre message  inférieur ou égal à {0}."),
+	min: jQuery.validator.format("votre message  supérieur ou égal à {0}.")
+});
