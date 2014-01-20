@@ -37,7 +37,7 @@ server
 		'/rest/arduinos', function(req,res) {
 		util.log('[WEB] Query : Arduino list');
 		metier.arduinos(function(arduinos) {
-			res.setHeader('Content-Type', 'application/json');
+			//res.setHeader('Content-Type', 'application/json');
 			res.send(arduinos);
 		});
 	})
