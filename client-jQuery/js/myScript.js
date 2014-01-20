@@ -6,116 +6,176 @@ var SERVER_ADDRESS = 'localhost';
 var SERVER_BASE_PATH = "/rest/arduinos";
 var baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH;
 
-
-//////////////////////
-// INITIALISATION : //
-//////////////////////
-// Document is ready
+// Browser is ready
 $(function() {
+	// Document is ready
 	$(document).ready (function() {
+
+		//////////////////////
+		// INITIALISATION : //
+		//////////////////////
+
 		// get arduino list from REST Server
-		// WARNING => need to refresh all the drop-down list here !!!!! 4 request, not really great...
+		// WARNING => need to refresh all the drop-down list here !!!!! 4 request, not really great, better do 1 "init" function
 		getArduinoList("#arduinosListBlink");
 		getArduinoList("#arduinosListRead");
 		getArduinoList("#arduinosListWrite");
 		getArduinoList("#arduinosListPost");
+
+
+		///////////////
+		// BUTTONS : //
+		///////////////
+
+		// Refresh button
+		$(".refreshButton").click(function() {
+			// WARNING : this is working if the BUTTON NAME IS THE SAME AS THE LIST ID !!!!
+			var listId = "#" + $(this).attr("name");
+			getArduinoList(listId);
+		});
+
+		/////////////
+		// FORMS : //
+		/////////////
+
+		// Form reset button
+		$('.resetButton').click(resetForm);
+
+		// // Form "submit" button (don't need it anymore : form aren't submited !!!!)
+		// $( "form" ).submit(function() {
+		//  	event.preventDefault();	// prevent redirection to main page for all the forms (very annoying)
+		// });
+
+		// Blink form
+		$("#blinkForm").validate({
+			// Specify the validation rules
+	        rules: {
+	            cmdIdBlink: {required: true},
+	            pinBlink: {required: true,  maxlength: 2},
+	            lenghtBlink: {required: true},
+	            nbBlink: {required: true}
+	        },
+
+	        // Specify the validation error messages
+	        messages: {
+	            cmdIdBlink: {
+	                required: "Please choose an ID"
+	            }
+	        },
+
+	        // handler for the form
+			submitHandler: function(form) {
+				var idCmd = $("#cmdIdBlink").val();
+				var idArduino = $("#arduinosListBlink option:selected").val();
+				var pin =  $('#pinBlink').val();
+				var lenght = $('#lenghtBlink').val();
+				var nbBlink = $('#nbBlink').val();
+				console.log('[BLINK] idArduino : ' + idArduino + " - pin blink: " + pin + " - lenght: " + lenght + " - nb blink: " + nbBlink);
+				doBlink(idCmd, idArduino, pin, lenght, nbBlink);
+	        }
+		});
+
+		// Pin Read form
+		$("#pinReadForm").validate({
+			// Specify the validation rules
+	        rules: {
+	            cmdIdRead: {required: true},
+	            pinRead: {required: true},
+	            modeRead: {required: true}
+	        },
+
+	        // Specify the validation error messages
+	        messages: {
+	            cmdIdRead: {
+	                required: "Please choose an ID"
+	            }
+	        },
+
+	        // handler for the form
+			submitHandler: function(form) {
+				var idCmd = $("#cmdIdRead").val();
+				var idArduino = $("#arduinosListRead option:selected").val();
+				var pin =  $('#pinRead').val();
+				var mode = $('#modeRead option:selected').val();
+				console.log('[READ] idArduino: ' + idArduino + " - command ID: " + idCmd + " - pin read: " + pin + " - mode: " + mode);
+				doPinRead(idCmd, idArduino, pin, mode);
+	        }
+		});
+
+		// Pin Write form
+		$("#pinWriteForm").validate({
+			// Specify the validation rules
+	        rules: {
+	            cmdIdWrite: {required: true},
+	            pinWrite: {required: true},
+	            modeWrite: {required: true},
+	            valueWrite: {required: true}
+	        },
+
+	        // Specify the validation error messages
+	        messages: {
+	            cmdIdWrite: {
+	                required: "Please choose an ID"
+	            }
+	        },
+
+	        // handler for the form
+			submitHandler: function(form) {
+				var idCmd = $("#cmdIdWrite").val();
+				var idArduino = $("#arduinosListWrite option:selected").val();
+				var pin =  $('#pinWrite').val();
+				var mode = $('#modeWrite').val();
+				var value = $('#valueWrite').val();
+				console.log('[WRITE] idArduino : ' + idArduino + " - command ID: " + idCmd + " - pin write: " + pin + " - mode:" + mode + " - value: " + value);
+				doPinWrite(idCmd, idArduino, pin, mode, value);
+	        }
+		});
+
+		// Pin Write form
+		$("#postForm").validate({
+			// Specify the validation rules
+	        rules: {
+	            cmdIdPost: {required: true},
+	            jsonStringPost: {required: true}
+	        },
+
+	        // Specify the validation error messages
+	        messages: {
+	            cmdIdPost: {
+	                required: "Please choose an ID"
+	            }
+	        },
+
+	        // handler for the form
+			submitHandler: function(form) {
+				var idCmd = $("#cmdIdPost").val();
+				var idArduino = $("#arduinosListPost option:selected").val();
+				var jsonString =  $('#jsonStringPost').val();
+				console.log('[POST] idArduino : ' + idArduino + " - json string : " + jsonString);
+				doPost(idCmd, idArduino, jsonString);
+	        }
+		});
 	})
 });
-
-
-///////////////
-// BUTTONS : //
-///////////////
-
-// BLINK Page refresh button
-$( "#blinkRefresh" ).bind( "click", function(event, ui) {
-	// fill drop down list with arduinos
-	getArduinoList("#arduinosListBlink");
-	console.log('Blink refresh button click event');
-});
-
-// READ Page refresh button
-$( "#readRefresh" ).bind( "click", function(event, ui) {
-	// fill drop down list with arduinos
-	getArduinoList("#arduinosListRead");
-	console.log('Read refresh button click event');
-});
-
-// WRITE Page refresh button
-$( "#writeRefresh" ).bind( "click", function(event, ui) {
-	// fill drop down list with arduinos
-	getArduinoList("#arduinosListWrite");
-	console.log('Write refresh button click event');
-});
-
-// POST Page refresh button
-$( "#postRefresh" ).bind( "click", function(event, ui) {
-	// fill drop down list with arduinos
-	getArduinoList("#arduinosListPost");
-	console.log('Post refresh button click event');
-});
-
-//Do blink button
-$( "#doBlink" ).bind( "click", function(event, ui) {
-	var idCmd = $("#cmdIdBlink").val();
-	var idArduino = $("#arduinosListBlink option:selected").val();
-	var pin =  $('#pinBlink').val();
-	var lenght = $('#lenghtBlink').val();
-	var nbBlink = $('#nbBlink').val();
-	console.log('[BLINK] idArduino : ' + idArduino + " - pin blink: " + pin + " - lenght: " + lenght + " - nb blink: " + nbBlink);
-	doBlink(idCmd, idArduino, pin, lenght, nbBlink);
-});
-
-// $( "#doBlink" ).submit(function( data, event ) {
-// 	alert("it worked !");
-// 	event.preventDefault();
-// });
-
-// $("form#doBlink").on('submit', function(data, event) {
-//     alert("test");
-//     event.preventDefault()
-// });
-
-// Do Pin READ button
-$( "#doPinRead" ).bind( "click", function(event, ui) {
-	var idCmd = $("#cmdIdRead").val();
-	var idArduino = $("#arduinosListRead option:selected").val();
-	var pin =  $('#pinRead').val();
-	var mode = $('#modeRead option:selected').val();
-	console.log('[READ] idArduino: ' + idArduino + " - command ID: " + idCmd + " - pin read: " + pin + " - mode: " + mode);
-	doPinRead(idCmd, idArduino, pin, mode);
-});
-
-// Do pin WRITE button
-$( "#doPinWrite" ).bind( "click", function(event, ui) {
-	var idCmd = $("#cmdIdWrite").val();
-	var idArduino = $("#arduinosListWrite option:selected").val();
-	var pin =  $('#pinWrite').val();
-	var mode = $('#modeWrite').val();
-	var value = $('#valueWrite').val();
-	console.log('[WRITE] idArduino : ' + idArduino + " - command ID: " + idCmd + " - pin write: " + pin + " - mode:" + mode + " - value: " + value);
-	doPinWrite(idCmd, idArduino, pin, mode, value);
-});
-
-// Do POST button
-$( "#doPost" ).bind( "click", function(event, ui) {
-	var idCmd = $("#cmdIdPost").val();
-	var idArduino = $("#arduinosListPost option:selected").val();
-	var jsonString =  $('#jsonStringPost').val();
-	console.log('[POST] idArduino : ' + idArduino + " - json string : " + jsonString);
-	doPost(idCmd, idArduino, jsonString);
-});
-
 
 
 ////////////////
 // METHODES : //
 ////////////////
+
+// reset form fields
+function resetForm () { 
+	$(':input')
+	.not(':button, :submit, :reset, :hidden') .val('')
+	.prop('checked', false)
+	.prop('selected', false);
+}
+
 // get arduino list from REST server & populate selected drop-down list
 function getArduinoList(idList) {
 
 	// 0-clear the list :
-	$("#arduinosListBlink").empty();
+	$(idList).empty();
 
 	// 1-get the json object containing the arduino list
 	$.getJSON( baseUrl, function(data) {
@@ -130,30 +190,13 @@ function getArduinoList(idList) {
    			console.log('[GETARDUINOLIST] List id: ' + idList + ' - IP: ' + arduino.id + ' - description: ' + arduino.description + ' - Option: ' + newOption);
    		});
 	});
-
-	// 4-refresh the dropdownlist
-	// $(idList).selectmenu('refresh');	// how to refresh display ???
-	// $(idList).trigger("chosen:updated");
 }
-
-// $('input#doBlink').click( function() {
-//     $.ajax({
-//         url: 'some-url',
-//         type: 'post',
-//         dataType: 'json',
-//         data: $('form#myForm').serialize(),
-//         success: function(data) {
-//                    // ... do something with the data...
-//                  }
-//     });
-// });
 
 
 function doBlink(idCmd, idArduino, pin, lenght, nbBlink) { // http://localhost:8080/rest/arduinos/blink/192.168.2.3/192.168.2.3/8/100/10
 	if (idArduino == null) {
 		alert("[DOBLINK] Wrong arduino ID : " + idArduino);
 	} else {
-		// WARNING : need to test each argument here !!!
 		// build the request URL
 		var requestUrl = baseUrl + "/blink/" + idCmd + "/" + idArduino + "/" + pin + "/" + lenght + "/" + nbBlink;
 
@@ -170,7 +213,7 @@ function doPinRead(idCmd, idArduino, pin, mode) { // http://localhost:8080/rest/
 	if (idArduino == null) {
 		alert("[DOREAD] Wrong arduino ID : " + idArduino);
 	} else {
-		// WARNING : need to test each argument here !!!
+		// WARNING : need to test each case (binary / analogique) !!!
 		// build the request URL
 		var requestUrl = baseUrl + "/pinRead/" + idCmd + "/" + idArduino + "/" + pin + "/" + mode;
 
@@ -188,7 +231,7 @@ function doPinWrite(idCmd, idArduino, pin, mode, value) { // http://localhost:80
 	if (idArduino == null) {
 		alert("[DOWRITE] Wrong arduino ID : " + idArduino);
 	} else {
-		// WARNING : need to test each argument here !!!
+		// WARNING : need to test each case (binary / analogique) !!!
 		// build the request URL
 		var requestUrl = baseUrl + "/pinWrite/" + idCmd + "/" + idArduino + "/" + pin + "/" + mode + "/" + value;
 
@@ -205,7 +248,7 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 	if (idArduino == null) {
 		alert("[DOPOST] Wrong arduino ID : " + idArduino);
 	} else {
-		// WARNING : need to test each argument here !!!
+		// WARNING : need to check JSON structure !!!
 		// build the request URL
 		var requestUrl = baseUrl + "/" + idCmd + "/" + idArduino;
 
@@ -227,29 +270,7 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 			alert('Post cmd failled !')
 		})
 
-		.always(function() {
-			//
-		});		
+		// .always(function() {
+		// });		
 	}
 }
-
-// redefinition des messages d'erreur pour la validation jQuery
-$.extend(jQuery.validator.messages, {
-	required: "votre message",
-	remote: "votre message",
-	email: "votre message",
-	url: "votre message",
-	date: "votre message",
-	dateISO: "votre message",
-	number: "votre message",
-	digits: "votre message",
-	creditcard: "votre message",
-	equalTo: "votre message",
-	accept: "votre message",
-	maxlength: jQuery.validator.format("votre message {0} caractéres."),
-	minlength: jQuery.validator.format("votre message {0} caractéres."),
-	rangelength: jQuery.validator.format("votre message  entre {0} et {1} caractéres."),
-	range: jQuery.validator.format("votre message  entre {0} et {1}."),
-	max: jQuery.validator.format("votre message  inférieur ou égal à {0}."),
-	min: jQuery.validator.format("votre message  supérieur ou égal à {0}.")
-});
