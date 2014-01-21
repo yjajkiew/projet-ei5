@@ -84,19 +84,39 @@ $(function() {
 		});
 
 		// Pin Read form
+		var binaryRange = [0,13];
+		var analogRange = [0,5];
 		$("#pinReadForm").validate({
-			// Specify the validation rules
-	        rules: {
-	            cmdIdRead: {required: true, maxlength: 3},
-	            pinRead: {required: true, range: [0,13]},
-	            modeRead: {required: true}
-	        },
+			// // Specify the validation rules
+			// rules: {
+			// 	cmdIdRead: {required: true, maxlength: 3},
+			// 	pinRead: {
+			// 		required: true,
+			// 		range: {
+			// 			depends: function(element) {
+			// 				if ($('#modeRead option:selected').val() == 'b') {
+			// 					return binaryRange;
+			// 				}
+			// 				else {
+			// 					return analogRange;
+			// 				}
+			// 			}
+			// 		}
+			// 	},
+			// 	modeRead: {required: true}
+			// },
+
+			rules: {
+			    cmdIdRead: {required: true, maxlength: 3, number: true},
+			    pinRead: {required: true,range: [0,13], number: true},
+			    modeRead: {required: true}
+			},
 
 	        // Specify the validation error messages
 	        messages: {
-	            cmdIdRead: {
-	                required: "Please choose an ID"
-	            }
+	            // cmdIdRead: {
+	            //     required: "Please choose an ID"
+	            // }
 	        },
 
 	        // handler for the form
@@ -114,17 +134,17 @@ $(function() {
 		$("#pinWriteForm").validate({
 			// Specify the validation rules
 	        rules: {
-	            cmdIdWrite: {required: true, maxlength: 3},
-	            pinWrite: {required: true, range: [0,13]},
+	            cmdIdWrite: {required: true, maxlength: 3, number: true},
+	            pinWrite: {required: true, range: [0,13], number: true},
 	            modeWrite: {required: true},
-	            valueWrite: {required: true}	// WARNING : need to test value here, according to BINARY // ANALOG
+	            valueWrite: {required: true, number: true}	// WARNING : need to test value here, according to BINARY // ANALOG
 	        },
 
 	        // Specify the validation error messages
 	        messages: {
-	            cmdIdWrite: {
-	                required: "Please choose an ID"
-	            }
+	            // cmdIdWrite: {
+	            //     required: "Please choose an ID"
+	            // }
 	        },
 
 	        // handler for the form
@@ -143,32 +163,55 @@ $(function() {
 		$("#postForm").validate({
 			// Specify the validation rules
 	        rules: {
-	            cmdIdPost: {required: true, maxlength: 3},
+	            cmdIdPost: {required: true, maxlength: 3, number: true},
 	            jsonStringPost: {required: true}	// WARNING : need to check JSON format
 	        },
 
 	        // Specify the validation error messages
 	        messages: {
-	            cmdIdPost: {
-	                required: "Please choose an ID"
-	            }
+	            // cmdIdPost: {
+	            //     required: "Please choose an ID"
+	            // }
 	        },
 
 	        // handler for the form
 			submitHandler: function(form) {
-				if (!JSON.stringify($('#jsonStringPost').val())) {
+				// check the JSON string unbtergrity
+				try{
+					var theJSON = jQuery.parseJSON($('#jsonStringPost').val());
+				}catch (error) {
 					alert('Wrong JSON string, check structure !');
+					return;
 				}
-				else {
-					var idCmd = $("#cmdIdPost").val();
-					var idArduino = $("#arduinosListPost option:selected").val();
-					var jsonString =  $('#jsonStringPost').val();
-					console.log('[POST] idArduino : ' + idArduino + " - json string : " + jsonString);
-					doPost(idCmd, idArduino, jsonString);	
-				}
+				var idCmd = $("#cmdIdPost").val();
+				var idArduino = $("#arduinosListPost option:selected").val();
+				var jsonString =  $('#jsonStringPost').val();
+				console.log('[POST] idArduino : ' + idArduino + " - json string : " + jsonString);
+				doPost(idCmd, idArduino, jsonString);
 	        }
 		});
 	})
+
+	// setup ajax error handler (verbose)
+	// $.ajaxSetup({
+ //        error: function(jqXHR, exception) {
+ //            if (jqXHR.status === 0) {
+ //                alert('Not connect.\n Verify Network.');
+ //            } else if (jqXHR.status == 404) {
+ //                alert('Requested page not found. [404]');
+ //            } else if (jqXHR.status == 500) {
+ //                alert('Internal Server Error [500].');
+ //            } else if (exception === 'parsererror') {
+ //                alert('Requested JSON parse failed.');
+ //            } else if (exception === 'timeout') {
+ //                alert('Time out error.');
+ //            } else if (exception === 'abort') {
+ //                alert('Ajax request aborted.');
+ //            } else {
+ //                alert('Uncaught Error.\n' + jqXHR.responseText);
+ //            }
+ //        }
+	// });
 });
 
 
@@ -279,11 +322,8 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 			console.log("[DOPOST] json answer: " + JSON.stringify(result));
 		})
 
-		.fail(function() {
-			alert('Post cmd failled !')
-		})
-
-		// .always(function() {
-		// });		
+		.fail(function(err) {
+			alert('Post cmd failled');
+		})	
 	}
 }
