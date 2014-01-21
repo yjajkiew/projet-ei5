@@ -36,7 +36,6 @@ exports.send = function(idArduino, jsonString, callback) {
 
 	// check if arduino exist
 	if (arduino != undefined) {
-
 		// Connect to Arduino server
 		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
 			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
@@ -52,6 +51,7 @@ exports.send = function(idArduino, jsonString, callback) {
 		// 'End' event, save data
 		.on('end', function() {
 			arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
+			// if (arduinoAnswer.error != 0)
 			callback(null, arduinoAnswer);
 			util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
 			arduinoAnswer = '';
@@ -72,6 +72,7 @@ exports.send = function(idArduino, jsonString, callback) {
 				util.log('[DAO] Arduino not responding, removing from collection: ' + arduino.id);
 			}
 		});
+		
 	}
 	else {
 		// arduino not in the collection, send back error message

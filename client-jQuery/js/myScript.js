@@ -16,7 +16,12 @@ $(function() {
 		//////////////////////
 
 		// get arduino list from REST Server
-		// WARNING => need to refresh all the drop-down list here !!!!! 4 request, not really great, better do 1 "init" function
+		// WARNING => need to refresh all the drop-down list here !!!!!
+		// 4 request, not really great...
+		// TODO later : 
+		// use 1 "init" function
+		// OR : use the same option (saved in a shared table ie.) for all the DD list box, 
+		// OR : use the same DDLB on all 4 pages.
 		getArduinoList("#arduinosListBlink");
 		getArduinoList("#arduinosListRead");
 		getArduinoList("#arduinosListWrite");
@@ -41,30 +46,33 @@ $(function() {
 		// Form reset button
 		$('.resetButton').click(resetForm);
 
-		// // Form "submit" button (don't need it anymore : form aren't submited !!!!)
-		// $( "form" ).submit(function() {
-		//  	event.preventDefault();	// prevent redirection to main page for all the forms (very annoying)
-		// });
+		// Add ip validator to form validation
+		$.validator.addMethod('IP4Checker', function(value) {
+            var ip = "^(?:(?:25[0-5]2[0-4][0-9][01]?[0-9][0-9]?)\.){3}" + "(?:25[0-5]2[0-4][0-9][01]?[0-9][0-9]?)$";
+                return value.match(ip);
+            }, 'Invalid IP address');
 
 		// Blink form
 		$("#blinkForm").validate({
 			// Specify the validation rules
 	        rules: {
-	            cmdIdBlink: {required: true},
-	            pinBlink: {required: true,  maxlength: 2},
-	            lenghtBlink: {required: true},
-	            nbBlink: {required: true}
+	            cmdIdBlink: {required: true, maxlength: 3, number: true},
+	            pinBlink: {required: true,  range: [0,9], number: true},
+	            lenghtBlink: {required: true, range: [50,10000], number: true},
+	            nbBlink: {required: true, range: [1,100], number: true}
 	        },
 
 	        // Specify the validation error messages
 	        messages: {
 	            cmdIdBlink: {
-	                required: "Please choose an ID"
+	                required: "Please choose an ID",
+	                number: "please enter a number"
 	            }
 	        },
 
 	        // handler for the form
 			submitHandler: function(form) {
+				// event.preventDefault();	// don't need it anymore (no submit on the form !!!)
 				var idCmd = $("#cmdIdBlink").val();
 				var idArduino = $("#arduinosListBlink option:selected").val();
 				var pin =  $('#pinBlink').val();
@@ -79,8 +87,8 @@ $(function() {
 		$("#pinReadForm").validate({
 			// Specify the validation rules
 	        rules: {
-	            cmdIdRead: {required: true},
-	            pinRead: {required: true},
+	            cmdIdRead: {required: true, maxlength: 3},
+	            pinRead: {required: true, range: [0,13]},
 	            modeRead: {required: true}
 	        },
 
@@ -106,10 +114,10 @@ $(function() {
 		$("#pinWriteForm").validate({
 			// Specify the validation rules
 	        rules: {
-	            cmdIdWrite: {required: true},
-	            pinWrite: {required: true},
+	            cmdIdWrite: {required: true, maxlength: 3},
+	            pinWrite: {required: true, range: [0,13]},
 	            modeWrite: {required: true},
-	            valueWrite: {required: true}
+	            valueWrite: {required: true}	// WARNING : need to test value here, according to BINARY // ANALOG
 	        },
 
 	        // Specify the validation error messages
@@ -135,8 +143,8 @@ $(function() {
 		$("#postForm").validate({
 			// Specify the validation rules
 	        rules: {
-	            cmdIdPost: {required: true},
-	            jsonStringPost: {required: true}
+	            cmdIdPost: {required: true, maxlength: 3},
+	            jsonStringPost: {required: true}	// WARNING : need to check JSON format
 	        },
 
 	        // Specify the validation error messages
@@ -148,11 +156,16 @@ $(function() {
 
 	        // handler for the form
 			submitHandler: function(form) {
-				var idCmd = $("#cmdIdPost").val();
-				var idArduino = $("#arduinosListPost option:selected").val();
-				var jsonString =  $('#jsonStringPost').val();
-				console.log('[POST] idArduino : ' + idArduino + " - json string : " + jsonString);
-				doPost(idCmd, idArduino, jsonString);
+				if (!JSON.stringify($('#jsonStringPost').val())) {
+					alert('Wrong JSON string, check structure !');
+				}
+				else {
+					var idCmd = $("#cmdIdPost").val();
+					var idArduino = $("#arduinosListPost option:selected").val();
+					var jsonString =  $('#jsonStringPost').val();
+					console.log('[POST] idArduino : ' + idArduino + " - json string : " + jsonString);
+					doPost(idCmd, idArduino, jsonString);	
+				}
 	        }
 		});
 	})
@@ -213,7 +226,7 @@ function doPinRead(idCmd, idArduino, pin, mode) { // http://localhost:8080/rest/
 	if (idArduino == null) {
 		alert("[DOREAD] Wrong arduino ID : " + idArduino);
 	} else {
-		// WARNING : need to test each case (binary / analogique) !!!
+		// WARNING : need to test each case (binary / analog) !!!
 		// build the request URL
 		var requestUrl = baseUrl + "/pinRead/" + idCmd + "/" + idArduino + "/" + pin + "/" + mode;
 
@@ -231,7 +244,7 @@ function doPinWrite(idCmd, idArduino, pin, mode, value) { // http://localhost:80
 	if (idArduino == null) {
 		alert("[DOWRITE] Wrong arduino ID : " + idArduino);
 	} else {
-		// WARNING : need to test each case (binary / analogique) !!!
+		// WARNING : need to test each case (binary / analog) !!!
 		// build the request URL
 		var requestUrl = baseUrl + "/pinWrite/" + idCmd + "/" + idArduino + "/" + pin + "/" + mode + "/" + value;
 
