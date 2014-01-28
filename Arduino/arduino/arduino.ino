@@ -257,7 +257,7 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
   // valeur de la pin à eteindre
   int led = atoi(pin->valuestring);
   //paramètre pin non numérique ou hors des limites: erreur 202
-  if(!isValidNumber(pin) || led < 0 || led > 13) {
+  if(!isValidNumber(pin) || led < 1 || led > 13) {
     sendReponse(client, reponse(strId,"202",NULL));
     return;
   }
@@ -274,7 +274,7 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
   // valeur de la durée
   int duree = atoi(dur->valuestring);
   //paramètre durée non numérique ou non supérieur à 0: erreur 204
-  if(!isValidNumber(dur) || duree < 1) {
+  if(!isValidNumber(dur) || duree < 100 || duree > 2000) {
     sendReponse(client, reponse(strId,"204",NULL));
     return;
   }
@@ -291,7 +291,7 @@ void doClignoter(EthernetClient *client,char * strId, aJsonObject* parametres){
   // valeur du nombre de clignotements
   int nbClignotements = atoi(nb->valuestring);
   //paramètre nb non numérique ou non supérieur à 0: erreur 206
-  if(!isValidNumber(nb) || nbClignotements < 1) {
+  if(!isValidNumber(nb) || nbClignotements < 2) {
     sendReponse(client, reponse(strId,"206",NULL));
     return;
   }
@@ -350,7 +350,7 @@ void doPinWrite(EthernetClient *client, char * strId, aJsonObject* parametres){
     return;
   }
   //paramètre pin non numérique ou pas dans les bornes (selon mode binaire ou analogique): erreur 305
-  if(!isValidNumber(pin) || (strcmp(mod2, "b")==0 && (pin2 < 0 || pin2 > 13)) || (strcmp(mod2, "a")==0 && (pin2 < 0 || pin2 > 5)) ) {
+  if(!isValidNumber(pin) || (strcmp(mod2, "b")==0 && (pin2 < 1 || pin2 > 13)) || (strcmp(mod2, "a")==0 && (pin2 < 0 || pin2 > 5)) ) {
     sendReponse(client, reponse(strId,"305",NULL)); // réponse d'erreur
     return;
   }
@@ -405,7 +405,7 @@ void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
   }
   
   //paramètre pin non numérique ou hors des limites: erreur 404
-  if(!isValidNumber(pin) || (strcmp(mod2, "b")==0 && (pin2 < 0 || pin2 > 13)) || (strcmp(mod2, "a")==0 && (pin2 < 0 || pin2 > 5)) ) {
+  if(!isValidNumber(pin) || (strcmp(mod2, "b")==0 && (pin2 < 1 || pin2 > 13)) || (strcmp(mod2, "a")==0 && (pin2 < 0 || pin2 > 5)) ) {
     sendReponse(client, reponse(strId,"404",NULL)); // réponse d'erreur
     return;
   }
