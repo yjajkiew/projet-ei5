@@ -4,13 +4,13 @@
     <title>REST Client</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="js/jquery.mobile-1.4.0/jquery.mobile-1.4.0.css">
     <!-- <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css"> -->
     <!-- <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script> -->
     <script type="text/javascript" src="js/jquery-2.0.3.js"></script>
     <script type="text/javascript" src="js/jquery-validation-1.11.1/jquery.validate.min.js"></script>
     <!-- need to be included before jQmobile to enable drop-down view formating -->
     <!-- <script type="text/javascript" src="js/jqmInit.js"></script> -->
-    <link rel="stylesheet" href="js/jquery.mobile-1.4.0/jquery.mobile-1.4.0.css">
     <script type="text/javascript" src="js/jquery.mobile-1.4.0/jquery.mobile-1.4.0.js"></script> 
     <!-- <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script> -->
     
@@ -31,9 +31,13 @@
                     <li><a href="#write" data-prefetch>Pin write</a></li>
                     <li><a href="#post" data-prefetch>POST command</a></li>
                 </ul>
+                <h1> Settings : </h1>
+                <ul data-role="listview" data-inset="true" data-filter="false">
+                    <li><a href="#address" data-prefetch>Change Server @</a></li>
+                </ul>
             </div>
         </div><!-- /content -->
-        <div data-role="footer"></br>
+        <div data-role="footer">
             <h1>Main menu</h1>
         </div><!-- /footer -->
     </div><!-- /page -->
@@ -42,36 +46,37 @@
     <!-- Page : Blink - #blink -->
     <div data-role="page" id="blink" data-theme="b">
         <div data-role="header">
-            <a href="#main" data-icon="back">Back</a>
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
             <h1>Blink</h1>
+            <a href="#main" data-icon="arrow-r" data-iconpos="right">Blink</a>
         </div><!-- /header -->
 
         <div data-role="content">
             <div class="arduinos">
                 <h2>Choose arduino :</h2>
                 <input type="button" data-inline="true" data-icon="refresh" value="Refresh" name="arduinosListBlink" id="blinkRefresh" class="refreshButton"/>             
-                <select data-inline="true" name="arduinosListBlink" id="arduinosListBlink"> </select>
+                <select data-inline="true" name="arduinosListBlink" id="arduinosListBlink" class="list"> </select>
+                <!-- <p>No arduino in list = no connection to REST server </p> -->
             </div><!-- /arduino list -->
             <hr />
             <form id="blinkForm" class="form">
                 <h2> Choose parameters : </h2>
                 <div data-role="fieldcontain" class="parameters">
-                    <label for="name">Command ID : </label>
+                    <label for="name">Command ID :</label>
                     <input type="number" name="cmdIdBlink" id="cmdIdBlink" value="1" /><br />
-                    <label for="pinBlink">Pin : </label>
+                    <label for="pinBlink">Pin :</label>
                     <input type="number" name="pinBlink" id="pinBlink" value="8" /><br />
-                    <label for="lenghtBlink"> Length : </label>
+                    <label for="lenghtBlink"> Length (ms) :</label>
                     <input type="number" name="lenghtBlink" id="lenghtBlink" value="100" /><br />
-                    <label for="nbBlink">Numbers of blink : </label>
+                    <label for="nbBlink">Numbers of blink :</label>
                     <input type="number" name="nbBlink" id="nbBlink" value="10" />
                 </div> <!-- /parameters -->
                 <hr />
                 <div class="actions">
                     <h2> Actions : </h2>
                     <div data-role="controlgroup" data-type="horizontal">
-                        <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                        <input type="button" name="resetBlink" id="resetBlink" class="resetButton" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
-                        <input type="submit" name="doBlink" id="doBlink" class="submit"data-icon="check" data-iconpos="right" value="Do blink"/>
+                        <input type="button" name="resetBlink" id="resetBlink" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
+                        <input type="submit" name="doBlink" id="doBlink" class="submit"data-icon="check" data-iconpos="right" value="Blink"/>
                     </div>
                 </div><!-- /action bottom buttons -->
             </form> <!-- /form -->
@@ -81,8 +86,9 @@
                 <div id="blinkResult"></div>
             </div> <!-- result -->
         </div><!-- /content -->
-        <div data-role="footer"></br>
-            <h1>Blink</h1>
+        <div data-role="footer">
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
+            <a href="#read" data-icon="arrow-r" data-iconpos="right">Read</a>
         </div><!-- /footer -->
     </div><!-- /page blink-->
 
@@ -90,7 +96,7 @@
     <!-- Page : Pin Read - #read -->
     <div data-role="page" id="read" data-theme="b">
         <div data-role="header">
-            <a href="#main" data-icon="back">Back</a>
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
             <h1>Pin Read</h1>
         </div><!-- /header -->
         <div data-role="content">
@@ -117,8 +123,7 @@
                 <div class="actions">
                     <h2> Actions : </h2>
                     <div data-role="controlgroup" data-type="horizontal">
-                        <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                        <input type="button" name="resetRead" id="resetRead" class="resetButton" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                        <input type="button" name="resetRead" id="resetRead" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
                         <input type="submit" name="doPinRead" id="doPinRead" data-icon="check" data-iconpos="right" value="Read"/>
                     </div>
                 </div><!-- /action bottom buttons -->
@@ -129,8 +134,10 @@
                 <div id="readResult"></div>
             </div><!-- /result -->
         </div><!-- /content -->
-        <div data-role="footer"></br>
-            <h1>Pin Read</h1>
+        <div data-role="footer">
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
+            <a href="#blink" data-icon="arrow-l" data-iconpos="left">Blink</a>
+            <a href="#write" data-icon="arrow-r" data-iconpos="right">Write</a>
         </div><!-- /footer -->
     </div><!-- /page read-->
 
@@ -138,7 +145,7 @@
     <!-- Page : Pin Write - #write -->
     <div data-role="page" id="write" data-theme="b">
         <div data-role="header">
-            <a href="#main" data-icon="back">Back</a>
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
             <h1>Pin Write</h1>
         </div><!-- /header -->
         <div data-role="content">
@@ -167,8 +174,7 @@
                 <div class="actions">
                     <h2> Actions : </h2>
                     <div data-role="controlgroup" data-type="horizontal">
-                        <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                        <input type="button" name="resetWrite" id="resetWrite" class="resetButton" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                        <input type="button" name="resetWrite" id="resetWrite" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
                         <input type="submit" name="doPinWrite" id="doPinWrite" data-icon="check" data-iconpos="right" value="Write"/>
                     </div>
                 </div><!-- /action bottom buttons -->
@@ -179,8 +185,10 @@
                 <div id="writeResult"></div>
             </div><!-- /result -->
         </div><!-- /content -->
-        <div data-role="footer"></br>
-            <h1>Pin Write</h1>
+        <div data-role="footer">
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
+            <a href="#read" data-icon="arrow-l" data-iconpos="left">Read</a>
+            <a href="#post" data-icon="arrow-r" data-iconpos="right">POST</a>
         </div><!-- /footer -->
     </div><!-- /page write-->
 
@@ -188,7 +196,7 @@
     <!-- Page : Post Command - #post -->
     <div data-role="page" id="post" data-theme="b">
         <div data-role="header">
-            <a href="#main" data-icon="back">Back</a>
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
             <h1>POST Command</h1>
         </div><!-- /header -->
         <div data-role="content">
@@ -204,14 +212,13 @@
                     <label for="name">Command ID : </label>
                     <input type="number" name="cmdIdPost" id="cmdIdPost" value="1"  />
                     <label for="jsonString">JSON to send : </label>
-                    <input type="text" name="jsonStringPost" id="jsonStringPost" value='[{"id":"1","pa":{"val":"0","pin":"8","mod":"b"},"ac":"pw"}, {"id":"2","pa":{"pin":"8","mod":"a"},"ac":"pr"}, {"id":"3","ac":"cl","pa":{"pin":"8","dur":"100","nb":"10"}}]'/>
+                    <input type="text" name="jsonStringPost" id="jsonStringPost" value='[{"id":"1","pa":{"val":"0","pin":"8","mod":"b"},"ac":"pw"}, {"id":"2","pa":{"pin":"8","mod":"b"},"ac":"pr"}, {"id":"3","ac":"cl","pa":{"pin":"8","dur":"100","nb":"10"}}]'/>
                 </div><!-- /Parameters -->
                 <hr />
                 <div class="actions">
                     <h2> Actions : </h2>
                     <div data-role="controlgroup" data-type="horizontal">
-                        <a href="#main" data-role="button" data-theme="a" data-icon="home" iconpos="left">Back</a>
-                        <input type="button" name="resetPost" id="resetPost" class="resetButton" data-icon="delete" data-iconpos="right" value="Reset parameters"/>
+                        <input type="button" name="resetPost" id="resetPost" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
                         <input type="submit" name="doPost" id="doPost" data-icon="check" data-iconpos="right" value="POST"/>
                     </div>
                 </div><!-- /action bottom buttons -->
@@ -222,10 +229,41 @@
                 <div id="postResult"></div>
             </div>
         </div><!-- /content -->
-        <div data-role="footer"></br>
-            <h1>POST Command</h1>
+        <div data-role="footer">
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
+            <a href="#write" data-icon="arrow-l" data-iconpos="left">Write</a>
         </div><!-- /footer -->
     </div><!-- /page -->
+
+    <!-- Page : Change server address - #address -->
+    <div data-role="page" id="address" data-theme="b">
+        <div data-role="header">
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
+            <h1>Server Address</h1>
+        </div><!-- /header -->
+
+        <div data-role="content">
+            <form id="addressForm" class="form">
+                <h2> Change server address : </h2>
+                <div data-role="fieldcontain" class="parameters">
+                    <label for="serverAddress">New server address (IPV4): </label>
+                    <input type="text" name="serverAddress" id="serverAddress" value="127.0.0.1" /><br />
+                </div>
+                <hr />
+                <div class="actions">
+                    <h2> Actions : </h2>
+                    <div data-role="controlgroup" data-type="horizontal">
+                        <input type="button" name="resetBlink" id="resetAddress" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
+                        <input type="submit" name="changeAddress" id="changeAddress" class="submit"data-icon="check" data-iconpos="right" value="Set"/>
+                    </div>
+                </div><!-- /action bottom buttons -->
+            </form> <!-- /form -->
+        </div><!-- /content -->
+        <div data-role="footer" data-inline="true">
+            <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
+        </div><!-- /footer -->
+    </div><!-- /page blink-->
+
     <script type="text/javascript" src="js/myScript.js"></script>
 </body>
 </html>

@@ -32,8 +32,11 @@ exports.arduinos = function(callback) {
 	});
 	// bulid JSON object
 	jsonObject = {data:arduinosTable};
-	// send it back
+	// send it back & log
 	callback(jsonObject);
+	var arduinoNbr = arduinosTable.length;
+	var plural = arduinoNbr >1 ? 's' : '';
+	util.log('[METIER] Sending info for ' + arduinoNbr + ' Arduino' + plural);
 }
 
 // LED blink
@@ -220,62 +223,55 @@ exports.cmd = function(idArduino, jsonObjectList, callback) {
 
 // send callback (from GET)
 function sendToDao(idArduino, jsonObject, callback) {
-	dao.send(idArduino, JSON.stringify(jsonObject), function(data) {
+	dao.send(idArduino, JSON.stringify(jsonObject), function(jsonArduino) {
+		try {
+			// try to parse the jsonArduino answer
+			jsonArduino = JSON.parse(jsonArduino);
 
-		// if data exist, build the answer
-		if (data != null) {
-			try {
-				data = JSON.parse(data);
-				if (data.er == '0') {
-					data = JSON.stringify({data:{id:data.id, erreur:data.er, etat:data.et, json:null}});
-				}
-				else {
-					data = JSON.stringify({data:{id:data.id, erreur:data.er, etat:data.et, json:data}});
-				}
-			} catch(err) {
-				var errorMessage = err + '[METIER] Error while parsing JSON from arduino : ' + err.message;
-				util.log(errorMessage);
-				err = JSON.stringify({data:{message:errorMessage}});
-				data = null;
+			// if no issue, build the appropriate answer to send back to [WEB]
+			if (jsonArduino.er != '0') {	// if arduino returned an error code
+				// WARNING : need to link error code to proper error text HERE !
+				jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
+				callback(jsonAnswer);
 			}
-		}else{
-			var errorMessage = '[METIER] No data received from arduino';
-			buildJsonError(errorMessage, function(jsonError) {
-				callback(jsonError);
-			});
+			else {	// if we have a "normal" answer
+				jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}};
+				callback(jsonAnswer);
+			}
+		} catch(err) {
+			// Errors : mean ether that arduino don't existe, or an issu occured while sending in [DAO].
+			// This mean that some identifier required above doesn't exist, so it's an error JSON message.
+			// As [DAO] already handled thoose issues (and they have the appropriated format), we only need to send them back to [WEB]
+			callback(jsonArduino);
 		}
-        // send back err & data
-        callback(err, data);
-		
 	});
 }
 
 // send callback (from POST)
 function sendCmdToDao(idArduino, jsonObject, callback) {
     dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
+		try {
+			// try to parse the jsonArduino answer
+			jsonArduino = JSON.parse(jsonArduino);
 
-        // if data exist, build the answer
-        if (data != null) {
-            try {
-                    data = JSON.parse(data);
-                    if (data.er == '0') {
-                    	// WARNING : we need to build a table here, wich is different from the other function 'sendToDao' !!
-                            data = JSON.stringify({data:[{id:data.id, erreur:data.er, etat:data.et, json:null}]});
-                    }
-                    else {
-                            data = JSON.stringify({data:[{id:data.id, erreur:data.er, etat:data.et, json:data}]});
-                    }
-            } catch(err) {
-                var errorMessage = err + '[METIER] Error while parsing data from arduino : ' + err.message;
-                util.log(errorMessage);
-                err = JSON.stringify({data:{message:errorMessage}});
-                data = null;
-            }
-        }
-
-        // send back err & data
-        callback(err, data);
-    });
+			// if no issue, build the appropriate answer to send back to [WEB]
+			if (jsonArduino.er != '0') {	// if arduino returned an error code
+				// WARNING : need to link error code to proper error text HERE !
+				jsonAnswer = {data:[{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}]};
+				callback(jsonAnswer);
+			}
+			else {	// if we have a "normal" answer
+				// WARNING : need to build the answer with all the frames sended by the arudino (not only the first one)
+				jsonAnswer = {data:[{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}]};
+				callback(jsonAnswer);
+			}
+		} catch(err) {
+			// Errors : mean ether that arduino don't existe, or an issu occured while sending in [DAO].
+			// This mean that some identifier required above doesn't exist, so it's an error JSON message.
+			// As [DAO] already handled thoose issues (and they have the appropriated format), we only need to send them back to [WEB]
+			callback(jsonArduino);
+		}
+	});
 }
 
 // Check BLINK parameters
@@ -286,7 +282,7 @@ function checkBlink(idCommand, pin, length, number, callback) {
 		errorMessage += 'wrong id: ' + idCommand +' ; ';
 	}
 	if(pin<0 || pin >13) {
-		errorMessage += 'wrong pin: ' + pin +' ; ';
+		errorMessage += 'wrong pin [0-13]: ' + pin +' ; ';
 	}
 	if(length<0 || length>1000) {
 		errorMessage += 'wrong length: ' + length +' ; ';
@@ -296,7 +292,7 @@ function checkBlink(idCommand, pin, length, number, callback) {
 	}
 	// if some params aren't good, send false & JSON string error message
 	if(errorMessage != '') {
-		var errorMsg = '[METIER] Blink -> parameters issue: [' + errorMessage + ']';
+		var errorMsg = '[METIER] Blink -> wrong parameters: [' + errorMessage + ']';
 		buildJsonError(errorMsg, function(jsonObject) {
 			callback(false, jsonObject);
 		});
@@ -326,7 +322,7 @@ function checkRead(idCommand, pin, mode, callback) {
 	}
 	// if some params aren't good, send false & JSON string error message
 	if(errorMessage != '') {
-		var errorMsg = '[METIER] Read -> parameters issue: [' + errorMessage + ']';
+		var errorMsg = '[METIER] Read -> wrong parameters: [' + errorMessage + ']';
 		buildJsonError(errorMsg, function(jsonObject) {
 			callback(false, jsonObject);
 		});
@@ -362,7 +358,7 @@ function checkWrite(idCommand, pin, mode, value, callback) {
 	}
 	// if some params aren't good, send false & JSON string error message
 	if(errorMessage != '') {
-		var errorMsg = '[METIER] Write -> parameters issue: [' + errorMessage + ']';
+		var errorMsg = '[METIER] Write -> wrong parameters: [' + errorMessage + ']';
 		buildJsonError(errorMsg, function(jsonObject) {
 			callback(false, jsonObject);
 		});

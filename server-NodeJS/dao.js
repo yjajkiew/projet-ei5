@@ -34,14 +34,17 @@ exports.send = function(idArduino, jsonString, callback) {
 	// Get Arduino info
 	arduino = arduinos.item(idArduino);
 
+	// log (WARNING : CAN CRASH HERE, need to restructure with a try/catch !!!)
+	//util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
+
 	// check if arduino exist
 	if (arduino == undefined) {
 		// arduino not in the collection, send back error message
-		var errorMsg = '[DAO] Arduino not connected / not in the collection, try to re-connect / reset)';
-		buildJsonError(errorMsg, function(jsonObject) {
-			callback(jsonObject);
-		});
+		var errorMsg = '[DAO] Arduino not connected / not in the collection => try to re-connect / reset)';
 		util.log(errorMsg);
+		buildJsonError(errorMsg, function(jsonError) {
+			callback(jsonError);
+		});
 	}
 	else {
 		// Connect to Arduino server
@@ -56,12 +59,13 @@ exports.send = function(idArduino, jsonString, callback) {
 			client.end();
 		})
 
-		// 'End' event, save data
+		// 'End' event, arudino answer
 		.on('end', function() {
+			// clean the string received & send it back to [METIER] & log
 			arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
-			// if (arduinoAnswer.error != 0)
 			callback(arduinoAnswer);
 			util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
+			// reset the answer for next call
 			arduinoAnswer = '';
 		})
 
@@ -69,8 +73,8 @@ exports.send = function(idArduino, jsonString, callback) {
 		.on('error', function(err) {
 			// send back error message & log
 			var errorMsg = '[DAO] Error while sending json to Arduino : ' + err.code;
-			buildJsonError(errorMsg, function(jsonObject) {
-				callback(jsonObject);
+			buildJsonError(errorMsg, function(jsonError) {
+				callback(jsonError);
 			});
 			util.log(errorMsg);
 
@@ -91,10 +95,7 @@ exports.send = function(idArduino, jsonString, callback) {
 //////// SERVER : arduinos registration
 
 var server = net.createServer(function(sock) {
-
 	// We have a connection - a socket object is assigned to the connection automatically
-	//util.log('[DAO] New Arduino : ' + sock.remoteAddress +':'+ sock.remotePort);
-    
 	sock.on('data', function(chunk) { //called every time data is received
     	data += chunk;  //add data chunk to data
 	})
@@ -133,7 +134,7 @@ server.on('error', function(err) {
 			break;
 
 		case 'EADDRNOTAVAIL' :
-			util.log('[DAO] Network unreachable ! Check network config, retrying in 10 sec...');
+			util.log('[DAO] Network unreachable ! Check ethernet cable, retrying in 10 sec...');
 			setTimeout(function () {
 			    server.listen(PORT, HOST);
 	    	},10000);
