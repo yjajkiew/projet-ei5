@@ -1,6 +1,5 @@
 #include <SPI.h>
 #include <Ethernet.h>
-#include <String.h>
 #include <aJSON.h>
 // ---------------------------------- CONFIGURATION DE L'ARDUINO DUEMILANOVE
 // adresse MAC de l'Arduino DUEMILANOVE
@@ -14,8 +13,6 @@ EthernetServer server(portArduino);
 IPAddress ipServeurEnregistrement(192,168,2,1); // IP du serveur d'enregistrement
 int portServeurEnregistrement=100; // port du serveur d'enregistrement
 EthernetClient clientArduino; // le client Arduino du serveur d'enregistrement
-String commandeGlobal; //commande reçue par le serveur
-String reponseGlobal; //réponse à envoyer au serveur
 
 // initialisation
 void setup() {
@@ -80,15 +77,15 @@ void loop()
       Serial.print(F("Memoire disponible debut boucle : "));
       Serial.println(freeRam());
       // on lit la commande de ce client
-      commandeGlobal=lireCommande(&client);
+      String commande=lireCommande(&client);
       // suivi
       Serial.print(F("commande : ["));
-      Serial.print(commandeGlobal);
+      Serial.print(commande);
       Serial.println(F("]"));
       // si la commande est vide, on ne la traite pas
-      if(commandeGlobal.length()==0) continue;
+      if(commande.length()==0) continue;
       // sinon on la traite
-      traiterCommande(&client,&commandeGlobal);
+      traiterCommande(&client,&commande);
       // mémoire disponible
       Serial.print(F("Memoire disponible fin boucle : "));
       Serial.println(freeRam());
@@ -133,6 +130,7 @@ void traiterCommande(EthernetClient *client, String *commande){
     return;
   }
   // on mémorise l'id
+  //int index = String(id->valuestring).lastIndexOf('.');
   char *strId = id->valuestring;
   
   // attribut action
@@ -217,12 +215,12 @@ int connecte(EthernetClient *client, IPAddress *serveurIP, int *serveurPort) {
   
 // lecture d'une commande du serveur
 String lireCommande(EthernetClient *client){
-  commandeGlobal = "";
+  String commande = "";
   while(client->available()) {
     char c = client->read();
-    commandeGlobal += c;
+    commande += c;
   }
-  return commandeGlobal; // on rend la commande
+  return commande; // on rend la commande
 }
 
 // formatage json de la réponse au client
@@ -236,9 +234,9 @@ String reponse(String id, String erreur, String etat){
   if(etat==NULL) etat="{}";
   
   // construction de la réponse
-  reponseGlobal="{\"id\":\""+id+"\",\"er\":\""+erreur+"\",\"et\":"+etat+"}";
+  String reponse="{\"id\":\""+id+"\",\"er\":\""+erreur+"\",\"et\":"+etat+"}";
   // résultat
-  return reponseGlobal;
+  return reponse;
 }
 
 // echo
@@ -427,8 +425,8 @@ void doPinRead(EthernetClient *client,char * strId, aJsonObject* parametres){
 
 // envoi réponse au client
 void sendReponse(EthernetClient *client, String message){
-  Serial.print(F("Memoire disponible : ")); // mémoire disponible
-  Serial.println(freeRam());
+  //Serial.print(F("Memoire disponible : ")); // mémoire disponible
+  //Serial.println(freeRam());
   // envoi de la réponse
   client->println(message);
   // suivi
