@@ -216,9 +216,11 @@ int connecte(EthernetClient *client, IPAddress *serveurIP, int *serveurPort) {
 // lecture d'une commande du serveur
 String lireCommande(EthernetClient *client){
   String commande = "";
+  int i = 0;
   while(client->available()) {
     char c = client->read();
-    commande += c;
+    if(i < 100) commande += c;
+    ++i;
   }
   return commande; // on rend la commande
 }
