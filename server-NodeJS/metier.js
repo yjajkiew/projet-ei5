@@ -14,10 +14,16 @@
 var util = require('util');
 // Import other layers
 var	dao = require('./dao');
+// Import Arduino error message (JSON object)
+var arduinoErrors = require('./ArduinoErrors.js').list;
 
+
+/////////////
+// HANDLER //
+/////////////
 
 // get arduino list
-exports.arduinos = function(callback) {
+var arduinos = function(callback) {
 	var arduinosTable = [];
 	var jsonObject;
 
@@ -40,9 +46,9 @@ exports.arduinos = function(callback) {
 }
 
 // LED blink
-exports.blink = function(idCommand, idArduino, pin, lenght, number, callback) {
+var blink = function(idCommand, idArduino, pin, length, number, callback) {
 	// check the parameters
-	checkBlink(idCommand, pin, lenght, number, function(check, jsonObject) {
+	checkBlink(idCommand, pin, length, number, function(check, jsonObject) {
 		// if we have an error
 		if(check == false) {
 			// send error back to [WEB] & log
@@ -62,7 +68,7 @@ exports.blink = function(idCommand, idArduino, pin, lenght, number, callback) {
 }
 
 // READ command  {"id":"4","ac":"pr","pa":{"pin":"0","mod":"a"}}
-exports.read = function(idCommand, idArduino, pin, mode, callback) {
+var read = function(idCommand, idArduino, pin, mode, callback) {
 	// check the parameters
 	checkRead(idCommand, pin, mode, function(check, jsonObject) {
 		// if we have an error
@@ -84,7 +90,7 @@ exports.read = function(idCommand, idArduino, pin, mode, callback) {
 }
 
 // WRITE command
-exports.write = function(idCommand, idArduino, pin, mode, value, callback) {
+var write = function(idCommand, idArduino, pin, mode, value, callback) {
 	// check the parameters
 	checkWrite(idCommand, pin, mode, value, function(check, jsonObject) {
 		// if we have an error
@@ -105,132 +111,142 @@ exports.write = function(idCommand, idArduino, pin, mode, value, callback) {
 	});
 }
 
-// command (in POST)
-exports.cmd = function(idArduino, jsonObjectList, callback) {
-	// iterating trought list of comands
-	for (var index in jsonObjectList) {
-		// getting cmd case
-		switch(jsonObjectList[index].ac) {
-			case "pw" :
-				util.log('[METIER] Command : pw');
-				// check param number
-				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.mod && jsonObjectList[index].pa.val) {
-					// check the parameters
-					checkWrite(jsonObjectList[index].id, jsonObjectList[index].pa.pin, jsonObjectList[index].pa.mod, jsonObjectList[index].pa.val, function(check, jsonObject) {
-						// if we have an error
-						if(check == false) {
-							// send error back to [WEB] & log
-							callback(jsonObject);
-							util.log(jsonObject.data.message);
-						}
-						// if parameters are OK
-						else {
-							// send jsonObject to [DAO] & log
-							util.log('[METIER] POST Write -> send to DAO : ' + JSON.stringify(jsonObject));
-							sendToDao(idArduino, jsonObject, function(jsonArduino) {
-								// need to check errors in arduino answer
-								callback(jsonArduino);
-							});
-						}
-					});
-				}
-				else{
-					// if some parameters are missing, send back error to [WEB]
-					errorMessage = '[METIER] POST Write -> missing parameters, need: [id,pin,mode,val]';
+// handle POST command list
+var postCmd = function(idArduino, jsonObjectList, callback) {
+	var results = [];
+	// use series to synchronise the answer to the client
+	function series(item) {
+	  if(item) {
+	  	// if we still have a JSON object in the array : do Cmd
+	  	doCmd(idArduino, item, function(jsonArduino) {
+	  		results.push(jsonArduino);
+	      	return series(jsonObjectList.shift());
+	    });
+	  } else {
+	  	// else, send back the answer array
+	  	callback(results);
+	  }
+	}
+	series(jsonObjectList.shift());
+}
+
+
+// handle one command (in POST)
+var doCmd = function(idArduino, jsonObject, callback) {
+	try{
+		JSON.parse(jsonObject);
+		if (jsonObject.ac) {	// if the "ac" key existe in the JSON
+			// getting cmd case
+			switch(jsonObject.ac) {
+
+				case 'cl' :
+					util.log('[METIER] command : cl');
+					// chack param presence
+					if (jsonObject.id && jsonObject.pa.pin && jsonObject.pa.dur && jsonObject.pa.nb) {
+						// call previous "blink" function & log
+						util.log('[METIER] POST Blink : ' + JSON.stringify(jsonObject));
+						blink(jsonObject.id, idArduino, jsonObject.pa.pin, jsonObject.pa.dur, jsonObject.pa.nb, function(jsonArduino) {
+							callback(jsonArduino);
+						});
+					}
+					else {
+						// if some parameters are missing, send back error to [WEB]
+						errorMessage = '[METIER] POST Blink -> missing parameters, need: [id,pin,mode]';
+						util.log(errorMessage);
+						buildJsonError(errorMessage, function(jsonError) {
+							callback(jsonError);
+						});
+					}
+					break;
+
+				case 'pr' :
+					util.log('[METIER] Command : pr');
+					if (jsonObject.id && jsonObject.pa.pin && jsonObject.pa.mod) {
+						// call previous "read" function & log
+						util.log('[METIER] POST Read : ' + JSON.stringify(jsonObject));
+						read(jsonObject.id, idArduino, jsonObject.pa.pin, jsonObject.pa.mod, function(jsonArduino) {
+							callback(jsonArduino);
+						});
+					}
+					else {
+						// if some parameters are missing, send back error to [WEB]
+						errorMessage = '[METIER] POST Read -> missing parameters, need: [id,pin,mode]';
+						util.log(errorMessage);
+						buildJsonError(errorMessage, function(jsonError) {
+							callback(jsonError);
+						});
+					}
+					break;
+
+				case "pw" :
+					util.log('[METIER] Command : pw');
+					// check param number
+					if (jsonObject.id && jsonObject.pa.pin && jsonObject.pa.mod && jsonObject.pa.val) {
+						// call previous "write" function & log
+						var message = '[METIER] POST Write : ' + JSON.stringify(jsonObject);
+						util.log(message);
+						write(jsonObject.id , idArduino, jsonObject.pa.pin, jsonObject.pa.mod, jsonObject.pa.val, function(jsonArduino) {
+							callback(jsonArduino);
+						});
+					}
+					else{
+						// if some parameters are missing, send back error to [WEB]
+						errorMessage = '[METIER] POST Write -> missing parameters, need: [id,pin,mode,val]';
+						util.log(errorMessage);
+						buildJsonError(errorMessage, function(jsonError) {
+							callback(jsonError);
+						});
+					}
+					break;
+
+				default :
+					// return error to "web"
+					var errorMessage = '[METIER] POST : no action founded, check JSON "ac" key';
+					util.log(errorMessage);
 					buildJsonError(errorMessage, function(jsonError) {
 						callback(jsonError);
 					});
-					util.log(errorMessage);
-				}
-				break;
-
-			case 'pr' :
-				util.log('[METIER] Command : pr');
-				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.mod) {
-					// check the parameters
-					checkRead(jsonObjectList[index].id, jsonObjectList[index].pa.pin, jsonObjectList[index].pa.mod, function(check, jsonObject) {
-						// if we have an error
-						if(check == false) {
-							// send error back to [WEB] & log
-							callback(jsonObject);
-							util.log(jsonObject.data.message);
-						}
-						// if parameters are OK
-						else {
-							// send jsonObject to [DAO] & log
-							util.log('[METIER] POST Read -> send to DAO : ' + JSON.stringify(jsonObject));
-							sendToDao(idArduino, jsonObject, function(jsonArduino) {
-								// need to check errors in arduino answer
-								callback(jsonArduino);
-							});
-						}
-					});
-				}
-				else {
-					// if some parameters are missing, send back error to [WEB]
-					errorMessage = '[METIER] POST Read -> missing parameters, need: [id,pin,mode]';
-					buildJsonError(errorMessage, function(jsonError) {
-						callback(jsonError);
-					});
-					util.log(errorMessage);
-				}
-				break;
-
-			case 'cl' :
-				util.log('[METIER] command : cl');
-				// chack param presence
-				if (jsonObjectList[index].id && jsonObjectList[index].pa.pin && jsonObjectList[index].pa.dur && jsonObjectList[index].pa.nb) {
-					// check the parameters
-					checkBlink(jsonObjectList[index].id, jsonObjectList[index].pa.pin, jsonObjectList[index].pa.dur, jsonObjectList[index].pa.nb, function(check, jsonObject) {
-						// if we have an error
-						if(check == false) {
-							// send error back to [WEB] & log
-							callback(jsonObject);
-							util.log(jsonObject.data.message);
-						}
-						// if parameters are OK
-						else {
-							// send jsonObject to [DAO] & log
-							util.log('[METIER] POST Blink -> send to DAO : ' + JSON.stringify(jsonObject));
-							sendToDao(idArduino, jsonObject, function(jsonArduino) {
-								// need to check errors in arduino answer
-								callback(jsonArduino);
-							});
-						}
-					});
-				}
-				else {
-					// if some parameters are missing, send back error to [WEB]
-					errorMessage = '[METIER] POST Blink -> missing parameters, need: [id,pin,mode]';
-					buildJsonError(errorMessage, function(jsonError) {
-						callback(jsonError);
-					});
-					util.log(errorMessage);
-				}
-				break;
-
-			default :
-				// return error to "web"
-				var errorMessage = '[METIER] POST : no action founded !';
-				buildJsonError(errorMessage, function(jsonError) {
-					callback(jsonError);
-				});
-				util.log(errorMessage);
-				break;
+					break;
+			}
+		} else {
+			// "ac" parameter is missing, send back error to [WEB]
+			errorMessage = '[METIER] POST Blink -> "ac" parameters missing in JSON, cannot proceed POST cmd';
+			util.log(errorMessage);
+			buildJsonError(errorMessage, function(jsonError) {
+				callback(jsonError);
+			});
 		}
+	}catch (err) {
+		// JSON parsing error
+		errorMessage = '[METIER] POST Blink -> unable to parse JSON';
+		util.log(errorMessage);
+		buildJsonError(errorMessage, function(jsonError) {
+			callback(jsonError);
+		});
 	}
 }
 
-// send callback (from GET)
+
+///////////////
+// FUNCTIONS //
+///////////////
+
+// send builded json to [DAO]
 function sendToDao(idArduino, jsonObject, callback) {
 	dao.send(idArduino, JSON.stringify(jsonObject), function(jsonArduino) {
 		try {
 			// try to parse the jsonArduino answer
 			jsonArduino = JSON.parse(jsonArduino);
 
-			// if no issue, build the appropriate answer to send back to [WEB]
-			if (jsonArduino.er != '0') {	// if arduino returned an error code
-				// WARNING : need to link error code to proper error text HERE !
+			// if arduino returned an error code
+			if (jsonArduino.er != '0') {	
+				// we link the error code to it's text
+				arduinoErrors.forEach(function(error) {
+					if (error.key === jsonArduino.er) {
+						jsonArduino.er = error.val;
+					}
+				});
+				// build the answer & send it back
 				jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
 				callback(jsonAnswer);
 			}
@@ -239,140 +255,161 @@ function sendToDao(idArduino, jsonObject, callback) {
 				callback(jsonAnswer);
 			}
 		} catch(err) {
-			// Errors : mean ether that arduino don't existe, or an issu occured while sending in [DAO].
-			// This mean that some identifier required above doesn't exist, so it's an error JSON message.
-			// As [DAO] already handled thoose issues (and they have the appropriated format), we only need to send them back to [WEB]
-			callback(jsonArduino);
+			// error while parsing the JSON, sending back to [WEB] & log
+			var errorMsg = '[METIER] Parsing JSON failed while sending to [DAO]';
+			util.log(errorMsg);
+			buildJsonError(errorMsg, function(jsonObject) {
+				callback(jsonObject);
+			});
 		}
 	});
 }
 
-// send callback (from POST)
-function sendCmdToDao(idArduino, jsonObject, callback) {
-    dao.send(idArduino, JSON.stringify(jsonObject), function(err, data) {
-		try {
-			// try to parse the jsonArduino answer
-			jsonArduino = JSON.parse(jsonArduino);
-
-			// if no issue, build the appropriate answer to send back to [WEB]
-			if (jsonArduino.er != '0') {	// if arduino returned an error code
-				// WARNING : need to link error code to proper error text HERE !
-				jsonAnswer = {data:[{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}]};
-				callback(jsonAnswer);
-			}
-			else {	// if we have a "normal" answer
-				// WARNING : need to build the answer with all the frames sended by the arudino (not only the first one)
-				jsonAnswer = {data:[{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}]};
-				callback(jsonAnswer);
-			}
-		} catch(err) {
-			// Errors : mean ether that arduino don't existe, or an issu occured while sending in [DAO].
-			// This mean that some identifier required above doesn't exist, so it's an error JSON message.
-			// As [DAO] already handled thoose issues (and they have the appropriated format), we only need to send them back to [WEB]
-			callback(jsonArduino);
-		}
-	});
-}
-
-// Check BLINK parameters
+// check blink parameters & build JSON to send to arduino
 function checkBlink(idCommand, pin, length, number, callback) {
-	// check params type / value
+	// do check
 	var errorMessage = '';
-	if (idCommand<0 || idCommand>1000){
-		errorMessage += 'wrong id: ' + idCommand +' ; ';
-	}
-	if(pin<0 || pin >13) {
-		errorMessage += 'wrong pin [0-13]: ' + pin +' ; ';
-	}
-	if(length<0 || length>1000) {
-		errorMessage += 'wrong length: ' + length +' ; ';
-	}
-	if(number<1 || number>1000) {
-		errorMessage += 'wrong nbrs: ' + number +' ; ';
-	}
-	// if some params aren't good, send false & JSON string error message
+
+	// CommandId
+	// if (!isNaN(idCommand)) {
+	// 	if (idCommand<0 || idCommand>99999 ){
+	// 		errorMessage += ' ( ' + idCommand +' )->CMD ID must be a number [0-99999];';
+	// 	}
+	// } else {
+	// 	if (idCommand.length > 100 ){
+	// 		errorMessage += ' ( ' + idCommand +' )->CMD ID to long [0-100];';
+	// 	}
+	// }
+	// // Pin
+	// if( pin<0 || pin>13 || isNaN(pin) ) {
+	// 	errorMessage += ' ( ' + pin +' )->PIN must be a number [0-13];';
+	// }
+	// // Length
+	// if(length<100 || length>2000 || isNaN(length)) {
+	// 	errorMessage +=  ' ( ' + length +' )->LENGTH must be a number [100-2000];';
+	// }
+	// // Number
+	// if(number<2 || number>1000 || isNaN(number)) {
+	// 	errorMessage += ' ( ' + number +' )->NB BLINK must be a number [2-100];';
+	// }
+
+	// if some params aren't good, send false & JSON object error message
 	if(errorMessage != '') {
-		var errorMsg = '[METIER] Blink -> wrong parameters: [' + errorMessage + ']';
+		var errorMsg = '[METIER] Wrong BLINK parameters: [ ' + errorMessage + ']';
 		buildJsonError(errorMsg, function(jsonObject) {
 			callback(false, jsonObject);
 		});
-	}
-	// if we are good, seend true & JSON string for arduino
-	else{
+	}else {
+		// if params are ok, build the JSON to send to Arduino
 		var jsonObject = {id:idCommand,ac:"cl",pa:{pin:pin,dur:length,nb:number}};
 		callback(true, jsonObject);
 	}
 }
 
-// Build READ json object
+// check pin read parameters & build JSON to send to arduino
 function checkRead(idCommand, pin, mode, callback) {
-	// check params type / value
+	// error string
 	var errorMessage = '';
-	if (idCommand<0 || idCommand>1000){	// check id
-		errorMessage += 'wrong id: ' + idCommand +' ; ';
+
+	// CommandId
+	if (!isNaN(idCommand)) {
+		if (idCommand<0 || idCommand>99999 ){
+			errorMessage += ' ( ' + idCommand +' )->CMD ID must be a number [0-99999];';
+		}
+	} else {
+		if (idCommand.length > 100 ){
+			errorMessage += ' ( ' + idCommand +' )->CMD ID to long [0-100];';
+		}
 	}
-	if(mode != 'a' && mode != 'b') {	// check mode
-		errorMessage += 'wrong mode: ' + mode +' ; ';
+	// Mode
+	if(mode != 'a' && mode != 'b') {
+		errorMessage += ' ( ' + mode +' )->MOD must be a letter [a/b] (Warning : no PIN check);';
+	}else {
+		// Pin
+		if(mode==='a' && (pin<0 || pin>5 || isNaN(pin))) {
+			errorMessage += ' ( ' + pin +' )->PIN must be a number [0-5](analog);';
+		}
+		if(mode==='b' && (pin<1 || pin>13 || isNaN(pin))) {
+			errorMessage += ' ( ' + pin +' )->PIN must be a number [1-13](binary);';
+		}
 	}
-	if(mode=='a' && (pin<0 || pin>5)) {
-		errorMessage += 'wrong pin [0-5](a): ' + pin +' ; ';
-	}
-	if(mode=="b" && (pin<0 || pin>13)) {
-		errorMessage += 'wrong pin [0-13](b): ' + pin +' ; ';
-	}
-	// if some params aren't good, send false & JSON string error message
+
+	// if some params aren't good, send false & JSON object error message
 	if(errorMessage != '') {
-		var errorMsg = '[METIER] Read -> wrong parameters: [' + errorMessage + ']';
+		var errorMsg = '[METIER] Wrong READ parameters: [ ' + errorMessage + ']';
 		buildJsonError(errorMsg, function(jsonObject) {
 			callback(false, jsonObject);
 		});
-	}
-	// if we are good, seend true & JSON string for arduino
-	else{
+	}else {
+		// if params are ok, build the JSON to send to Arduino
 		var jsonObject = {id:idCommand,ac:"pr",pa:{pin:pin,mod:mode}};
 		callback(true, jsonObject);
 	}
 }
 
-// Build WRITE json object
+// check pin read parameters & build JSON to send to arduino
 function checkWrite(idCommand, pin, mode, value, callback) {
-	// check params type / value
+	// error string
 	var errorMessage = '';
-	if (idCommand<0 || idCommand>1000){	// check id
-		errorMessage += 'wrong id: ' + idCommand +' ; ';
+
+	// CommandId
+	if (!isNaN(idCommand)) {
+		if (idCommand<0 || idCommand>99999 ){
+			errorMessage += ' ( ' + idCommand +' )->CMD ID must be a number [0-99999];';
+		}
+	} else {
+		if (idCommand.length > 100 ){
+			errorMessage += ' ( ' + idCommand +' )->CMD ID to long [0-100];';
+		}
 	}
-	if(mode != 'a' && mode != 'b') {	// check mode
-		errorMessage += 'wrong mode: ' + mode +' ; ';
+	// Mode
+	if(mode != 'a' && mode != 'b') {
+		errorMessage += ' ( ' + mode +' )->MOD must be a letter [a/b] (Warning : no PIN / VALUE check);';
+	}else {
+		// Pin
+		if(mode==='a' && (pin<0 || pin>5 || isNaN(pin))) {
+			errorMessage += ' ( ' + pin +' )->PIN must be a number [0-5](analog);';
+		}
+		if(mode==='b' && (pin<0 || pin>13 || isNaN(pin))) {
+			errorMessage += ' ( ' + pin +' )->PIN must be a number [0-13](binary);';
+		}
+		// Value
+		if(mode=='a' && (value<0 || value>255 || isNaN(value))){
+			errorMessage += ' ( ' +  value +' )->VALUE must be a number [0-255](analog);';
+		}
+		if(mode=='b' && (value<0 || value>1 || isNaN(value))){
+			errorMessage += ' ( ' +  value +' )->VALUE must be a number [0/1](binary);';
+		}
 	}
-	if(mode=='a' && (pin<0 || pin>5)) {	//
-		errorMessage += 'wrong pin [0-5](a): ' + pin +' ; ';
-	}
-	if(mode=='b' && (pin<0 || pin>13)) {	//
-		errorMessage += 'wrong pin [0-13](b): ' + pin +' ; ';
-	}
-	if(mode=='a' && (value<0 || value>255)){
-		errorMessage += 'wrong value [0-255](a): ' + value +' ; ';
-	}
-	if(mode=='b' && (value<0 || value>1)){
-		errorMessage += 'wrong value [0/1](b): ' + value +' ; ';
-	}
-	// if some params aren't good, send false & JSON string error message
+
+	// if some params aren't good, send false & JSON object error message
 	if(errorMessage != '') {
-		var errorMsg = '[METIER] Write -> wrong parameters: [' + errorMessage + ']';
+		var errorMsg = '[METIER] Wrong WRITE parameters: [ ' + errorMessage + ']';
 		buildJsonError(errorMsg, function(jsonObject) {
 			callback(false, jsonObject);
 		});
-	}
-	// if we are good, seend true & JSON string for arduino
-	else{
+	}else {
+		// if params are ok, build the JSON to send to Arduino
 		var jsonObject = {id:idCommand,ac:"pw",pa:{pin:pin,mod:mode,val:value}};
 		callback(true, jsonObject);
 	}
 }
 
-// build JSON error message
+// build JSON object error message
 function buildJsonError(msg, callback) {
 	// build the error message & send it back
 	var jsonErrorMessage = {data:{message:msg}};
 	callback(jsonErrorMessage);
 }
+
+
+/////////////
+// EXPORTS //
+/////////////
+
+// Export modules
+module.exports.arduinos = arduinos;
+module.exports.blink = blink;
+module.exports.read = read;
+module.exports.write = write;
+module.exports.postCmd = postCmd;
