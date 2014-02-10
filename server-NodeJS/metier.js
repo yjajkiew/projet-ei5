@@ -245,6 +245,9 @@ function sendToDao(idArduino, jsonObject, callback) {
 					if (error.key === jsonArduino.er) {
 						jsonArduino.er = error.val;
 					}
+					else {
+						jsonArduino.er += '(not registered)';
+					}
 				});
 				// build the answer & send it back
 				jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
