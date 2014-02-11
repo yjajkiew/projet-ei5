@@ -445,9 +445,5 @@ module.exports.arduinos = arduinos;
 module.exports.blink = blink;
 module.exports.read = read;
 module.exports.write = write;
-<<<<<<< HEAD
 // module.exports.postCmd = postCmd;
 module.exports.asyncPostCmd = asyncPostCmd;
-=======
-module.exports.postCmd = postCmd;
->>>>>>> c4037279b6b3e6f9aa6e43ac9370f5b8c867ff64
