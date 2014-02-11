@@ -237,6 +237,7 @@ function sendToDao(idArduino, jsonObject, callback) {
 	// stringify the JSON query and send it to [DAO]
 	dao.send(idArduino, JSON.stringify(jsonObject), function(jsonArduino) {
 		try {
+<<<<<<< HEAD
 			// if we had an error in [DAO], send it back directly (Warning : JSON object here !)
 			if (jsonArduino.data) {
 				callback(jsonArduino)
@@ -245,6 +246,29 @@ function sendToDao(idArduino, jsonObject, callback) {
 				jsonArduino = JSON.parse(jsonArduino);
 
 				
+=======
+			// try to parse the jsonArduino answer
+			jsonArduino = JSON.parse(jsonArduino);
+
+			// if arduino returned an error code
+			if (jsonArduino.er != '0') {	
+				// we link the error code to it's text
+				arduinoErrors.forEach(function(error) {
+					if (error.key === jsonArduino.er) {
+						jsonArduino.er = error.val;
+					}
+					else {
+						jsonArduino.er += '(not registered)';
+					}
+				});
+				// build the answer & send it back
+				jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
+				callback(jsonAnswer);
+			}
+			else {	// if we have a "normal" answer
+				jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}};
+				callback(jsonAnswer);
+>>>>>>> c4037279b6b3e6f9aa6e43ac9370f5b8c867ff64
 			}
 		} catch(err) {
 			// error while parsing the JSON, sending back to [WEB] & log
@@ -421,5 +445,9 @@ module.exports.arduinos = arduinos;
 module.exports.blink = blink;
 module.exports.read = read;
 module.exports.write = write;
+<<<<<<< HEAD
 // module.exports.postCmd = postCmd;
 module.exports.asyncPostCmd = asyncPostCmd;
+=======
+module.exports.postCmd = postCmd;
+>>>>>>> c4037279b6b3e6f9aa6e43ac9370f5b8c867ff64
