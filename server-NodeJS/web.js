@@ -21,10 +21,7 @@ var metier 	= require('./metier');
 // Globals Variables 
 var server 	= new express();
 var PORT 	= process.argv[2] || 8080;
-var BASE_PATH = "/rest/arduinos";
-
-// Client : index.html
-var index = fs.readFileSync('./public/index.html');
+var BASE_PATH = '/rest/arduinos';
 
 
 
@@ -55,19 +52,20 @@ server
 	next();
 })
 
+// jQuery Client: http://localhost:8080/
+.get('/', function(req,res) {
+	res.setHeader('Content-Type', 'text/html');
+	util.log('[WEB] Query : jQuery Client');
+	var index = fs.readFile('./public/index.html')
+	res.send(index);
+})
+
 // Arduino list query: http://localhost:8080/rest/arduinos
 .get(BASE_PATH, function(req, res) {
 	util.log('[WEB] Query : Arduino list');
 	metier.arduinos(function(arduinos) {
 		res.send(arduinos);
 	});
-})
-
-// jQuery Client: http://localhost:8080/
-.get('/', function(req,res) {
-	res.setHeader('Content-Type', 'text/html');
-	util.log('[WEB] Query : jQuery Client');
-	res.send(index);
 })
 
 // LED blink query: http://localhost:8080/rest/arduinos/blink/192.168.2.3/192.168.2.3/8/100/10
@@ -105,9 +103,9 @@ server
 	// parameters from POST
 	var params = req.body;
 	// logs
-	util.log('[WEB] Query : URL=[ ' + p.command + ' , ' + p.idArduino + ' ] ; POST=' + JSON.stringify(params));	// direct acces of the key 'id': req.body['id']
-	metier.postCmd(p.idArduino, params, function(answer) {
-		res.send(answer);
+	util.log('[WEB] Query : URL=[ ' + p.command + ' , ' + p.idArduino + ' ] ; POST=' + JSON.stringify(params));
+	metier.asyncPostCmd(p.idArduino, params, function(jsonObject) {
+		res.send(jsonObject);
 	});
 })
 

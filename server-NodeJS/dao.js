@@ -11,9 +11,10 @@
 // Imports modules:
 var util = require('util');
 var	net = require('net');
+var async = require('async');
 // Import other layer
 var arduinosCollection = require('./Collection');
-// var heartbeat = require('./heartbeat');
+var Arduino = require('./Arduino.js');
 
 
 
@@ -29,11 +30,11 @@ var	arduinoAnswer = '';
 var	HOST = '192.168.2.1';		// Registration server IP
 var	PORT = 100;					// Registration server PORT
 var	data = '';					// string containing received chunks
-var	arduinos = new arduinosCollection.collection();		// collection containing connected arduinos properties, as JSON objects
+var	arduinos = new arduinosCollection.collection();		// collection containing connected arduinos properties, as objects
 
 
 // send JSON command to arduino
-exports.send = function(idArduino, jsonString, callback) {
+var sendToArduino = function(idArduino, jsonString, callback) {
 
 	// Get Arduino info
 	arduino = arduinos.item(idArduino);
@@ -41,7 +42,7 @@ exports.send = function(idArduino, jsonString, callback) {
 	// check if arduino exist
 	if (arduino == undefined) {
 		// arduino not in the collection, send back error message
-		var errorMsg = '[DAO] Arduino not connected / not in the collection => try to re-connect / reset)';
+		var errorMsg = '[DAO] Arduino not connected / not in the collection => try to re-connect / reset';
 		util.log(errorMsg);
 		buildJsonError(errorMsg, function(jsonError) {
 			callback(jsonError);
@@ -52,10 +53,8 @@ exports.send = function(idArduino, jsonString, callback) {
 		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
 			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
 			client.write(jsonString);
-		})
-
-		// settings
-		
+			arduinoAnswer = '';
+		})		
 
 		// Receive data from Arduino
 		.on('data', function(chunk) {	// NOTE : arduino need to register itself befor beeing able to respond to query !
@@ -108,7 +107,9 @@ var server = net.createServer(function(sock) {
 	.on('end', function() { //called when eol character '\0' is received
 		data = data.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
 		try {
-			data = JSON.parse(data);	// parse JSON object
+			// parse JSON object
+			data = JSON.parse(data);
+			// check if arduino is already in our arduinos array
 			if(arduinos.add(data.id, data) === undefined) {
 				util.log('[DAO] Arduino already registered');
 			}
@@ -116,7 +117,7 @@ var server = net.createServer(function(sock) {
 				util.log('[DAO] Arduino saved : ' + JSON.stringify(data));
 			}
 		}catch(err) {
-			util.log('[DAO] Error while parsing arduino JSON registration : ' + err.message)
+			util.log('[DAO] Error while parsing arduino JSON registration - ' + err)
 		}
 		data = '';
 	})
@@ -169,6 +170,16 @@ function buildJsonError(msg, callback) {
 }
 
 // return arduinos array, containing string from arduinos' registrations
-exports.getArduinos = function(callback) {
+var getArduinos = function(callback) {
+	// should force a 'hearbeat' here !
 	callback(arduinos);
 };
+
+
+
+/////////////
+// EXPORTS //
+/////////////
+
+module.exports.send = sendToArduino;
+module.exports.getArduinos = getArduinos;

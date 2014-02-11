@@ -1,64 +1,91 @@
-// Async arduino heartbeat
+// Acheck arduino state
 function heartbeat(arduino, callback) {
-	var heartbeatText = '';
-
 	// Connect to Arduino server
 	var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
 		// build json object
 		var jsonObject = {id:"1",ac:"ec",pa:{}};
 		var jsonString = JSON.stringify(jsonObject);
-		heartbeatText += '[DAO-HeartBeat] Checking Arduino @ ' + arduino.id + ":" + arduino.port;
 		client.write(jsonString);
 	})
 
 	// Receive data from Arduino
-	.on('data', function(chunk) {	// NOTE : arduino need to register itself befor beeing able to respond to query !
+	.on('data', function(chunk) {
 		arduinoAnswer+=chunk;
 		client.end();
 	})
 
-	// 'End' event, just log
+	// 'End' event
 	.on('end', function() {
-		arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
-		heartbeatText += ' => OK !';
 		arduinoAnswer = '';
-		//log 
-		util.log(heartbeatText);
+		callback(true);
 	})
 
-	// 'error' event, remove arduino
+	// 'error' event
 	.on('error', function(err) {
-		// delete arduino
-		if (arduinos.remove(arduino.id) === undefined) {
-			util.log('[DAO-HeartBeat] arduino : ' + arduino.id + ' already removed from collection');
-		}
-		else {
-			util.log('[DAO-HeartBeat] Arduino : ' + arduino.id + ' not responding, removing from collection');
-		}
+		callback(false);
 	});
 }
 
-// Final task (same in all the examples)
-function final() { console.log('Done', results); }
-
-// A simple async series:
+// iterate trought the erduino list and do hearbeat
 var arduinosCheck = function(arduinos) {
-	var items = arduinos;
-	var results = [];
-	function series(item) {
-	  	if(item) {
-	    	heartbeat( item, function(result) {
-	      		results.push(result);
-	      		return series(items.shift());
-	    	});
-	  	} else {
-	    	// return final();
-	  	}
-	}
-	series(items.shift());
+	arduinos.forEach(arduino, function() {
+		heartbeat(arduino, function(checkBoolean) {
+			if (!checkBoolean) {
+				util.log('[DAO-HeartBeat] Arduino : ' + arduino.id + ' didn\'t respond, removing from collection');
+			}
+			else {
+				util.log('[DAO-HeartBeat] Arduino : ' + arduino.id + ' echo OK');
+			}
+		});
+	});
 }
 
-// call heartbeat repetedly
+// call heartbeat periodically
 setInterval(function() {
+	util.log('[DAO] Checking arduinos in the collection')
 	arduinosCheck(arduinos);
 }, 5000);
+
+
+// 1st parameter in async.map() is the array of items
+async.each(items,
+  // 2nd parameter is the function that each item is passed into
+  function(item, callback){
+    // Call an asynchronous function (often a save() to MongoDB)
+    item.someAsyncCall(function (){
+      // Async call is done, alert via callback
+      callback();
+    });
+  },
+  // 3rd parameter is the function call when everything is done
+  function(err){
+    // All tasks are done now
+    doSomethingOnceAllAreDone();
+  }
+);
+
+async.each(openFiles, function( file, callback) {
+
+  // Perform operation on file here.
+  console.log('Processing file ' + file);
+  callback();
+
+  if( file.length > 32 ) {
+    console.log('This file name is too long');
+    callback('File name too long');
+
+    return;
+  } else {
+    console.log('File saved');
+    callback();
+  }
+}, function(err){
+    // if any of the saves produced an error, err would equal that error
+    if( err ) {
+      // One of the iterations produced an error.
+      // All processing will now stop.
+      console.log('A file failed to process');
+    } else {
+      console.log('All files have been processed successfully');
+    }
+});
