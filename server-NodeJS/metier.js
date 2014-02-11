@@ -237,40 +237,34 @@ function sendToDao(idArduino, jsonObject, callback) {
 	// stringify the JSON query and send it to [DAO]
 	dao.send(idArduino, JSON.stringify(jsonObject), function(jsonArduino) {
 		try {
-<<<<<<< HEAD
 			// if we had an error in [DAO], send it back directly (Warning : JSON object here !)
 			if (jsonArduino.data) {
 				callback(jsonArduino)
 			} else {
-				// try to parse the jsonArduino answer (Warning : string here !)
+				// try to parse the jsonArduino answer
 				jsonArduino = JSON.parse(jsonArduino);
 
-				
-=======
-			// try to parse the jsonArduino answer
-			jsonArduino = JSON.parse(jsonArduino);
-
-			// if arduino returned an error code
-			if (jsonArduino.er != '0') {	
-				// we link the error code to it's text
-				arduinoErrors.forEach(function(error) {
-					if (error.key === jsonArduino.er) {
-						jsonArduino.er = error.val;
-					}
-					else {
-						jsonArduino.er += '(not registered)';
-					}
-				});
-				// build the answer & send it back
-				jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
-				callback(jsonAnswer);
+				// if arduino returned an error code
+				if (jsonArduino.er != '0') {	
+					// we link the error code to it's text
+					arduinoErrors.forEach(function(error) {
+						if (error.key === jsonArduino.er) {
+							jsonArduino.er = error.val;
+						}
+						else {
+							jsonArduino.er += '(not registered)';
+						}
+					});
+					// build the answer & send it back
+					jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
+					callback(jsonAnswer);
+				}
+				else {	// if we have a "normal" answer
+					jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}};
+					callback(jsonAnswer);
+				}
 			}
-			else {	// if we have a "normal" answer
-				jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}};
-				callback(jsonAnswer);
->>>>>>> c4037279b6b3e6f9aa6e43ac9370f5b8c867ff64
-			}
-		} catch(err) {
+		}catch(err) {
 			// error while parsing the JSON, sending back to [WEB] & log
 			var errorMsg = '[METIER] Processing arduino JSON failed -> ' + err;
 			util.log(errorMsg);

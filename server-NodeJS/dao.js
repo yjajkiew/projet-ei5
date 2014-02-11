@@ -50,8 +50,8 @@ var sendToArduino = function(idArduino, jsonString, callback) {
 	}
 	else {
 		// Connect to Arduino server
-		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
-			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.id + ":" + arduino.port);
+		var client = net.connect({host:arduino.ip, port:arduino.port},function() { //'connect' listener
+			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.ip + ":" + arduino.port);
 			client.write(jsonString);
 			arduinoAnswer = '';
 		})		
@@ -106,6 +106,7 @@ var server = net.createServer(function(sock) {
 	
 	.on('end', function() { //called when eol character '\0' is received
 		data = data.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
+		// util.log('[DAO] received : ' + data);
 		try {
 			// parse JSON object
 			data = JSON.parse(data);
