@@ -1,7 +1,7 @@
 /////////////////
 // VARIABLES : //
 /////////////////
-var SERVER_PORT = 8080;
+var SERVER_PORT = 80;
 var SERVER_ADDRESS = 'localhost';
 var SERVER_BASE_PATH = "/rest/arduinos";
 var baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH;
@@ -295,6 +295,7 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 	} else {
 		// build the request URL
 		var requestUrl = baseUrl + "/" + idCmd + "/" + idArduino;
+		// console.log(jsonString);
 
 		// do AJAX POST
 		$.ajax({
@@ -302,11 +303,11 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 			url: requestUrl,
 			contentType: "application/json; charset=utf-8",
 			data: jsonString,
-			dataType: "json"
+			// dataType: "json"
 		})
 
 		.done(function(result) {
-			$( "#postResult" ).html(JSON.stringify(result));
+			$( "#postResult" ).html(result);
 			console.log("[DOPOST] json answer: " + JSON.stringify(result));
 		})
 
@@ -325,7 +326,7 @@ function getAjax(url, callback) {
 
 	.done(function(result) {
 		callback(result);
-		console.log("[GET] json answer: " + JSON.stringify(result));
+		console.log("[GET] json answer: " + result);
 	})
 
 	.fail(function(err) {

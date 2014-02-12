@@ -2,7 +2,7 @@ exports.collection = function()
 {
 	// properties
 	this.count=0;
-	this.collection=[];
+	this.collection={};
 
 	// methodes
 	this.add = function(key,item) {

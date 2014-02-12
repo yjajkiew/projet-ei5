@@ -33,14 +33,14 @@ var arduinos = function(callback) {
 		// build the table
 		arduinosCollection.forEach(function(ard) {
 			//create json object using the expected format
-			var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,ip:ard.id,mac:ard.mac}; 
+			var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,mac:ard.mac}; 
 			arduinosTable.push(jsonArduino);
 		});
 	});
 	// build JSON object
 	jsonObject = {data:arduinosTable};
 	// send it back & log
-	callback(jsonObject);
+	callback(JSON.stringify(jsonObject));
 	var arduinoNbr = arduinosTable.length;
 	var plural = arduinoNbr >1 ? 's' : '';
 	util.log('[METIER] Sending info for ' + arduinoNbr + ' Arduino' + plural);
@@ -114,26 +114,27 @@ var write = function(idCommand, idArduino, pin, mode, value, callback) {
 
 // POST command
 function asyncPostCmd(idArduino, jsonObjectList, callback) {
-	// re-build the array (check if any error in the array)
-	var jsonArray = [];
-	try {
-		jsonObjectList.forEach(function(item) {
-			jsonArray.push(item);
-		});
-	} catch(err) {
-		errorMessage = '[METIER] POST -> not an array of JSON, should be: [json1, json2, ..., jsonN]';
-		util.log(errorMessage);
-		buildJsonError(errorMessage, function(jsonError) {
-			callback(jsonError);
-		});
-	}
+	// // re-build the array (check if any error in the array)
+	// var jsonArray = [];
+	// try {
+	// 	jsonObjectList.forEach(function(item) {
+	// 		jsonArray.push(item);
+	// 	});
+	// } catch(err) {
+	// 	errorMessage = '[METIER] POST -> not an array of JSON, should be: [json1, json2, ..., jsonN]';
+	// 	util.log(errorMessage);
+	// 	buildJsonError(errorMessage, function(jsonError) {
+	// 		callback(jsonError);
+	// 	});
+	// }
+
 	// result array
 	var results = [];
 
     // start async call on our collection
     async.eachSeries(
 		// the array to iterate over
-		jsonArray,
+		jsonObjectList,
 
 		// the iterator function
 		function(jsonObject, callback) {
@@ -239,7 +240,7 @@ function sendToDao(idArduino, jsonObject, callback) {
 		try {
 			// if we had an error in [DAO], send it back directly (Warning : JSON object here !)
 			if (jsonArduino.data) {
-				callback(jsonArduino)
+				callback(JSON.stringify(jsonArduino));
 			} else {
 				// try to parse the jsonArduino answer
 				jsonArduino = JSON.parse(jsonArduino);
@@ -257,11 +258,11 @@ function sendToDao(idArduino, jsonObject, callback) {
 					});
 					// build the answer & send it back
 					jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
-					callback(jsonAnswer);
+					callback(JSON.stringify(jsonAnswer));
 				}
 				else {	// if we have a "normal" answer
 					jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}};
-					callback(jsonAnswer);
+					callback(JSON.stringify(jsonAnswer));
 				}
 			}
 		}catch(err) {
@@ -269,25 +270,8 @@ function sendToDao(idArduino, jsonObject, callback) {
 			var errorMsg = '[METIER] Processing arduino JSON failed -> ' + err;
 			util.log(errorMsg);
 			buildJsonError(errorMsg, function(jsonObject) {
-				callback(jsonObject);
+				callback(JSON.stringify(jsonObject));
 			});
-		}
-
-		// if arduino returned an error code
-		if (jsonArduino.er != '0') {	
-			// we link the error code to it's text
-			arduinoErrors.list.forEach(function(error) {
-				if (error.key === jsonArduino.er) {
-					jsonArduino.er = error.val;
-				}
-			});
-			// build the answer & send it back
-			jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
-			callback(jsonAnswer);
-		}
-		else {	// if we have a "normal" answer
-			jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}};
-			callback(jsonAnswer);
 		}
 	});
 }

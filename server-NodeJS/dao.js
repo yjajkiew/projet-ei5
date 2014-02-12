@@ -14,7 +14,6 @@ var	net = require('net');
 var async = require('async');
 // Import other layer
 var arduinosCollection = require('./Collection');
-var Arduino = require('./Arduino.js');
 
 
 
@@ -39,6 +38,8 @@ var sendToArduino = function(idArduino, jsonString, callback) {
 	// Get Arduino info
 	arduino = arduinos.item(idArduino);
 
+	// util.log('arduino : ' + idArduino );
+
 	// check if arduino exist
 	if (arduino == undefined) {
 		// arduino not in the collection, send back error message
@@ -50,8 +51,8 @@ var sendToArduino = function(idArduino, jsonString, callback) {
 	}
 	else {
 		// Connect to Arduino server
-		var client = net.connect({host:arduino.ip, port:arduino.port},function() { //'connect' listener
-			util.log('[DAO] Sending : ' + jsonString + ' to Arduino @ ' + arduino.ip + ":" + arduino.port);
+		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
+			util.log('[DAO] Sending : ' + jsonString + ' to arduino @ ' + arduino.id + ":" + arduino.port);
 			client.write(jsonString);
 			arduinoAnswer = '';
 		})		

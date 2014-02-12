@@ -100,13 +100,26 @@ server
 .post(BASE_PATH + '/:command/:idArduino', function(req, res) {
 	// parameters from URL
 	var p = req.params;
-	// parameters from POST
+	// POST data
 	var params = req.body;
-	// logs
-	util.log('[WEB] Query : URL=[ ' + p.command + ' , ' + p.idArduino + ' ] ; POST=' + JSON.stringify(params));
-	metier.asyncPostCmd(p.idArduino, params, function(jsonObject) {
-		res.send(jsonObject);
-	});
+	// parse to JSON
+	try{
+		// params.forEach(function(json) {
+		// 	util.log(JSON.stringify(json));
+		// });
+		// logs
+		util.log('[WEB] Query : URL=[ ' + p.command + ' , ' + p.idArduino + ' ] ');// POST=' + JSON.stringify(params));
+		metier.asyncPostCmd(p.idArduino, params, function(jsonObject) {
+			res.send(jsonObject);
+		});
+	} catch(err) {
+		errorMessage = '[WEB] Error while parsing the JSON in POST ' + err;
+		util.log(errorMessage);
+		buildJsonError(errorMessage, function(jsonError) {
+			callback(jsonError);
+		});
+	}
+	
 })
 
 // ERROR : wrong URL
@@ -144,3 +157,11 @@ server.listen(PORT, function() {
 	// log
 	util.log('[WEB] Server launched on port ' + PORT);
 });
+
+
+// build JSON object error message
+function buildJsonError(msg, callback) {
+	// build the error message & send it back
+	var jsonErrorMessage = {data:{message:msg}};
+	callback(jsonErrorMessage);
+}
