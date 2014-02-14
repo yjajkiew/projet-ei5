@@ -252,8 +252,9 @@ function doBlink(idCmd, idArduino, pin, lenght, nbBlink) { // http://localhost:8
 		var requestUrl = baseUrl + "/blink/" + idCmd + "/" + idArduino + "/" + pin + "/" + lenght + "/" + nbBlink;
 
 		// do AJAX GET
-		getAjax(requestUrl, function(jsonString) {
-			//alert(JSON.stringify(jsonObject), 'Result'); ==> to much limited, need to use a modal dialogue pop-up
+		getAjax(requestUrl, function(jsonObject) {
+			jsonString = JSON.stringify(jsonObject);
+			console.log('Blink result : ' + jsonString);
 			$( "#blinkResult" ).html(jsonString);
 		})
 	}
@@ -268,7 +269,9 @@ function doPinRead(idCmd, idArduino, pin, mode) { // http://localhost:8080/rest/
 		var requestUrl = baseUrl + "/pinRead/" + idCmd + "/" + idArduino + "/" + pin + "/" + mode;
 
 		// do AJAX GET
-		getAjax(requestUrl, function(jsonString) {
+		getAjax(requestUrl, function(jsonObject) {
+			jsonString = JSON.stringify(jsonObject);
+			console.log('Read result : ' + jsonString);
 			$( "#readResult" ).html(jsonString);
 		})
 	}
@@ -283,7 +286,9 @@ function doPinWrite(idCmd, idArduino, pin, mode, value) { // http://localhost:80
 		var requestUrl = baseUrl + "/pinWrite/" + idCmd + "/" + idArduino + "/" + pin + "/" + mode + "/" + value;
 
 		// do AJAX GET
-		getAjax(requestUrl, function(jsonString) {
+		getAjax(requestUrl, function(jsonObject) {
+			jsonString = JSON.stringify(jsonObject);
+			console.log('Write result' + jsonString);
 			$( "#writeResult" ).html(jsonString);
 		})
 	}
@@ -307,8 +312,10 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 		})
 
 		.done(function(result) {
-			$( "#postResult" ).html(result);
-			console.log("[DOPOST] json answer: " + result);
+			jsonString = JSON.stringify(result);
+			console.log('Write result' + jsonString);
+			$( "#postResult" ).html(jsonString);
+			console.log("[DOPOST] json answer: " + jsonString);
 		})
 
 		.fail(function(err) {

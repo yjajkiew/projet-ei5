@@ -81,7 +81,7 @@ var sendToArduino = function(idArduino, jsonObject, callback) {
 		.on('end', function() {
 			// clean the string received & send it back to [METIER] & log
 			arduinoAnswer = arduinoAnswer.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
-			util.log('[DAO] Disconnected, received : ' + arduinoAnswer);
+			util.log('[DAO] Arduino answer : ' + arduinoAnswer);
 			callback(arduinoAnswer);
 			// reset the answer for next call
 			arduinoAnswer = '';
