@@ -1,7 +1,7 @@
 /////////////////
 // VARIABLES : //
 /////////////////
-var SERVER_PORT = 80;
+var SERVER_PORT = 8080;
 var SERVER_ADDRESS = 'localhost';
 var SERVER_BASE_PATH = "/rest/arduinos";
 var baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH;
@@ -139,7 +139,7 @@ $(function() {
 	            cmdIdWrite: {required: true, maxlength: 3, number: true},
 	            pinWrite: {required: true, range: [0,13], number: true},
 	            modeWrite: {required: true},
-	            valueWrite: {required: true, number: true}	// WARNING : need to test value here, according to BINARY // ANALOG
+	            valueWrite: {required: true, number: true}
 	        },
 
 	        // handler for the form
@@ -163,7 +163,7 @@ $(function() {
 			// Specify the validation rules
 	        rules: {
 	            cmdIdPost: {required: true, maxlength: 3, number: true},
-	            jsonStringPost: {required: true}	// WARNING : need to check JSON format
+	            jsonStringPost: {required: true}
 	        },
 
 	        // handler for the form
@@ -195,14 +195,14 @@ $(function() {
 
 	        // handler for the form
 	        submitHandler: function(form) {
-	        	// get new ip address
+	        	// update infos
 	        	SERVER_ADDRESS = $("#serverAddress").val();
 	        	SERVER_PORT = $("#serverPort").val();
 	        	SERVER_BASE_PATH = $("#serverPath").val()
-	        	// Re-build server base URL
+	        	// Re-build base URL
 	        	baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH;
 	        	// log & display
-	        	message = 'New server address : ' + baseUrl;
+	        	message = 'New server URL : ' + baseUrl;
 	        	console.log('[SETTINGS] ' + message);
 	        	alert(message);
 	        	// return to menu
@@ -252,9 +252,9 @@ function doBlink(idCmd, idArduino, pin, lenght, nbBlink) { // http://localhost:8
 		var requestUrl = baseUrl + "/blink/" + idCmd + "/" + idArduino + "/" + pin + "/" + lenght + "/" + nbBlink;
 
 		// do AJAX GET
-		getAjax(requestUrl, function(jsonObject) {
+		getAjax(requestUrl, function(jsonString) {
 			//alert(JSON.stringify(jsonObject), 'Result'); ==> to much limited, need to use a modal dialogue pop-up
-			$( "#blinkResult" ).html(JSON.stringify(jsonObject));
+			$( "#blinkResult" ).html(jsonString);
 		})
 	}
 }
@@ -268,8 +268,8 @@ function doPinRead(idCmd, idArduino, pin, mode) { // http://localhost:8080/rest/
 		var requestUrl = baseUrl + "/pinRead/" + idCmd + "/" + idArduino + "/" + pin + "/" + mode;
 
 		// do AJAX GET
-		getAjax(requestUrl, function(jsonObject) {
-			$( "#readResult" ).html(JSON.stringify(jsonObject));
+		getAjax(requestUrl, function(jsonString) {
+			$( "#readResult" ).html(jsonString);
 		})
 	}
 }
@@ -283,8 +283,8 @@ function doPinWrite(idCmd, idArduino, pin, mode, value) { // http://localhost:80
 		var requestUrl = baseUrl + "/pinWrite/" + idCmd + "/" + idArduino + "/" + pin + "/" + mode + "/" + value;
 
 		// do AJAX GET
-		getAjax(requestUrl, function(jsonObject) {
-			$( "#writeResult" ).html(JSON.stringify(jsonObject));
+		getAjax(requestUrl, function(jsonString) {
+			$( "#writeResult" ).html(jsonString);
 		})
 	}
 }
@@ -308,7 +308,7 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 
 		.done(function(result) {
 			$( "#postResult" ).html(result);
-			console.log("[DOPOST] json answer: " + JSON.stringify(result));
+			console.log("[DOPOST] json answer: " + result);
 		})
 
 		.fail(function(err) {

@@ -40,7 +40,7 @@ var arduinos = function(callback) {
 	// build JSON object
 	jsonObject = {data:arduinosTable};
 	// send it back & log
-	callback(JSON.stringify(jsonObject));
+	callback(jsonObject);
 	var arduinoNbr = arduinosTable.length;
 	var plural = arduinoNbr >1 ? 's' : '';
 	util.log('[METIER] Sending info for ' + arduinoNbr + ' Arduino' + plural);
@@ -114,19 +114,15 @@ var write = function(idCommand, idArduino, pin, mode, value, callback) {
 
 // POST command
 function asyncPostCmd(idArduino, jsonObjectList, callback) {
-	// // re-build the array (check if any error in the array)
-	// var jsonArray = [];
-	// try {
-	// 	jsonObjectList.forEach(function(item) {
-	// 		jsonArray.push(item);
-	// 	});
-	// } catch(err) {
-	// 	errorMessage = '[METIER] POST -> not an array of JSON, should be: [json1, json2, ..., jsonN]';
-	// 	util.log(errorMessage);
-	// 	buildJsonError(errorMessage, function(jsonError) {
-	// 		callback(jsonError);
-	// 	});
-	// }
+	try {
+		jsonObjectList = JSON.parse(jsonObjectList);
+	} catch(err) {
+		errorMessage = '[METIER] Failed to parse POST JSON -> ' + err;
+		util.log(errorMessage);
+		buildJsonError(errorMessage, function(jsonError) {
+			callback(jsonError);
+		});
+	}
 
 	// result array
 	var results = [];
@@ -148,7 +144,7 @@ function asyncPostCmd(idArduino, jsonObjectList, callback) {
 		// the final callback (or when error occured)
 		function(err) {
 			if (err) {
-				util.log('[DAO] Error occured while checking arduinos : ' + err)
+				util.log('[METIER] Failed to process command array : ' + err)
 			}
 			callback(results);
     	}  
@@ -162,7 +158,7 @@ var doCmd = function(idArduino, jsonObject, callback) {
 	switch(jsonObject.ac) {
 
 		case 'cl' :
-			// chack param presence
+			// check param presence
 			if (jsonObject.id && jsonObject.pa.pin && jsonObject.pa.dur && jsonObject.pa.nb) {
 				util.log('[METIER] Post command : Blink');
 				// call previous "blink" function
@@ -222,7 +218,7 @@ var doCmd = function(idArduino, jsonObject, callback) {
 			var errorMessage = '[METIER] POST : "ac" parameters missing in JSON, cannot proceed POST cmd';
 			util.log(errorMessage);
 			buildJsonError(errorMessage, function(jsonError) {
-				// callback(jsonError);
+				callback(jsonError);
 			});
 		break;
 	}
@@ -236,11 +232,11 @@ var doCmd = function(idArduino, jsonObject, callback) {
 // send builded json to [DAO]
 function sendToDao(idArduino, jsonObject, callback) {
 	// stringify the JSON query and send it to [DAO]
-	dao.send(idArduino, JSON.stringify(jsonObject), function(jsonArduino) {
+	dao.send(idArduino, jsonObject, function(jsonArduino) {
 		try {
 			// if we had an error in [DAO], send it back directly (Warning : JSON object here !)
 			if (jsonArduino.data) {
-				callback(JSON.stringify(jsonArduino));
+				callback(jsonArduino);
 			} else {
 				// try to parse the jsonArduino answer
 				jsonArduino = JSON.parse(jsonArduino);
@@ -258,11 +254,11 @@ function sendToDao(idArduino, jsonObject, callback) {
 					});
 					// build the answer & send it back
 					jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
-					callback(JSON.stringify(jsonAnswer));
+					callback(jsonAnswer);
 				}
 				else {	// if we have a "normal" answer
 					jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}};
-					callback(JSON.stringify(jsonAnswer));
+					callback(jsonAnswer);
 				}
 			}
 		}catch(err) {
@@ -270,7 +266,7 @@ function sendToDao(idArduino, jsonObject, callback) {
 			var errorMsg = '[METIER] Processing arduino JSON failed -> ' + err;
 			util.log(errorMsg);
 			buildJsonError(errorMsg, function(jsonObject) {
-				callback(JSON.stringify(jsonObject));
+				callback(jsonObject);
 			});
 		}
 	});
@@ -406,6 +402,22 @@ function checkWrite(idCommand, pin, mode, value, callback) {
 	}
 }
 
+// link error code from arduino to related text
+function linkArduinoErrors (errCode, callback) {
+	if (errCode != '') {
+		// we link the error code to it's text
+		arduinoErrors.forEach(function(error) {
+			if (error.key === errCode) {
+				errCode = error.val;
+			}
+			else {
+				errCode += '(not registered)';
+			}
+		});
+	}
+	callback(errCode);
+}
+
 // build JSON object error message
 function buildJsonError(msg, callback) {
 	// build the error message & send it back
@@ -423,5 +435,4 @@ module.exports.arduinos = arduinos;
 module.exports.blink = blink;
 module.exports.read = read;
 module.exports.write = write;
-// module.exports.postCmd = postCmd;
 module.exports.asyncPostCmd = asyncPostCmd;

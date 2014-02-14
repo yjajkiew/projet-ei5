@@ -1,9 +1,11 @@
 //************//
 // Couche DAO //
 //************//
-// -> CLIENT : receive JSON frame from "metier.js"
+// -> CLIENT : receive JSON Object from "metier.js"
+// -> CLIENT : serialize JSON for arduino
 // -> CLIENT : send JSON frame to Arduino
 // -> CLIENT : get Arduino JSON answer
+// -> CLEITN : de-serialize Arduino answer & send it back to [METIER]
 // -> SERVER : keep a track of connected Arduinos
 // -> Transmit JSON answer to 'metier.js'
 
@@ -33,7 +35,7 @@ var	arduinos = new arduinosCollection.collection();		// collection containing co
 
 
 // send JSON command to arduino
-var sendToArduino = function(idArduino, jsonString, callback) {
+var sendToArduino = function(idArduino, jsonObject, callback) {
 
 	// Get Arduino info
 	arduino = arduinos.item(idArduino);
@@ -50,6 +52,18 @@ var sendToArduino = function(idArduino, jsonString, callback) {
 		});
 	}
 	else {
+		// try to serialize JSON 
+		try {
+			jsonString = JSON.stringify(jsonObject);
+		} catch(err) {
+			// error while serializing
+			var errorMsg = '[DAO] Unable to serialize JSON -> ' + err;
+			util.log(errorMsg);
+			buildJsonError(errorMsg, function(jsonError) {
+				callback(jsonError);
+			});
+		}
+
 		// Connect to Arduino server
 		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
 			util.log('[DAO] Sending : ' + jsonString + ' to arduino @ ' + arduino.id + ":" + arduino.port);
@@ -119,7 +133,7 @@ var server = net.createServer(function(sock) {
 				util.log('[DAO] Arduino saved : ' + JSON.stringify(data));
 			}
 		}catch(err) {
-			util.log('[DAO] Error while parsing arduino JSON registration - ' + err)
+			util.log('[DAO] Parsing registration JSON failed -> ' + err)
 		}
 		data = '';
 	})

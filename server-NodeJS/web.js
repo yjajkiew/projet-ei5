@@ -2,9 +2,10 @@
 //  [WEB] //
 //********//
 // -> get request URL
-// -> parse the URL and extract query parameters (ardiuno ip, commands, ...)
-// -> send query to 'metier.js' for processing
+// -> parse the URL and extract query parameters (ardiuno ip, commands, ...) and data from POST
+// -> send query to 'metier.js' for processing (params + data from POST)
 // -> get JSON answer from [METIER] (which one get it from the [DAO] layer)
+// -> serialize JSON from [METIER]
 // -> transmit JSON answer to Client
 
 
@@ -29,11 +30,12 @@ var BASE_PATH = '/rest/arduinos';
 // MIDDLEWARES //
 ///////////////// for the express framework
 
-// server.use(express.logger());  // log all request in console
-server.use(express.bodyParser());	// use url parser
-server.use(express.static(__dirname + '/public'));	// serve static files
-server.use(express.favicon(__dirname + '/public/favicon.ico')) // activate indicated favicon
-
+server.configure(function(){
+	// server.use(express.logger());  // log all request in console
+	server.use(rawBody);	// POST body parser (see at the bottom)
+	server.use(express.static(__dirname + '/public'));	// serve static files
+	server.use(express.favicon(__dirname + '/public/favicon.ico')) // activate indicated favicon
+});
 
 
 ////////////
@@ -48,6 +50,7 @@ server
 .all('/*', function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	res.setHeader('Content-Type', 'application/json');
 	// note : "next" statement is use to call next middleware
 	next();
 })
@@ -64,7 +67,10 @@ server
 .get(BASE_PATH, function(req, res) {
 	util.log('[WEB] Query : Arduino list');
 	metier.arduinos(function(arduinos) {
-		res.send(arduinos);
+		// serialize & send answer
+		answer = JSON.stringify(arduinos);
+		util.log('[WEB] ARDUINOS sending back : ' + answer); 
+		res.send(answer);
 	});
 })
 
@@ -73,7 +79,10 @@ server
 	var p = req.params;
 	util.log('[WEB] Query : LED blink [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.lenght + ' , ' + p.number + ' ]');
 	metier.blink(p.idCommand, p.idArduino, p.pin, p.lenght, p.number, function(jsonObject) {
-		res.send(jsonObject);
+		// serialize & send answer
+		answer = JSON.stringify(jsonObject);
+		util.log('[WEB] BLINK sending back : ' + answer); 
+		res.send(answer);
 	});
 })
 
@@ -82,7 +91,10 @@ server
 	var p = req.params;
 	util.log('[WEB] Query : Read [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.mode + ' ]');
 	metier.read(p.idCommand, p.idArduino, p.pin, p.mode, function(jsonObject) {
-		res.send(jsonObject);
+		// serialize & send answer
+		answer = JSON.stringify(jsonObject);
+		util.log('[WEB] READ sending back : ' + answer); 
+		res.send(answer);
 	});
 })
 
@@ -91,7 +103,10 @@ server
 	var p = req.params;
 	util.log('[WEB] Query : Command [ ' + 'write' + ' , ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.mode + ' , ' + p.val + ' ]');
 	metier.write(p.idCommand, p.idArduino, p.pin, p.mode, p.val, function(jsonObject) {
-		res.send(jsonObject);
+		// serialize & send answer
+		answer = JSON.stringify(jsonObject);
+		util.log('[WEB] WRITE sending back : ' + answer); 
+		res.send(answer);
 	});
 })
 
@@ -101,52 +116,42 @@ server
 	// parameters from URL
 	var p = req.params;
 	// POST data
-	var params = req.body;
-	// parse to JSON
-	try{
-		// params.forEach(function(json) {
-		// 	util.log(JSON.stringify(json));
-		// });
-		// logs
-		util.log('[WEB] Query : URL=[ ' + p.command + ' , ' + p.idArduino + ' ] ');// POST=' + JSON.stringify(params));
-		metier.asyncPostCmd(p.idArduino, params, function(jsonObject) {
-			res.send(jsonObject);
-		});
-	} catch(err) {
-		errorMessage = '[WEB] Error while parsing the JSON in POST ' + err;
-		util.log(errorMessage);
-		buildJsonError(errorMessage, function(jsonError) {
-			callback(jsonError);
-		});
-	}
-	
+	var params = req.rawBody;
+	// log
+	util.log('[WEB] POST command (' + req.ip + ') - ' + 'URL=' + req.url + ' POST=' + JSON.stringify(params));
+	// console.log(req.route);
+	// send to METIER
+	metier.asyncPostCmd(p.idArduino, params, function(jsonObject) {
+		// serialize & send answer
+		answer = JSON.stringify(jsonObject);
+		util.log('[WEB] POST sending back : ' + answer); 
+		res.send(answer);
+	});
 })
 
 // ERROR : wrong URL
 .use(
-	function(req,res) {
+	function(err,req,res,next) {
 		// get ride of favicon query from browser
 		if (req.url != '/favicon.ico') {
-			// build error message
-			var errorMessage = '[WEB] Wrong URL request : [' + url.parse(req.url).pathname + ']';
-			var jsonErrorMessage = {data:{message:errorMessage}};
-			// send it back
-			res.send(jsonErrorMessage);
-			util.log(errorMessage);
+			if(err) {
+				// if we encountered an error previously :
+				var errorMessage = '[WEB] Error -> ' + err;
+				buildJsonStringError(errorMessage, function(jsonStringError) {
+					res.send(sonStringError);
+				});
+				util.log('[WEB] Error Stack Trace -> ' + err.stack);
+			} else {
+				// if it's a wrong URL :
+				var errorMessage = '[WEB] Wrong URL request : [' + url.parse(req.url).pathname + ']';
+				buildJsonStringError(errorMessage, function(jsonStringError) {
+					res.send(jsonStringError);
+				});
+				util.log(errorMessage);
+			}
 		}
 	}
 );
-
-// Connection close
-server.on('close', function() {
-	util.log('[WEB] Connection closed');
-})
-
-// On errors
-server.on('error', function(err) {
-	util.log('[WEB] Error on connection : ' + err.code);
-});
-
 
 
 ////////////
@@ -159,9 +164,32 @@ server.listen(PORT, function() {
 });
 
 
+//////////////
+// Methodes //
+//////////////
+
+// hand-made body parser
+function rawBody(req, res, next) {
+	req.setEncoding("utf8");
+	req.rawBody = '';
+	
+	req.on("data", function(chunk){ 
+		req.rawBody += chunk;
+	});
+	
+	req.on("end", function() {
+		next();
+	});
+
+	// req.on("err", function() {
+	// 	next(err);
+	// });
+}
+
+
 // build JSON object error message
-function buildJsonError(msg, callback) {
+function buildJsonStringError(msg, callback) {
 	// build the error message & send it back
 	var jsonErrorMessage = {data:{message:msg}};
-	callback(jsonErrorMessage);
+	callback(JSON.stringify(jsonErrorMessage));
 }
