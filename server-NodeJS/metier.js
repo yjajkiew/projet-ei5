@@ -113,42 +113,46 @@ var write = function(idCommand, idArduino, pin, mode, value, callback) {
 }
 
 // POST command
-function asyncPostCmd(idArduino, jsonObjectList, callback) {
+function asyncPostCmd(idArduino, jsonStringArray, callback) {
 	try {
-		jsonObjectList = JSON.parse(jsonObjectList);
+		// parse the client JSON string
+		jsonObjectArray = JSON.parse(jsonStringArray);
+		util.log(util.isArray(jsonObjectArray));
+
+		// result array
+		var resultArray = [];
+
+	    // start async call on our collection
+	    async.eachSeries(
+			// the array to iterate over
+			jsonObjectArray,
+
+			// the iterator function
+			function(jsonObject, callback) {
+				doCmd(idArduino, jsonObject, function(jsonArduino) {
+					resultArray.push(jsonArduino);
+					//callback (telling the iterator that the task is over)
+					callback();
+				});
+			},
+
+			// the final callback (or when error occured)
+			function(err) {
+				if (err) {
+					util.log('[METIER] Processing command array failed -> ' + err)
+				}
+				callback(resultArray);
+	    	}  
+	    )
 	} catch(err) {
-		errorMessage = '[METIER] Failed to parse POST JSON -> ' + err;
+		errorMessage = '[METIER] Parsing POST JSON failed -> ' + err;
 		util.log(errorMessage);
 		buildJsonError(errorMessage, function(jsonError) {
 			callback(jsonError);
 		});
 	}
 
-	// result array
-	var results = [];
-
-    // start async call on our collection
-    async.eachSeries(
-		// the array to iterate over
-		jsonObjectList,
-
-		// the iterator function
-		function(jsonObject, callback) {
-			doCmd(idArduino, jsonObject, function(jsonArduino) {
-				results.push(jsonArduino);
-				//callback (telling the iterator that the task is over)
-				callback();
-			});
-		},
-
-		// the final callback (or when error occured)
-		function(err) {
-			if (err) {
-				util.log('[METIER] Failed to process command array : ' + err)
-			}
-			callback(results);
-    	}  
-    )
+	
 }
 
 

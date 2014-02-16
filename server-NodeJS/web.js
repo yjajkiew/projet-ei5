@@ -31,7 +31,7 @@ var BASE_PATH = '/rest/arduinos';
 ///////////////// for the express framework
 
 server.configure(function(){
-	// server.use(express.logger());  // log all request in console
+	// server.use(express.logger());  // log all http requests in console
 	server.use(rawBody);	// POST body parser (see at the bottom)
 	server.use(express.static(__dirname + '/public'));	// serve static files
 	server.use(express.favicon(__dirname + '/public/favicon.ico')) // activate indicated favicon
@@ -187,7 +187,7 @@ function rawBody(req, res, next) {
 }
 
 
-// build JSON object error message
+// build JSON string error message
 function buildJsonStringError(msg, callback) {
 	// build the error message & send it back
 	var jsonErrorMessage = {data:{message:msg}};

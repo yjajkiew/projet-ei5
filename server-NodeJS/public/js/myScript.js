@@ -1,10 +1,12 @@
 /////////////////
 // VARIABLES : //
 /////////////////
-var SERVER_PORT = 8080;
 var SERVER_ADDRESS = 'localhost';
+var SERVER_PORT = 8080;
 var SERVER_BASE_PATH = "/rest/arduinos";
 var baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH;
+var listArray = ["#arduinosListBlink", "#arduinosListRead", "#arduinosListWrite", "#arduinosListPost"];
+var arduinoArray = [];
 
 // Browser is ready
 $(function() {
@@ -15,20 +17,34 @@ $(function() {
 		// INITIALISATION : //
 		//////////////////////
 
-		// get arduino list from REST Server
-		// WARNING => need to refresh all the drop-down list here !!!!!
-		// 4 request, not really great...
-		// TODO later : 
-		// use 1 "init" function
-		// OR : use the same option (saved in a shared table ie.) for all the DD list box, 
-		// OR : use the same DDLB on all 4 pages.
-		getArduinoList("#arduinosListBlink");
-		getArduinoList("#arduinosListRead");
-		getArduinoList("#arduinosListWrite");
-		getArduinoList("#arduinosListPost");
-
 		// hide AJAX loading indicator
 		$(".loading").hide();
+
+		// hide result class div (every time one page is displayed -> useful when switching between actions)
+		$( ":mobile-pagecontainer" ).on( "pagecontainershow", function( event, ui ) {
+			hideResult();
+		});
+
+		// update listBoxes
+		listArray.forEach(function(list) {
+			getArduinoList(list);
+		});
+
+		// // get arduino list from REST Server
+		// getArduinoList(function(arduinos) {
+		// 	// save the array
+		// 	arduinos.forEach(function(arduino) {
+		// 		console.log(arduino);
+		// 		arduinoArray.push(arduino);
+		// 	});
+		// });
+
+		// // update all the DPLB
+		// // WARNING -> NOT working ....
+		// listArray.forEach(function(list) {
+		// 	console.log(list);
+		// 	populateDropDownList(list, arduinoArray);
+		// });
 
 
 		///////////////
@@ -37,11 +53,15 @@ $(function() {
 
 		// Refresh button
 		$(".refreshButton").click(function() {
-			// WARNING : this is working if the BUTTON NAME IS THE SAME AS THE LIST ID !!!!
+			// // WARNING : this is working if the BUTTON NAME IS THE SAME AS THE LIST ID !!!!
 			// get the list id & get the arduino list from the server & populate the list
 			var listId = "#" + $(this).attr("name");
 			getArduinoList(listId);
 			console.log('[REFRESH] ' + listId);
+			// update listBoxes
+			// listArray.forEach(function(list) {
+			// 	getArduinoList(list);
+			// })
 		});
 
 
@@ -67,7 +87,6 @@ $(function() {
 
 		// add IPv4 Address Validator
 		$.validator.addMethod('ipv4', function(value) {
-		    // var ipv4 = /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/;
 		    var ipv4 = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 		    return value.match(ipv4);
 		}, 'Invalid IPv4 address, should be : "255.255.255.255"');
@@ -105,6 +124,7 @@ $(function() {
 				var lenght = $('#lenghtBlink').val();
 				var nbBlink = $('#nbBlink').val();
 				console.log('[BLINK] @' + baseUrl + ' -  idArduino : ' + idArduino + " - pin blink: " + pin + " - lenght: " + lenght + " - nb blink: " + nbBlink);
+				showResult();
 				doBlink(idCmd, idArduino, pin, lenght, nbBlink);
 	        }
 		});
@@ -127,6 +147,7 @@ $(function() {
 				if ((mode == 'a' && (pin>5 || pin<0) || (mode=='b' && (pin<0 || pin>13)))) {
 					alert("Wrong PIN : [0-13] binary - [0-5] analog");
 				}else{
+					showResult();
 					doPinRead(idCmd, idArduino, pin, mode);
 				}
 	        }
@@ -153,6 +174,7 @@ $(function() {
 				if ((mode == 'a' &&(pin>5 || pin<0) ||(mode=='b' && (pin<0 || pin>13)))) {
 					alert("Wrong PIN : [0-13] binary - [0-5] analog");
 				}else{
+					showResult();
 					doPinWrite(idCmd, idArduino, pin, mode, value);
 				}
 	        }
@@ -175,6 +197,7 @@ $(function() {
 					var idCmd = $("#cmdIdPost").val();
 					var idArduino = $("#arduinosListPost option:selected").val();
 					console.log('[POST] @' + baseUrl + ' - idArduino : ' + idArduino + " - json string : " + jsonString);
+					showResult();
 					doPost(idCmd, idArduino, jsonString);
 				}catch (error) {
 					alert('Wrong JSON string, check structure !');
@@ -243,6 +266,37 @@ function getArduinoList(idList) {
 	})
 }
 
+// // get arduinos from REST server
+// function getArduinoList(callback) {
+// 	// the array of arduinos
+// 	var arduinosArray = [];
+
+// 	// do AJAX GET
+// 	getAjax(baseUrl, function(jsonObject) {
+// 		// get data
+//    		var jsonData = jsonObject.data;
+
+//    		// iterate trough data & populate array
+//    		jsonData.forEach(function(arduino) {
+//    			arduinosArray.push(arduino);
+// 		});
+
+// 		callback(arduinosArray);
+// 	});
+// }
+
+// // populate a dropDownList from array
+// function populateDropDownList(idList, array) {
+// 	// clear the list :
+// 	$(idList).empty();
+
+// 	// populate the list if we have items
+// 	if(array.length) {
+// 		array.forEach(function(item) {
+// 			$(idList).append('<option value=' + arduino.id + '>' + arduino.id + '</option>');
+// 		});
+// 	}
+// }
 
 function doBlink(idCmd, idArduino, pin, lenght, nbBlink) { // http://localhost:8080/rest/arduinos/blink/192.168.2.3/192.168.2.3/8/100/10
 	if (idArduino == null) {
@@ -308,18 +362,22 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 			url: requestUrl,
 			contentType: "application/json; charset=utf-8",
 			data: jsonString,
-			// dataType: "json"
+			dataType: "text"	// see : "getAjax" function
 		})
 
 		.done(function(result) {
-			jsonString = JSON.stringify(result);
-			console.log('Write result' + jsonString);
-			$( "#postResult" ).html(jsonString);
-			console.log("[DOPOST] json answer: " + jsonString);
+			// try to de-serialize the received string
+			try{
+				jsonObject = JSON.parse(result);	// not needed if dataType set to JSON !!!
+				$( "#postResult" ).html(jsonString);
+				console.log("[POST] json answer: " + jsonString);
+			} catch(err) {
+				alert('[POST] Parsing JSON failed -> ' + err);
+			}
 		})
 
 		.fail(function(err) {
-			alert('Post cmd failled');
+			alert('[POST] cmd failed');
 		})
 	}
 }
@@ -328,17 +386,31 @@ function getAjax(url, callback) {
 	$.ajax({
 		type: "get",
 		url: url,
-		dataType: "json"
+		dataType: "text"	// WARNING -> automatically PARSE THE JSON when set to "json" (jQuery)!!!! ==> better to force "text" and parse it to catch errors as we want
 	})
 
 	.done(function(result) {
-		callback(result);
-		console.log("[GET] json answer: " + result);
+		// try to de-serialize the received string
+		try{
+			jsonObject = JSON.parse(result);	// not needed if dataType set to JSON !!!
+			callback(jsonObject);
+			console.log('[GET] json answer: ' + JSON.stringify(jsonObject));
+		} catch(err) {
+			alert('[GET]  Parsing JSON failed ->' + err);
+		}
 	})
 
 	.fail(function(err) {
-		alert('GET failed : ' + err.status);
+		alert('[GET] failed : ' + err.status);
 	})
+}
+
+function showResult() {
+	$('.result').show();
+}
+
+function hideResult() {
+	$('.result').hide();
 }
 
 	// setup ajax error handler (verbose)

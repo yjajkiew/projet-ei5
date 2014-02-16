@@ -48,7 +48,6 @@
         <div data-role="header">
             <a href="#main" data-icon="home" data-iconpos="left">Menu</a>
             <h1>Blink</h1>
-            <a href="#main" data-icon="arrow-r" data-iconpos="right">Blink</a>
         </div><!-- /header -->
 
         <div data-role="content">
@@ -76,7 +75,7 @@
                     <h2> Actions : </h2>
                     <div data-role="controlgroup" data-type="horizontal">
                         <input type="button" name="resetBlink" id="resetBlink" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
-                        <input type="submit" name="doBlink" id="doBlink" class="submit"data-icon="check" data-iconpos="right" value="Blink"/>
+                        <input type="submit" name="doBlink" id="doBlink" class="action" data-icon="check" data-iconpos="right" value="Blink" /> <!-- onclick="showResult();" -->
                     </div>
                 </div><!-- /action bottom buttons -->
             </form> <!-- /form -->
@@ -125,7 +124,7 @@
                     <h2> Actions : </h2>
                     <div data-role="controlgroup" data-type="horizontal">
                         <input type="button" name="resetRead" id="resetRead" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
-                        <input type="submit" name="doPinRead" id="doPinRead" data-icon="check" data-iconpos="right" value="Read"/>
+                        <input type="submit" name="doPinRead" id="doPinRead" class="action" data-icon="check" data-iconpos="right" value="Read"/>
                     </div>
                 </div><!-- /action bottom buttons -->
             </form><!-- /form -->
@@ -177,7 +176,7 @@
                     <h2> Actions : </h2>
                     <div data-role="controlgroup" data-type="horizontal">
                         <input type="button" name="resetWrite" id="resetWrite" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
-                        <input type="submit" name="doPinWrite" id="doPinWrite" data-icon="check" data-iconpos="right" value="Write"/>
+                        <input type="submit" name="doPinWrite" id="doPinWrite" class="action" data-icon="check" data-iconpos="right" value="Write"/>
                     </div>
                 </div><!-- /action bottom buttons -->
             </form><!-- /form -->
@@ -222,7 +221,7 @@
                     <h2> Actions : </h2>
                     <div data-role="controlgroup" data-type="horizontal">
                         <input type="button" name="resetPost" id="resetPost" class="resetButton" data-icon="delete" data-iconpos="right" value="Clear"/>
-                        <input type="submit" name="doPost" id="doPost" data-icon="check" data-iconpos="right" value="POST"/>
+                        <input type="submit" name="doPost" id="doPost" class="action" data-icon="check" data-iconpos="right" value="POST"/>
                     </div>
                 </div><!-- /action bottom buttons -->
             </form><!-- /form -->
