@@ -33,7 +33,7 @@ var arduinos = function(callback) {
 		// build the table
 		arduinosCollection.forEach(function(ard) {
 			//create json object using the expected format
-			var jsonArduino = {id:ard.id,port:ard.port,description:ard.desc,mac:ard.mac}; 
+			var jsonArduino = {id:ard.id,ip:ard.ip,port:ard.port,description:ard.desc,mac:ard.mac}; 
 			arduinosTable.push(jsonArduino);
 		});
 	});
@@ -52,7 +52,7 @@ var blink = function(idCommand, idArduino, pin, length, number, callback) {
 		if(check == false) {
 			// send error back to [WEB] & log
 			callback(jsonObject);
-			util.log(jsonObject.data.message);
+			util.log(jsonObject.message);
 		}
 		// if parameters are OK
 		else {
@@ -74,7 +74,7 @@ var read = function(idCommand, idArduino, pin, mode, callback) {
 		if(check == false) {
 			// send error back to [WEB] & log
 			callback(jsonObject);
-			util.log(jsonObject.data.message);
+			util.log(jsonObject.message);
 		}
 		// if parameters are OK
 		else {
@@ -96,7 +96,7 @@ var write = function(idCommand, idArduino, pin, mode, value, callback) {
 		if(check == false) {
 			// send error back to [WEB] & log
 			callback(jsonObject);
-			util.log(jsonObject.data.message);
+			util.log(jsonObject.message);
 		}
 		// if parameters are OK
 		else {
@@ -215,7 +215,7 @@ var doCmd = function(idArduino, jsonObject, callback) {
 
 		default :
 			// return error to "web"
-			var errorMessage = '[METIER] POST : "ac" parameters missing in JSON, cannot proceed POST cmd';
+			var errorMessage = '[METIER] POST : action parameter "a" wrong or missing';
 			util.log(errorMessage);
 			buildJsonError(errorMessage, function(jsonError) {
 				callback(jsonError);
@@ -235,7 +235,7 @@ function sendToDao(idArduino, jsonObject, callback) {
 	dao.send(idArduino, jsonObject, function(jsonArduino) {
 		try {
 			// if we had an error in [DAO], send it back directly (Warning : JSON object here !)
-			if (jsonArduino.data) {
+			if (jsonArduino.message) {
 				callback(jsonArduino);
 			} else {
 				// try to parse the jsonArduino answer
@@ -243,15 +243,15 @@ function sendToDao(idArduino, jsonObject, callback) {
 
 				// if arduino returned an error code
 				if (jsonArduino.er != '0') {	
-					// we link the error code to it's text
-					arduinoErrors.forEach(function(error) {
-						if (error.key === jsonArduino.er) {
-							jsonArduino.er = error.val;
-						}
-						else {
-							jsonArduino.er += '(not registered)';
-						}
-					});
+					// // we link the error code to it's text
+					// arduinoErrors.forEach(function(error) {
+					// 	if (error.key === jsonArduino.er) {
+					// 		jsonArduino.er = error.val;
+					// 	}
+					// 	else {
+					// 		jsonArduino.er += '(not registered)';
+					// 	}
+					// });
 					// build the answer & send it back
 					jsonAnswer = {id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino};
 					callback(jsonAnswer);

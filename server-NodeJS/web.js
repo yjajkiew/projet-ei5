@@ -48,8 +48,9 @@ server
 
 // Allow CORS, tricky ! (needed when working under the same Domain Name like "localhost")
 .all('/*', function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	res.header("Access-Control-Allow-Origin", "*");	// Allow all domaines as Oringin of the request //request.headers.origin || "*"
+	res.header("Access-Control-Allow-Methods","GET, POST");	// specified the supported CROS methodes
+	//res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	res.setHeader('Content-Type', 'application/json');
 	// note : "next" statement is use to call next middleware
 	next();

@@ -39,8 +39,7 @@ var sendToArduino = function(idArduino, jsonObject, callback) {
 
 	// Get Arduino info
 	arduino = arduinos.item(idArduino);
-
-	// util.log('arduino : ' + idArduino );
+	// console.log(arduino);
 
 	// check if arduino exist
 	if (arduino == undefined) {
@@ -65,8 +64,8 @@ var sendToArduino = function(idArduino, jsonObject, callback) {
 		}
 
 		// Connect to Arduino server
-		var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
-			util.log('[DAO] Sending : ' + jsonString + ' to arduino @ ' + arduino.id + ":" + arduino.port);
+		util.log('[DAO] Sending : ' + jsonString + ' to arduino @ ' + arduino.id + ":" + arduino.port);
+		var client = net.connect({host:arduino.ip, port:arduino.port},function() { //'connect' listener
 			client.write(jsonString);
 			arduinoAnswer = '';
 		})		
@@ -121,7 +120,6 @@ var server = net.createServer(function(sock) {
 	
 	.on('end', function() { //called when eol character '\0' is received
 		data = data.replace(/(\r\n|\n|\r)/gm,'');	// get ride of EOL chars '\r\n'
-		// util.log('[DAO] received : ' + data);
 		try {
 			// parse JSON object
 			data = JSON.parse(data);
@@ -140,7 +138,7 @@ var server = net.createServer(function(sock) {
     
 	// Add a 'close' event handler to this instance of socket
 	.on('close', function(data) {
-		//	util.log('[DAO] Connection closed');
+		// util.log('[DAO] Connection closed');
 	});
 });
 

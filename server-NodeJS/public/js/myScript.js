@@ -3,8 +3,8 @@
 /////////////////
 var SERVER_ADDRESS = 'localhost';
 var SERVER_PORT = 8080;
-var SERVER_BASE_PATH = "/rest/arduinos";
-var baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH;
+var SERVER_BASE_PATH = "/rest";
+var baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH + '/arduinos';
 var listArray = ["#arduinosListBlink", "#arduinosListRead", "#arduinosListWrite", "#arduinosListPost"];
 var arduinoArray = [];
 
@@ -85,7 +85,13 @@ $(function() {
 		///////////////
 
 		$(document).ajaxStart(function () {
+			// show loading indicator
 		    $(".loading").show();
+		    // empty the result div
+		    $(".postResult").html('');
+		    $(".postResult").html('');
+		    $(".writeResult").html('');
+		    $(".postResult").html('');
 		});
 
 		$(document).ajaxComplete(function () {
@@ -135,6 +141,7 @@ $(function() {
 				// event.preventDefault();	// don't need it anymore (no submit on the form !!!)
 				var idCmd = $("#cmdIdBlink").val();
 				var idArduino = $("#arduinosListBlink option:selected").val();
+				console.log(idArduino);
 				var pin =  $('#pinBlink').val();
 				var lenght = $('#lenghtBlink').val();
 				var nbBlink = $('#nbBlink').val();
@@ -160,7 +167,7 @@ $(function() {
 				var mode = $('#modeRead option:selected').val();
 				console.log('[READ] @' + baseUrl + ' - idArduino: ' + idArduino + " - command ID: " + idCmd + " - pin read: " + pin + " - mode: " + mode);
 				if ((mode == 'a' && (pin>5 || pin<0) || (mode=='b' && (pin<0 || pin>13)))) {
-					alert("Wrong PIN : [0-13] binary - [0-5] analog");
+					alert("Wrong PIN : [1-13] binary - [0-5] analog");
 				}else{
 					showResult();
 					doPinRead(idCmd, idArduino, pin, mode);
@@ -238,7 +245,7 @@ $(function() {
 	        	SERVER_PORT = $("#serverPort").val();
 	        	SERVER_BASE_PATH = $("#serverPath").val()
 	        	// Re-build base URL
-	        	baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH;
+	        	baseUrl = "http://" + SERVER_ADDRESS + ':' + SERVER_PORT + SERVER_BASE_PATH + '/arduinos';
 	        	// log & display
 	        	message = 'New server URL : ' + baseUrl;
 	        	console.log('[SETTINGS] ' + message);
@@ -269,8 +276,12 @@ function getArduinoList(idList) {
 	// clear the list :
 	$(idList).empty();
 
+	// url : 
+	var url = baseUrl + '/';
+	console.log(url);
+
 	// do AJAX GET
-	getAjax(baseUrl, function(jsonObject) {
+	getAjax(url, function(jsonObject) {
    		var jsonData = jsonObject.data;
    		jsonData.forEach(function(arduino) {
    			// Add the option to the Drop-Down list
@@ -314,7 +325,7 @@ function getArduinoList(idList) {
 // }
 
 function doBlink(idCmd, idArduino, pin, lenght, nbBlink) { // http://localhost:8080/rest/arduinos/blink/192.168.2.3/192.168.2.3/8/100/10
-	if (idArduino == null) {
+	if (idArduino === undefined) {
 		alert("[DOBLINK] Wrong arduino ID : " + idArduino);
 	} else {
 		// build the request URL
@@ -371,16 +382,33 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 		var requestUrl = baseUrl + "/" + idCmd + "/" + idArduino;
 		// console.log(jsonString);
 
+		// // create CORS GET
+		// var xhr = createCORSRequest('POST', baseUrl);
+		// if (!xhr) {
+		//   throw new Error('CORS not supported');
+		// }
+
+		// // handler
+		// xhr.onload = function() {
+		// var responseText = xhr.responseText;
+		// 	console.log(responseText);
+		// // process the response.
+		// };
+
+		// xhr.onerror = function() {
+		// 	console.log('There was an error!');
+		// };
+
+		// xhr.send();
+
 		// do AJAX POST
 		$.ajax({
-			type: "post",
 			url: requestUrl,
-			// xhrFields: {
-		 //    	withCredentials: true	// for OCRS requests
-			// },
+			type: "post",
+			crossDomain: true,
 			contentType: "application/json; charset=utf-8",
 			data: jsonString,
-			dataType: "text"	// see : "getAjax" function
+			dataType: "text"	// see : "getAjax" function,
 		})
 
 		.done(function(result) {
@@ -396,34 +424,33 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 
 		.fail(function(err) {
 			alert('[POST] cmd failed');
-		})
+		});
 	}
 }
 
 function getAjax(url, callback) {
 	$.ajax({
-		type: "get",
 		url: url,
-		// xhrFields: {
-	 //    	withCredentials: true	// for OCRS requests
-		// },
+		type: "get",
+		crossDomain: true,
 		dataType: "text"	// WARNING -> automatically PARSE THE JSON when set to "json" (jQuery)!!!! ==> better to force "text" and parse it to catch errors as we want
 	})
 
-	.done(function(result) {
-		// try to de-serialize the received string
-		try{
-			jsonObject = JSON.parse(result);	// not needed if dataType set to JSON !!!
-			callback(jsonObject);
-			console.log('[GET] json answer: ' + JSON.stringify(jsonObject));
-		} catch(err) {
-			alert('[GET]  Parsing JSON failed ->' + err);
-		}
-	})
+		.done(function(result) {
+			// try to de-serialize the received string
+			try{
+				jsonObject = JSON.parse(result);	// not needed if dataType set to JSON !!!
+				callback(jsonObject);
+				console.log('[GET] json answer: ' + JSON.stringify(jsonObject));
+			} catch(err) {
+				alert('[GET]  Parsing JSON failed ->' + err);
+			}
+		})
 
-	.fail(function(err) {
-		alert('[GET] failed : ' + err.status);
-	})
+		.fail(function(err) {
+			
+            
+		});
 }
 
 function showResult() {
@@ -434,23 +461,49 @@ function hideResult() {
 	$('.result').hide();
 }
 
-	// setup ajax error handler (verbose)
-	// $.ajaxSetup({
- //        error: function(jqXHR, exception) {
- //            if (jqXHR.status === 0) {
- //                alert('Not connected.\n Verify Network.');
- //            } else if (jqXHR.status == 404) {
- //                alert('Requested page not found. [404]');
- //            } else if (jqXHR.status == 500) {
- //                alert('Internal Server Error [500].');
- //            } else if (exception === 'parsererror') {
- //                alert('Requested JSON parse failed.');
- //            } else if (exception === 'timeout') {
- //                alert('Time out error.');
- //            } else if (exception === 'abort') {
- //                alert('Ajax request aborted.');
- //            } else {
- //                alert('Uncaught Error.\n' + jqXHR.responseText);
- //            }
- //        }
-	// });
+// build CORS request
+function createCORSRequest(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+
+    // Check if the XMLHttpRequest object has a "withCredentials" property.
+    // "withCredentials" only exists on XMLHTTPRequest2 objects.
+    xhr.open(method, url, true);
+
+  } else if (typeof XDomainRequest != "undefined") {
+
+    // Otherwise, check if XDomainRequest.
+    // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+
+  } else {
+
+    // Otherwise, CORS is not supported by the browser.
+    xhr = null;
+
+  }
+  return xhr;
+}
+
+
+// setup ajax error handler (verbose, override)
+// $.ajaxSetup({
+//        error: function(jqXHR, exception) {
+//            if (jqXHR.status === 0) {
+//                alert('Not connected.\n Verify Network.');
+//            } else if (jqXHR.status == 404) {
+//                alert('Requested page not found. [404]');
+//            } else if (jqXHR.status == 500) {
+//                alert('Internal Server Error [500].');
+//            } else if (exception === 'parsererror') {
+//                alert('Requested JSON parse failed.');
+//            } else if (exception === 'timeout') {
+//                alert('Time out error.');
+//            } else if (exception === 'abort') {
+//                alert('Ajax request aborted.');
+//            } else {
+//                alert('Uncaught Error.\n' + jqXHR.responseText);
+//            }
+//        }
+// });
