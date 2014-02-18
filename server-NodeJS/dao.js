@@ -181,7 +181,7 @@ server.listen(PORT, HOST, function() {
 // build JSON error message
 function buildJsonError(msg, callback) {
 	// build the error message & send it back
-	var jsonErrorMessage = {data:{message:msg}};
+	var jsonErrorMessage = {message:msg};
 	callback(jsonErrorMessage);
 }
 

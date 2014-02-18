@@ -19,10 +19,10 @@ var fs 		= require('fs');
 // Import work layer
 var metier 	= require('./metier');
 
-// Globals Variables 
-var server 	= new express();
-var PORT 	= process.argv[2] || 8080;
+// Globals Variables
 var BASE_PATH = '/rest/arduinos';
+var PORT 	= process.argv[2] || 8080;
+var server 	= new express();
 
 
 
@@ -68,9 +68,10 @@ server
 	util.log('[WEB] Query : Arduino list');
 	metier.arduinos(function(arduinos) {
 		// serialize & send answer
-		answer = JSON.stringify(arduinos);
-		util.log('[WEB] ARDUINOS sending back : ' + answer); 
-		res.send(answer);
+		sendToClient(arduinos, function(jsonString) {
+			util.log('[WEB] ARDUINOS sending back : ' + jsonString); 
+			res.send(jsonString);
+		});
 	});
 })
 
@@ -80,9 +81,10 @@ server
 	util.log('[WEB] Query : LED blink [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.lenght + ' , ' + p.number + ' ]');
 	metier.blink(p.idCommand, p.idArduino, p.pin, p.lenght, p.number, function(jsonObject) {
 		// serialize & send answer
-		answer = JSON.stringify(jsonObject);
-		util.log('[WEB] BLINK sending back : ' + answer); 
-		res.send(answer);
+		sendToClient(jsonObject, function(jsonString) {
+			util.log('[WEB] BLINK sending back : ' + jsonString); 
+			res.send(jsonString);
+		});
 	});
 })
 
@@ -92,9 +94,10 @@ server
 	util.log('[WEB] Query : Read [ ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.mode + ' ]');
 	metier.read(p.idCommand, p.idArduino, p.pin, p.mode, function(jsonObject) {
 		// serialize & send answer
-		answer = JSON.stringify(jsonObject);
-		util.log('[WEB] READ sending back : ' + answer); 
-		res.send(answer);
+		sendToClient(jsonObject, function(jsonString) {
+			util.log('[WEB] READ sending back : ' + jsonString); 
+			res.send(jsonString);
+		});
 	});
 })
 
@@ -104,9 +107,10 @@ server
 	util.log('[WEB] Query : Command [ ' + 'write' + ' , ' + p.idCommand + ' , ' + p.idArduino + ' , ' + p.pin + ' , ' + p.mode + ' , ' + p.val + ' ]');
 	metier.write(p.idCommand, p.idArduino, p.pin, p.mode, p.val, function(jsonObject) {
 		// serialize & send answer
-		answer = JSON.stringify(jsonObject);
-		util.log('[WEB] WRITE sending back : ' + answer); 
-		res.send(answer);
+		sendToClient(jsonObject, function(jsonString) {
+			util.log('[WEB] WRITE sending back : ' + jsonString); 
+			res.send(jsonString);
+		});
 	});
 })
 
@@ -118,14 +122,15 @@ server
 	// POST data
 	var params = req.rawBody;
 	// log
-	util.log('[WEB] POST command (' + req.ip + ') - ' + 'URL=' + req.url + ' POST=' + JSON.stringify(params));
+	util.log('[WEB] POST command (' + req.ip + ') - ' + 'URL=' + req.url + ' POST=' + params);	//JSON.stringify()
 	// console.log(req.route);
 	// send to METIER
-	metier.asyncPostCmd(p.idArduino, params, function(jsonObject) {
+	metier.cmd(p.idArduino, params, function(jsonObject) {
 		// serialize & send answer
-		answer = JSON.stringify(jsonObject);
-		util.log('[WEB] POST sending back : ' + answer); 
-		res.send(answer);
+		sendToClient(jsonObject, function(jsonString) {
+			util.log('[WEB] POST sending back : ' + jsonString); 
+			res.send(jsonString);
+		});
 	});
 })
 
@@ -138,7 +143,7 @@ server
 				// if we encountered an error previously :
 				var errorMessage = '[WEB] Error -> ' + err;
 				buildJsonStringError(errorMessage, function(jsonStringError) {
-					res.send(sonStringError);
+					res.send(jsonStringError);
 				});
 				util.log('[WEB] Error Stack Trace -> ' + err.stack);
 			} else {
@@ -180,16 +185,22 @@ function rawBody(req, res, next) {
 	req.on("end", function() {
 		next();
 	});
+}
 
-	// req.on("err", function() {
-	// 	next(err);
-	// });
+// send back serialized JSON with specified format
+function sendToClient(jsonObject, callback) {
+	// build answer
+	jsonAnswer = {data:jsonObject};
+	// serialize answer
+	jsonString = JSON.stringify(jsonAnswer);
+	// callback
+	callback(jsonString);
 }
 
 
 // build JSON string error message
 function buildJsonStringError(msg, callback) {
 	// build the error message & send it back
-	var jsonErrorMessage = {data:{message:msg}};
+	var jsonErrorMessage = {message:msg};
 	callback(JSON.stringify(jsonErrorMessage));
 }

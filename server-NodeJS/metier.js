@@ -37,10 +37,8 @@ var arduinos = function(callback) {
 			arduinosTable.push(jsonArduino);
 		});
 	});
-	// build JSON object
-	jsonObject = {data:arduinosTable};
 	// send it back & log
-	callback(jsonObject);
+	callback(arduinosTable);
 	var arduinoNbr = arduinosTable.length;
 	var plural = arduinoNbr >1 ? 's' : '';
 	util.log('[METIER] Sending info for ' + arduinoNbr + ' Arduino' + plural);
@@ -113,11 +111,10 @@ var write = function(idCommand, idArduino, pin, mode, value, callback) {
 }
 
 // POST command
-function asyncPostCmd(idArduino, jsonStringArray, callback) {
+function cmd(idArduino, jsonStringArray, callback) {
 	try {
 		// parse the client JSON string
 		jsonObjectArray = JSON.parse(jsonStringArray);
-		util.log(util.isArray(jsonObjectArray));
 
 		// result array
 		var resultArray = [];
@@ -136,11 +133,12 @@ function asyncPostCmd(idArduino, jsonStringArray, callback) {
 				});
 			},
 
-			// the final callback (or when error occured)
+			// the final callback (or when error occure)
 			function(err) {
 				if (err) {
 					util.log('[METIER] Processing command array failed -> ' + err)
 				}
+				// return result
 				callback(resultArray);
 	    	}  
 	    )
@@ -151,8 +149,6 @@ function asyncPostCmd(idArduino, jsonStringArray, callback) {
 			callback(jsonError);
 		});
 	}
-
-	
 }
 
 
@@ -257,11 +253,11 @@ function sendToDao(idArduino, jsonObject, callback) {
 						}
 					});
 					// build the answer & send it back
-					jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino}};
+					jsonAnswer = {id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:jsonArduino};
 					callback(jsonAnswer);
 				}
 				else {	// if we have a "normal" answer
-					jsonAnswer = {data:{id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null}};
+					jsonAnswer = {id:jsonArduino.id, erreur:jsonArduino.er, etat:jsonArduino.et, json:null};
 					callback(jsonAnswer);
 				}
 			}
@@ -425,7 +421,7 @@ function linkArduinoErrors (errCode, callback) {
 // build JSON object error message
 function buildJsonError(msg, callback) {
 	// build the error message & send it back
-	var jsonErrorMessage = {data:{message:msg}};
+	var jsonErrorMessage = {message:msg};
 	callback(jsonErrorMessage);
 }
 
@@ -439,4 +435,4 @@ module.exports.arduinos = arduinos;
 module.exports.blink = blink;
 module.exports.read = read;
 module.exports.write = write;
-module.exports.asyncPostCmd = asyncPostCmd;
+module.exports.cmd = cmd;

@@ -10,6 +10,19 @@ var arduinoArray = [];
 
 // Browser is ready
 $(function() {
+	// use custom style on drop-down menu
+	// "mobileinit" is called when jQuery mobile load 
+	$(document).bind('mobileinit', function(){
+		// overides drop-down menun style :
+		$.mobile.selectmenu.prototype.options.nativeMenu = false;
+		$.mobile.defaultPageTransition = "fade";
+
+		// page loading widget settings
+		$.mobile.loader.prototype.options.text = 'loading';
+		$.mobile.loader.prototype.options.textVisible = 'false';
+		$.mobile.loader.prototype.options.theme = 'a';
+		$.mobile.loader.prototype.options.html = '';
+	});
 	// Document is ready
 	$(document).ready (function() {
 
@@ -20,15 +33,17 @@ $(function() {
 		// hide AJAX loading indicator
 		$(".loading").hide();
 
-		// hide result class div (every time one page is displayed -> useful when switching between actions)
+		// hide result class div & update listboxes (every time one page is displayed -> useful when switching between actions)
 		$( ":mobile-pagecontainer" ).on( "pagecontainershow", function( event, ui ) {
+			// hide result div
 			hideResult();
+			// update listboxes
+			listArray.forEach(function(list) {
+				getArduinoList(list);
+			});
 		});
 
-		// update listBoxes
-		listArray.forEach(function(list) {
-			getArduinoList(list);
-		});
+		
 
 		// // get arduino list from REST Server
 		// getArduinoList(function(arduinos) {
@@ -360,6 +375,9 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 		$.ajax({
 			type: "post",
 			url: requestUrl,
+			// xhrFields: {
+		 //    	withCredentials: true	// for OCRS requests
+			// },
 			contentType: "application/json; charset=utf-8",
 			data: jsonString,
 			dataType: "text"	// see : "getAjax" function
@@ -369,8 +387,8 @@ function doPost(idCmd, idArduino, jsonString) { // http://localhost:8080/rest/ar
 			// try to de-serialize the received string
 			try{
 				jsonObject = JSON.parse(result);	// not needed if dataType set to JSON !!!
-				$( "#postResult" ).html(jsonString);
-				console.log("[POST] json answer: " + jsonString);
+				$( "#postResult" ).html(result);
+				console.log("[POST] json answer: " + result);
 			} catch(err) {
 				alert('[POST] Parsing JSON failed -> ' + err);
 			}
@@ -386,6 +404,9 @@ function getAjax(url, callback) {
 	$.ajax({
 		type: "get",
 		url: url,
+		// xhrFields: {
+	 //    	withCredentials: true	// for OCRS requests
+		// },
 		dataType: "text"	// WARNING -> automatically PARSE THE JSON when set to "json" (jQuery)!!!! ==> better to force "text" and parse it to catch errors as we want
 	})
 
