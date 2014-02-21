@@ -10,11 +10,12 @@
 
 @implementation Arduino
 
-@synthesize ip, desc, mac, port;
+@synthesize leId, ip, desc, mac, port;
 
 -(id)initWithJson:(NSDictionary*)json {
     
-    ip = [json valueForKey:@"id"];
+    leId = [json valueForKey:@"id"];
+    ip = [json valueForKey:@"ip"];
     desc = [json valueForKey:@"description"];
     mac = [json valueForKey:@"mac"];
     port = [[json valueForKey:@"port"] intValue];
@@ -23,7 +24,7 @@
 }
 
 -(NSString*)description {
-    return [NSString stringWithFormat:@"ip:%@ - desc: %@ - mac: %@ - port: %d", ip, desc, mac, port];
+    return [NSString stringWithFormat:@"id:%@ - ip:%@ - desc: %@ - mac: %@ - port: %d", leId, ip, desc, mac, port];
 }
 
 @end

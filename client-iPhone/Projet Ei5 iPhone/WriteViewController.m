@@ -17,7 +17,7 @@
 
 @implementation WriteViewController
 
-@synthesize pinNumberTextField, valueTextField, modeSegmentedControl, tableView, arduinos;
+@synthesize pinNumberTextField, valueTextField, modeSegmentedControl, tableView, activityIndicator, arduinos;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -31,16 +31,50 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
+	
+    //init view title in navigation bar
+    [self.navigationItem setTitle:NSLocalizedString(@"write-title",nil)];
+    
     arduinos = [[NSMutableArray alloc] init];
+    
     tableView.delegate = self;
     tableView.dataSource = self;
     
-    [self fetchArduinosList];
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl setTintColor:[UIColor whiteColor]];
+    refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"pull-to-refresh",nil) attributes:@{NSForegroundColorAttributeName: [UIColor whiteColor],}];
+    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    [self.tableView addSubview:refreshControl];
     
+    [activityIndicator setHidden:YES];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(keyboardDone)];
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+    
+    [self fetchArduinosList];
+}
+
+- (void)refresh:(UIRefreshControl *)refreshControl {
+    [self fetchArduinosList];
+    [refreshControl endRefreshing];
+}
+
+-(void)keyboardDidShow:(NSNotification *)note {
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
+}
+
+-(void)keyboardDone {
+    [self.view endEditing:YES];
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
 }
 
 -(void)fetchArduinosList {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [activityIndicator setHidden:NO];
+    [activityIndicator startAnimating];
+    
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/arduinos/", globalServerAddress]]];
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [NSURLConnection sendAsynchronousRequest:urlRequest queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
@@ -52,10 +86,18 @@
              
          }
          else NSLog(@"error request arduino list");
+         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+         [self performSelectorOnMainThread:@selector(stopSpinning) withObject:nil waitUntilDone:NO];
      }];
 }
 
+-(void)stopSpinning {
+    [activityIndicator stopAnimating];
+    [activityIndicator setHidden:YES];
+}
+
 -(void)updateUIWithDictionary:(NSDictionary *)json {
+    [arduinos removeAllObjects];
     NSArray *arrayArduinosJson = [json valueForKey:@"data"];
     for(NSDictionary *json in arrayArduinosJson) {
         Arduino *arduino = [[Arduino alloc] initWithJson:json];
@@ -79,7 +121,7 @@
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section == 0) return @"Select arduino";
+    if(section == 0) return NSLocalizedString(@"select-arduino-input",nil);
     else return nil;
 }
 
@@ -128,26 +170,42 @@
     NSIndexPath *indexPath = tableView.indexPathForSelectedRow;
     NSCharacterSet *numericOnly = [NSCharacterSet decimalDigitCharacterSet];
     
-    if(!pinNumberTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:pinNumberTextField.text]] || [pinNumberTextField.text intValue] < 0 || [pinNumberTextField.text intValue] > 15 ) errorMessage = @"Pin number must be between 0 and 15";
-    else if(!valueTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:valueTextField.text]] || [valueTextField.text intValue] < 0) errorMessage = @"Value must be superior to 0";
-    else if(indexPath == nil) errorMessage = @"You haven't selected an arduino board !";
+    //check if pin is not a empty number
+    if(!pinNumberTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:pinNumberTextField.text]]) errorMessage = NSLocalizedString(@"pin-number-error",nil);
+    //check if in analog mode pin number is between 0 and 5
+    else if(modeSegmentedControl.selectedSegmentIndex == 1 && ([pinNumberTextField.text intValue] < 0 || [pinNumberTextField.text intValue] > 5)) errorMessage = NSLocalizedString(@"analog-pin-error",nil);
+    //check if in binary mode pin number is between 1 and 13
+    else if(modeSegmentedControl.selectedSegmentIndex == 0 && ([pinNumberTextField.text intValue] < 1 || [pinNumberTextField.text intValue] > 13)) errorMessage = NSLocalizedString(@"binary-pin-error",nil);
+    else if(!valueTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:valueTextField.text]] || [valueTextField.text intValue] < 0) errorMessage = NSLocalizedString(@"value-numeric-error",nil);
+    //check if in binary mode value is between 0 and 1
+    else if(modeSegmentedControl.selectedSegmentIndex == 0 && ([valueTextField.text intValue] < 0 || [valueTextField.text intValue] > 1)) errorMessage = NSLocalizedString(@"value-binary-error",nil);
+    //check if in analog mode value is between 0 and 255
+    else if(modeSegmentedControl.selectedSegmentIndex == 1 && ([valueTextField.text intValue] < 0 || [valueTextField.text intValue] > 255)) errorMessage = NSLocalizedString(@"value-analog-error",nil);
+    
+    //check if arduino is selected
+    else if(indexPath == nil) errorMessage = NSLocalizedString(@"arduino-error",nil);
     
     //error => display alert
     if(errorMessage != nil) {
-        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error"
+        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"error-title",nil)
                                                              message:errorMessage
                                                             delegate:nil
-                                                   cancelButtonTitle:@"OK"
+                                                   cancelButtonTitle:NSLocalizedString(@"ok",nil)
                                                    otherButtonTitles:nil];
         [errorAlert show];
     }
     else {
+        //deactivate send button because the request will be fired
+        [(UIButton*)sender setEnabled:NO];
+        
         NSLog(@"%@", [NSString stringWithFormat:@"Button: Cell %ld in Section %ld is selected",(long)indexPath.row, (long)indexPath.section]);
         Arduino *arduino = [arduinos objectAtIndex:indexPath.row];
         NSString *mode;
         if(modeSegmentedControl.selectedSegmentIndex == 1) mode = @"a";
         else mode = @"b";
-        NSString *command = [NSString stringWithFormat:@"%@/arduinos/pinWrite/%@/%@/%@/%@/%@", globalServerAddress, arduino.ip, arduino.ip,pinNumberTextField.text,mode,valueTextField.text];
+        NSString *command = [NSString stringWithFormat:@"%@/arduinos/pinWrite/%d/%@/%@/%@/%@", globalServerAddress, 2, arduino.leId,pinNumberTextField.text,mode,valueTextField.text];
+        
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         
         ///rest/arduinos/pinWrite/:idCommand/:idArduino/:pin/:mode/:val
         NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:command]];
@@ -162,6 +220,7 @@
                  
              }
              else NSLog(@"error request arduino list");
+             [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
          }];
         
     }
@@ -189,6 +248,7 @@
     
     if (![[touch view] isKindOfClass:[UITextField class]]) {
         [self.view endEditing:YES];
+        [self.navigationItem.rightBarButtonItem setEnabled:NO];
     }
     [super touchesBegan:touches withEvent:event];
 }

@@ -17,7 +17,7 @@
 
 @implementation BlinkViewController
 
-@synthesize tableView, pinNumberTextField, blinksNumberTextField, delayTextField, arduinos;
+@synthesize tableView, pinNumberTextField, blinksNumberTextField, delayTextField, activityIndicator, arduinos;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -31,11 +31,27 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
+	
+    //init view title in navigation bar
+    [self.navigationItem setTitle:NSLocalizedString(@"blink-title",nil)];
+    
     arduinos = [[NSMutableArray alloc] init];
+    
     tableView.delegate = self;
     tableView.dataSource = self;
     
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl setTintColor:[UIColor whiteColor]];
+    refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"pull-to-refresh",nil) attributes:@{NSForegroundColorAttributeName: [UIColor whiteColor],}];
+    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    [self.tableView addSubview:refreshControl];
+    
+    [activityIndicator setHidden:YES];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(keyboardDone)];
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
     /*
     //json string example
     NSString *jsonString = @"{\"data\":[ {\"id\":\"192.168.2.3\",\"desc\":\"Uno_Projet3\",\"mac\":\"AA:AA:AA:AA:AA:AA\",\"port\":333},  {\"id\":\"192.168.2.5\",\"desc\":\"Uno_Projet5\",\"mac\":\"BB:BB:BB:BB:BB:BB\",\"port\":555} ]}";
@@ -46,7 +62,25 @@
     
 }
 
+- (void)refresh:(UIRefreshControl *)refreshControl {
+    [self fetchArduinosList];
+    [refreshControl endRefreshing];
+}
+
+-(void)keyboardDidShow:(NSNotification *)note {
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
+}
+
+-(void)keyboardDone {
+    [self.view endEditing:YES];
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+}
+
 -(void)fetchArduinosList {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [activityIndicator setHidden:NO];
+    [activityIndicator startAnimating];
+    
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/arduinos/", globalServerAddress]]];
     
     NSLog(@"url: %@", [NSString stringWithFormat:@"%@/arduinos/", globalServerAddress]);
@@ -61,10 +95,18 @@
              
          }
          else NSLog(@"error request arduino list: %@", error);
+         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+         [self performSelectorOnMainThread:@selector(stopSpinning) withObject:nil waitUntilDone:NO];
      }];
 }
 
+-(void)stopSpinning {
+    [activityIndicator stopAnimating];
+    [activityIndicator setHidden:YES];
+}
+
 -(void)updateUIWithDictionary:(NSDictionary *)json {
+    [arduinos removeAllObjects];
     NSArray *arrayArduinosJson = [json valueForKey:@"data"];
     for(NSDictionary *json in arrayArduinosJson) {
         Arduino *arduino = [[Arduino alloc] initWithJson:json];
@@ -88,7 +130,7 @@
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section == 0) return @"Select arduino";
+    if(section == 0) return NSLocalizedString(@"select-arduino-input",nil);
     else return nil;
 }
 
@@ -137,24 +179,33 @@
     NSIndexPath *indexPath = tableView.indexPathForSelectedRow;
     NSCharacterSet *numericOnly = [NSCharacterSet decimalDigitCharacterSet];
     
-    if(!pinNumberTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:pinNumberTextField.text]] || [pinNumberTextField.text intValue] < 0 || [pinNumberTextField.text intValue] > 15) errorMessage = @"Pin number must be between 0 and 15";
-    else if(!blinksNumberTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:blinksNumberTextField.text]] ||[blinksNumberTextField.text intValue] < 0) errorMessage = @"Blinks number must be superior to 0";
-    else if(!delayTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:delayTextField.text]] || [delayTextField.text intValue] < 0) errorMessage = @"Delay must be superior to 0";
-    else if(indexPath == nil) errorMessage = @"You haven't selected an arduino board !";
+    //check if pin is number between 1 and 13
+    if(!pinNumberTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:pinNumberTextField.text]] || [pinNumberTextField.text intValue] < 1 || [pinNumberTextField.text intValue] > 13) errorMessage = NSLocalizedString(@"binary-pin-error",nil);
+    //check if number of blink is superior to 2
+    else if(!blinksNumberTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:blinksNumberTextField.text]] ||[blinksNumberTextField.text intValue] < 2) errorMessage = NSLocalizedString(@"blink-number-error",nil);
+    //check if blink delay is between 100 and 2000
+    else if(!delayTextField.text.length || ![numericOnly isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:delayTextField.text]] || [delayTextField.text intValue] < 100 || [delayTextField.text intValue] > 2000) errorMessage = NSLocalizedString(@"delay-error",nil);
+    
+    else if(indexPath == nil) errorMessage = NSLocalizedString(@"arduino-error",nil);
     
     //error => display alert
     if(errorMessage != nil) {
-        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error"
+        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"error-title",nil)
                                                              message:errorMessage
                                                             delegate:nil
-                                                   cancelButtonTitle:@"OK"
+                                                   cancelButtonTitle:NSLocalizedString(@"ok",nil)
                                                    otherButtonTitles:nil];
         [errorAlert show];
     }
     else {
+        //deactivate send button because the request will be fired
+        [(UIButton*)sender setEnabled:NO];
+        
         NSLog(@"%@", [NSString stringWithFormat:@"Button: Cell %ld in Section %ld is selected",(long)indexPath.row, (long)indexPath.section]);
         Arduino *arduino = [arduinos objectAtIndex:indexPath.row];
-        NSString *command = [NSString stringWithFormat:@"%@/arduinos/blink/%@/%@/%@/%@/%@", globalServerAddress, arduino.ip, arduino.ip,pinNumberTextField.text,delayTextField.text,blinksNumberTextField.text];
+        NSString *command = [NSString stringWithFormat:@"%@/arduinos/blink/%d/%@/%@/%@/%@", globalServerAddress, 3, arduino.leId, pinNumberTextField.text,delayTextField.text,blinksNumberTextField.text];
+        
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 
         // “/arduinos/blink/{idCommande}/{idArduino}/{pin}/{duree}/ {nombre}”
         NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:command]];
@@ -170,6 +221,7 @@
                  
              }
              else NSLog(@"error request arduino list");
+             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
          }];
 
     }
@@ -197,6 +249,7 @@
     
     if (![[touch view] isKindOfClass:[UITextField class]]) {
         [self.view endEditing:YES];
+        [self.navigationItem.rightBarButtonItem setEnabled:NO];
     }
     [super touchesBegan:touches withEvent:event];
 }

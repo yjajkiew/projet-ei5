@@ -1,0 +1,78 @@
+/* 
+  Localizable.strings
+  Projet Ei5 iPhone
+
+  Created by Yann Jajkiewicz on 2/18/14.
+  Copyright (c) 2014 Yann Jajkiewicz. All rights reserved.
+*/
+
+
+/* ------------- GENERAL ------------- */
+
+"app-title" = "Projet Domotique Ei5";
+"arduinos-title" = "Arduinos";
+"actions-title" = "Actions";
+"rest-server-title" = "REST Server";
+"error-title" = "error";
+"send" = "Send";
+"ok" = "Ok";
+"cancel" = "Cancel";
+"done" = "Done";
+"back" = "Back";
+"pull-to-refresh" = "Pull to refresh";
+
+
+/* ------------- ACTIONS ------------- */
+"read-action" = "Read pin";
+"write-action" = "Write pin";
+"blink-action" = "Blink";
+"command-action" = "Send command";
+
+
+/* ------------- VIEWS ------------- */
+"read-title" = "Read";
+"write-title" = "Write";
+"blink-title" = "Blink";
+"command-title" = "Command";
+"response-title" = "Response";
+
+
+/* ------------- INPUT ------------- */
+"select-arduino-input" = "Select Arduino";
+"binary-input" = "Binary";
+"analog-input" = "Analog";
+"mode-input" = "Mode";
+"pin-number-input" = "Pin number";
+"value-input" = "Value";
+"blink-number-input" = "Number of blinks";
+"delay-input" = "Delay";
+"command-input" = "Command";
+
+
+/* ------------- RESPONSE VIEW ------------- */
+"error-text" = "Error";
+"state-text" = "State";
+"id-text" = "Id";
+"json-text" = "Json";
+
+
+/* ------------- ERROR MESSAGES ------------- */
+    //shared
+"pin-number-error" = "Pin must be a number";
+"analog-pin-error" = "Analog pin number must be between 0 and 5";
+"binary-pin-error" = "Binary pin number must be between 1 and 13";
+"arduino-error" = "You haven't selected an arduino board !";
+"communication-error" = "Communication error with the REST server";
+
+    //write
+"value-numeric-error" = "Value must be numeric >= 0";
+"value-binary-error" = "Value in binary mode must be between 0 and 1";
+"value-analog-error" = "Value in analog mode must be between 0 and 255";
+
+    //blink
+"blink-number-error" = "Blinks number must be superior to 2";
+"delay-error" = "Delay must be between 100 and 2000";
+
+    //command
+"command-empty-error" = "Command must be written";
+"command-json-error" = "Incorrect Json command";

@@ -11,8 +11,9 @@
 @interface IndexViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property NSMutableArray *arduinos;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *editRestServerButton;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
+@property NSMutableArray *arduinos;
 
 
 @end

@@ -29,6 +29,7 @@
 		BCD4320A184905720068CCFF /* Arduino.m in Sources */ = {isa = PBXBuildFile; fileRef = BCD43209184905720068CCFF /* Arduino.m */; };
 		BCDDDD45185739D800C6DE66 /* ReadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BCDDDD44185739D800C6DE66 /* ReadViewController.m */; };
 		BCDDDD4B185747E900C6DE66 /* CommandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BCDDDD4A185747E900C6DE66 /* CommandViewController.m */; };
+		BCFBCC8418B36EC300C24CA9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = BCFBCC8318B36EC300C24CA9 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,7 @@
 		BC3F7BD7184DF6F300F0FD93 /* ResponseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResponseViewController.m; sourceTree = "<group>"; };
 		BC3F7BD9184E2AA100F0FD93 /* WriteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WriteViewController.h; sourceTree = "<group>"; };
 		BC3F7BDA184E2AA100F0FD93 /* WriteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WriteViewController.m; sourceTree = "<group>"; };
+		BCAB777518B3A66900C6D0FF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BCD431CD1848D24F0068CCFF /* Projet Ei5 iPhone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Projet Ei5 iPhone.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCD431D01848D24F0068CCFF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BCD431D21848D24F0068CCFF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -77,6 +79,7 @@
 		BCDDDD44185739D800C6DE66 /* ReadViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReadViewController.m; sourceTree = "<group>"; };
 		BCDDDD49185747E900C6DE66 /* CommandViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandViewController.h; sourceTree = "<group>"; };
 		BCDDDD4A185747E900C6DE66 /* CommandViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommandViewController.m; sourceTree = "<group>"; };
+		BCFBCC8318B36EC300C24CA9 /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +106,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BC1FE4231897C6440076DFC7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				BCD43208184905720068CCFF /* Arduino.h */,
+				BCD43209184905720068CCFF /* Arduino.m */,
+				BC3F7BD3184DF24900F0FD93 /* Response.h */,
+				BC3F7BD4184DF24900F0FD93 /* Response.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		BC1FE4241897C6580076DFC7 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				BCD432051848D8540068CCFF /* BlinkViewController.h */,
+				BCD432061848D8540068CCFF /* BlinkViewController.m */,
+				BCDDDD49185747E900C6DE66 /* CommandViewController.h */,
+				BCDDDD4A185747E900C6DE66 /* CommandViewController.m */,
+				BCD431E51848D24F0068CCFF /* IndexViewController.h */,
+				BCD431E61848D2500068CCFF /* IndexViewController.m */,
+				BCDDDD43185739D800C6DE66 /* ReadViewController.h */,
+				BCDDDD44185739D800C6DE66 /* ReadViewController.m */,
+				BC3F7BD6184DF6F300F0FD93 /* ResponseViewController.h */,
+				BC3F7BD7184DF6F300F0FD93 /* ResponseViewController.m */,
+				BC3F7BD9184E2AA100F0FD93 /* WriteViewController.h */,
+				BC3F7BDA184E2AA100F0FD93 /* WriteViewController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
 		BCD431C41848D24F0068CCFF = {
 			isa = PBXGroup;
 			children = (
@@ -136,29 +169,11 @@
 		BCD431D61848D24F0068CCFF /* Projet Ei5 iPhone */ = {
 			isa = PBXGroup;
 			children = (
-				BCD431DF1848D24F0068CCFF /* AppDelegate.h */,
-				BCD431E01848D24F0068CCFF /* AppDelegate.m */,
-				BCD43208184905720068CCFF /* Arduino.h */,
-				BCD43209184905720068CCFF /* Arduino.m */,
-				BCD432051848D8540068CCFF /* BlinkViewController.h */,
-				BCD432061848D8540068CCFF /* BlinkViewController.m */,
-				BCDDDD49185747E900C6DE66 /* CommandViewController.h */,
-				BCDDDD4A185747E900C6DE66 /* CommandViewController.m */,
-				BC3F7BD0184DDD5700F0FD93 /* Global.h */,
-				BC3F7BD1184DDD5700F0FD93 /* Global.m */,
+				BC1FE4241897C6580076DFC7 /* Controllers */,
+				BC1FE4231897C6440076DFC7 /* Model */,
 				BCD431E81848D2500068CCFF /* Images.xcassets */,
-				BCD431E51848D24F0068CCFF /* IndexViewController.h */,
-				BCD431E61848D2500068CCFF /* IndexViewController.m */,
 				BCD431E21848D24F0068CCFF /* Main.storyboard */,
-				BCDDDD43185739D800C6DE66 /* ReadViewController.h */,
-				BCDDDD44185739D800C6DE66 /* ReadViewController.m */,
-				BC3F7BD3184DF24900F0FD93 /* Response.h */,
-				BC3F7BD4184DF24900F0FD93 /* Response.m */,
-				BC3F7BD6184DF6F300F0FD93 /* ResponseViewController.h */,
-				BC3F7BD7184DF6F300F0FD93 /* ResponseViewController.m */,
 				BCD431D71848D24F0068CCFF /* Supporting Files */,
-				BC3F7BD9184E2AA100F0FD93 /* WriteViewController.h */,
-				BC3F7BDA184E2AA100F0FD93 /* WriteViewController.m */,
 			);
 			path = "Projet Ei5 iPhone";
 			sourceTree = "<group>";
@@ -166,10 +181,15 @@
 		BCD431D71848D24F0068CCFF /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				BCD431DF1848D24F0068CCFF /* AppDelegate.h */,
+				BCD431E01848D24F0068CCFF /* AppDelegate.m */,
+				BC3F7BD0184DDD5700F0FD93 /* Global.h */,
+				BC3F7BD1184DDD5700F0FD93 /* Global.m */,
 				BCD431D81848D24F0068CCFF /* Projet Ei5 iPhone-Info.plist */,
 				BCD431D91848D24F0068CCFF /* InfoPlist.strings */,
 				BCD431DC1848D24F0068CCFF /* main.m */,
 				BCD431DE1848D24F0068CCFF /* Projet Ei5 iPhone-Prefix.pch */,
+				BCFBCC8318B36EC300C24CA9 /* Localizable.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -269,6 +289,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BCD431E91848D2500068CCFF /* Images.xcassets in Resources */,
+				BCFBCC8418B36EC300C24CA9 /* Localizable.strings in Resources */,
 				BCD431DB1848D24F0068CCFF /* InfoPlist.strings in Resources */,
 				BCD431E41848D24F0068CCFF /* Main.storyboard in Resources */,
 			);
@@ -334,6 +355,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				BCD431E31848D24F0068CCFF /* Base */,
+				BCAB777518B3A66900C6D0FF /* en */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";

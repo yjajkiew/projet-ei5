@@ -10,6 +10,7 @@
 
 @interface Arduino : NSObject
 
+@property NSString *leId;
 @property NSString *ip;
 @property NSString *desc;
 @property NSString *mac;
