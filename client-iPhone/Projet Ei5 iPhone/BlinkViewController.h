@@ -14,8 +14,11 @@
 @property (weak, nonatomic) IBOutlet UITextField *pinNumberTextField;
 @property (weak, nonatomic) IBOutlet UITextField *blinksNumberTextField;
 @property (weak, nonatomic) IBOutlet UITextField *delayTextField;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property NSMutableArray *arduinos;
 
 - (IBAction)sendAction:(id)sender;
+- (void)keyboardDidShow:(NSNotification *)note;
+- (void)keyboardDone;
 
 @end

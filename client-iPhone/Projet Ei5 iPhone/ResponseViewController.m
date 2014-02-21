@@ -28,7 +28,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
+	
+    //init view title in navigation bar
+    [self.navigationItem setTitle:NSLocalizedString(@"response-title",nil)];
+    
     erreurLabel.text = [NSString stringWithFormat:@"%d",response.erreur];
     etatLabel.text = response.etat;
     idLabel.text = response.ip;

@@ -17,7 +17,7 @@
 
 @implementation CommandViewController
 
-@synthesize commandTextView, tableView, arduinos;
+@synthesize commandTextView, tableView, activityIndicator, arduinos;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -31,19 +31,54 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
+    
+	//init view title in navigation bar
+    [self.navigationItem setTitle:NSLocalizedString(@"command-title",nil)];
+    
     arduinos = [[NSMutableArray alloc] init];
+    
     tableView.delegate = self;
     tableView.dataSource = self;
+    
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl setTintColor:[UIColor whiteColor]];
+    refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"pull-to-refresh",nil) attributes:@{NSForegroundColorAttributeName: [UIColor whiteColor],}];
+    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    [self.tableView addSubview:refreshControl];
+    
+    [activityIndicator setHidden:YES];
     
     [commandTextView.layer setBorderColor: [[UIColor darkGrayColor] CGColor]];
     [commandTextView.layer setBorderWidth: 1.0];
     [commandTextView.layer setCornerRadius:8.0f];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(keyboardDone)];
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+    
     [self fetchArduinosList];
 }
 
+- (void)refresh:(UIRefreshControl *)refreshControl {
+    [self fetchArduinosList];
+    [refreshControl endRefreshing];
+}
+
+-(void)keyboardDidShow:(NSNotification *)note {
+    [self.navigationItem.rightBarButtonItem setEnabled:YES];
+}
+
+-(void)keyboardDone {
+    [self.view endEditing:YES];
+    [self.navigationItem.rightBarButtonItem setEnabled:NO];
+}
+
 -(void)fetchArduinosList {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [activityIndicator setHidden:NO];
+    [activityIndicator startAnimating];
+    
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/arduinos/", globalServerAddress]]];
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [NSURLConnection sendAsynchronousRequest:urlRequest queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
@@ -55,10 +90,18 @@
              
          }
          else NSLog(@"error request arduino list");
+         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+         [self performSelectorOnMainThread:@selector(stopSpinning) withObject:nil waitUntilDone:NO];
      }];
 }
 
+-(void)stopSpinning {
+    [activityIndicator stopAnimating];
+    [activityIndicator setHidden:YES];
+}
+
 -(void)updateUIWithDictionary:(NSDictionary *)json {
+    [arduinos removeAllObjects];
     NSArray *arrayArduinosJson = [json valueForKey:@"data"];
     for(NSDictionary *json in arrayArduinosJson) {
         Arduino *arduino = [[Arduino alloc] initWithJson:json];
@@ -82,7 +125,7 @@
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section == 0) return @"Select arduino";
+    if(section == 0) return NSLocalizedString(@"select-arduino-input",nil);
     else return nil;
 }
 
@@ -133,34 +176,39 @@
     NSData *commandJsonData = [commandTextView.text dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *commandJson = [NSJSONSerialization JSONObjectWithData:commandJsonData options:NSJSONReadingAllowFragments error:nil];
     
-    if(indexPath == nil) errorMessage = @"You haven't selected an arduino board !";
-    else if(!commandTextView.text.length) errorMessage = @"Command must be written";
-    else if([commandJson valueForKey:@"id"] == [NSNull null] || [commandJson valueForKey:@"pa"] == [NSNull null] || [commandJson valueForKey:@"ac"] == [NSNull null]) errorMessage = @"Incorrect Json command";
-    
+    if(!commandTextView.text.length) errorMessage = NSLocalizedString(@"command-empty-error",nil);
+    else if(![[commandJson valueForKey:@"id"] length] || ![[commandJson valueForKey:@"pa"] count] || ![[commandJson valueForKey:@"ac"] length]) errorMessage = NSLocalizedString(@"command-json-error",nil);
+    else if(indexPath == nil) errorMessage = NSLocalizedString(@"arduino-error",nil);
     //error => display alert
     if(errorMessage != nil) {
-        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:@"Error"
+        UIAlertView *errorAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"error-title",nil)
                                                              message:errorMessage
                                                             delegate:nil
-                                                   cancelButtonTitle:@"OK"
+                                                   cancelButtonTitle:NSLocalizedString(@"ok",nil)
                                                    otherButtonTitles:nil];
         [errorAlert show];
     }
     else {
+        //deactivate send button because the request will be fired
+        [(UIButton*)sender setEnabled:NO];
+        
         NSLog(@"%@", [NSString stringWithFormat:@"Button: Cell %ld in Section %ld is selected",(long)indexPath.row, (long)indexPath.section]);
         Arduino *arduino = [arduinos objectAtIndex:indexPath.row];
         
         //create post data
-        NSData *postData = [commandTextView.text dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+        NSString *commandToSend = [NSString stringWithFormat:@"[%@]", commandTextView.text];
+        NSData *postData = [commandToSend dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
         NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
 
         //create request with postdata
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-        [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/arduinos/commands/%@", globalServerAddress, arduino.ip]]];
+        [request setURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/arduinos/commands/%@", globalServerAddress, arduino.leId]]];
         [request setHTTPMethod:@"POST"];
         [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request setHTTPBody:postData];
+        
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         
         //send request and process result
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
@@ -174,6 +222,7 @@
                  [self performSelectorOnMainThread:@selector(showResponse:) withObject:response waitUntilDone:YES];
              }
              else NSLog(@"error request arduino list");
+             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
          }];
         
     }
@@ -201,6 +250,7 @@
     
     if (![[touch view] isKindOfClass:[UITextField class]]) {
         [self.view endEditing:YES];
+        [self.navigationItem.rightBarButtonItem setEnabled:NO];
     }
     [super touchesBegan:touches withEvent:event];
 }
