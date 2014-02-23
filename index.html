@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+    <head>
+    	<link href="styles.css" rel="stylesheet" type="text/css"/>
+    	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+	    <title>Shwo Laser</title>
+	    
+	    <!--[if lte IE 8]>
+			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+    </head>
+    
+    <body>
+		<div id="global">
+		
+		<header>
+				<ul>
+					<li id="current"><a href="#">Accueil</a></li>
+					<li><a href="projet.html">Projet</a></li>
+					<li><a href="galerie.html">Galerie</a></li>
+					<li><a href="rapports.html">Rapports</a></li>
+				</ul>
+				<hr />
+			</header>
+
+
+
+			<div id="contenu">
+				<div id="subheader">
+					<h1>Système de contrôle d'axe avec application de show laser</h1>
+					<p>Stage Master EI5 IAIE 2013/2014 </p>
+					<h4>Soutenu par : <a href="mailto:benjamin-guilleux@laposte.net" title="benjamin-guilleux@laposte.net">Benjamin Guilleux, </a><a href="mailto:lucie.chouteau@gmail.com" title="lucie.chouteau@gmail.com">Lucie Chouteau, </a><a href="mailto:jeremie.c53@hotmail.fr" title="jeremie.c53@hotmail.fr">Jeremie Chaperon</a></h4>
+					<h4>Encadré par : <a href="mailto:sebastien.lagrange@univ-angers.fr" title="sebastien.lagrange@univ-angers.fr">Sebastien Lagrange</a></h4>
+					<a href="http://www.univ-angers.fr/"><img src="images/UnivAngers.png" title="Universit&eacute;  d'Angers" alt="Logo de l'universit&eacute; d'Angers"/></a>
+					<a href="http://www.istia.univ-angers.fr/"><img src="images/LogoIstia.png" title="Institut des Sciences et Techniques de l'Ingénieur de l'université d'Angers" alt="Logo de l'ISTIA"/></a>
+					<a href="http://www.br-automation.com/fr//"><img src="images/BR.jpg" title="B&R Automation" alt="Logo de B&R"/></a>
+				</div>
+		
+				<section>
+					<h3 class="titre">Résumé</h3>
+					<p>
+	Le projet de cette dernière année à l’ISTIA fait partie d'une double inscription dans le cursus ingénieur ainsi que "master recherche". Le but de ce dernier est de retrouver des éléments caractéristiques dans une image 3D. Les résultats sont ensuite utilisés dans un robot pour lui permettre de se déplacer et interagir avec son environnement. Ce robot est développé pour une compétition organisée par la DGA (Département Général de l’Armement) dans le but d'améliorer les connaissances dans le domaine de la cartographie automatisée.
+					</p>
+					Ce projet comporte deux objectifs principaux :
+					<ul>
+						<li>Identifier et isoler les plans dans l'image (murs et sol)</li>
+						<li>Identifier et isoler des objets d'intérêts (depuis une base de données)</li>
+					</ul>
+					<p>
+	Les images à traiter sont obtenues à partir de deux capteurs : un capteur laser (informations de profondeur uniquement) et un capteur "Kinect" (image couleur et profondeur). Ces deux appareils donnent des images de type "nuage de points".<br />
+	Ce travail sera développé en C++ avec le framework Qt. Avant ce développement, une recherche bibliographique ainsi qu'un état de l'art seront fait afin de préparer le développement et les techniques à employer.
+					</p>
+					<p><b>Mots-Clés :</b> traitement d'images, 3D, C++, robotique, recherche</p>
+				</section>
+				<section>
+					<h3 class="titre">Abstract</h3>
+					
+					<p>
+	The project for the last year in the ISTIA is part of an enrolment as a student in research master degree. The aim of this project is to characterize features in 3D pictures. The result is then used in a robot and allows it to interact with its environment and give feedback information to the operator. This robot is made for a French contest of robotics organized by the DGA (a department of the army) and aim to develop the knowledge in automated mapping of closed area.
+					</p>
+					There are two main objectives:
+					<ul>
+						<li>Isolating and segregating plans (floor and walls)</li>
+						<li>Isolating objects and identifying them from a database</li>
+					</ul>
+					<p>
+	The pictures to process are taken by two sensors. One is a Kinect sensor (color and depth sensor) and the other one is a laser sensor (depth only). Both give a “point cloud” image containing information to deal with.<br />
+	All this work will be developed in C++ with the Qt framework. Prior to it, a state of the art research is done to prepare and extend the research elements.
+					</p>
+					<p><b>Keywords:</b> image recognition, 3D, C++, robotics, research</p>
+				</section>
+			</div>		
+			<footer>
+				<hr />
+				<ul>
+					<li><a href="http://www.univ-angers.fr/"><img src="images/UnivAngers.png" title="Université d'Angers" alt="Logo de l'université d'Angers"/></a></li>
+					<li><a href="http://www.istia.univ-angers.fr/"><img src="images/LogoIstia.png" title="Institut des Sciences et Techniques de l'Ingénieur de l'université d'Angers" alt="Logo de l'ISTIA"/></a></li>
+					<li><a href="http://www.br-automation.com/fr//"><img src="images/BR.jpg" title="B&R Automation" alt="Logo de B&R"/></a></li>
+				</ul>
+			</footer>
+		</div>
+    </body>
+</html>
