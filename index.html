@@ -1,85 +1,109 @@
-
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
-    <head>
-    	<link href="styles.css" rel="stylesheet" type="text/css"/>
-    	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
-	    <title>Shwo Laser</title>
-	    
-	    <!--[if lte IE 8]>
-			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-    </head>
-    
-    <body>
-		<div id="global">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />	
+	<title>Applications mobiles et domotique: Serveur REST Node.js | ISTIA Ei5 AGI Projet 2013-2014</title>
+	<meta name="author" content="Baptiste Gauduchon et Yann Jajkiewicz" />
+	<meta name="description" content="" />
+	<meta name="keywords"  content="" />
+	<meta name="Resource-type" content="Document" />
+
+	<link rel="stylesheet" type="text/css" href="jquery.fullPage.css" />
+	<link rel="stylesheet" type="text/css" href="style.css" />
+
+	<!--[if IE]>
+		<script type="text/javascript">
+			 var console = { log: function() {} };
+		</script>
+	<![endif]-->
 		
-		<header>
-				<ul>
-					<li id="current"><a href="#">Accueil</a></li>
-					<li><a href="projet.html">Projet</a></li>
-					<li><a href="galerie.html">Galerie</a></li>
-					<li><a href="rapports.html">Rapports</a></li>
-				</ul>
-				<hr />
-			</header>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>	
+	
+	<script type="text/javascript" src="jquery.fullPage.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var pepe = $.fn.fullpage({
+				slidesColor: ['#eee', '#4BBFC3', '#7BAABE', '#ccddff', 'whitesmoke'],
+				anchors: ['accueil', 'resume', 'abstract', 'images', 'liens'],
+				menu: '#menu'
+			});
+			
+		});
+	</script>
 
+</head>
+<body>
 
+<ul id="menu">
+	<li data-menuanchor="accueil"><a href="#accueil">Accueil</a></li>
+	<li data-menuanchor="resume"><a href="#resume">Résumé</a></li>
+	<li data-menuanchor="abstract"><a href="#abstract">Abstract</a></li>
+	<li data-menuanchor="images"><a href="#images">Images</a></li>
+	<li data-menuanchor="liens"><a href="#liens">Liens</a></li>
+</ul>
 
-			<div id="contenu">
-				<div id="subheader">
-					<h1>Système de contrôle d'axe avec application de show laser</h1>
-					<p>Stage Master EI5 IAIE 2013/2014 </p>
-					<h4>Soutenu par : <a href="mailto:benjamin-guilleux@laposte.net" title="benjamin-guilleux@laposte.net">Benjamin Guilleux, </a><a href="mailto:lucie.chouteau@gmail.com" title="lucie.chouteau@gmail.com">Lucie Chouteau, </a><a href="mailto:jeremie.c53@hotmail.fr" title="jeremie.c53@hotmail.fr">Jeremie Chaperon</a></h4>
-					<h4>Encadré par : <a href="mailto:sebastien.lagrange@univ-angers.fr" title="sebastien.lagrange@univ-angers.fr">Sebastien Lagrange</a></h4>
-					<a href="http://www.univ-angers.fr/"><img src="images/UnivAngers.png" title="Universit&eacute;  d'Angers" alt="Logo de l'universit&eacute; d'Angers"/></a>
-					<a href="http://www.istia.univ-angers.fr/"><img src="images/LogoIstia.png" title="Institut des Sciences et Techniques de l'Ingénieur de l'université d'Angers" alt="Logo de l'ISTIA"/></a>
-					<a href="http://www.br-automation.com/fr//"><img src="images/BR.jpg" title="B&R Automation" alt="Logo de B&R"/></a>
-				</div>
-		
-				<section>
-					<h3 class="titre">Résumé</h3>
-					<p>
-	Le projet de cette dernière année à l’ISTIA fait partie d'une double inscription dans le cursus ingénieur ainsi que "master recherche". Le but de ce dernier est de retrouver des éléments caractéristiques dans une image 3D. Les résultats sont ensuite utilisés dans un robot pour lui permettre de se déplacer et interagir avec son environnement. Ce robot est développé pour une compétition organisée par la DGA (Département Général de l’Armement) dans le but d'améliorer les connaissances dans le domaine de la cartographie automatisée.
-					</p>
-					Ce projet comporte deux objectifs principaux :
-					<ul>
-						<li>Identifier et isoler les plans dans l'image (murs et sol)</li>
-						<li>Identifier et isoler des objets d'intérêts (depuis une base de données)</li>
-					</ul>
-					<p>
-	Les images à traiter sont obtenues à partir de deux capteurs : un capteur laser (informations de profondeur uniquement) et un capteur "Kinect" (image couleur et profondeur). Ces deux appareils donnent des images de type "nuage de points".<br />
-	Ce travail sera développé en C++ avec le framework Qt. Avant ce développement, une recherche bibliographique ainsi qu'un état de l'art seront fait afin de préparer le développement et les techniques à employer.
-					</p>
-					<p><b>Mots-Clés :</b> traitement d'images, 3D, C++, robotique, recherche</p>
-				</section>
-				<section>
-					<h3 class="titre">Abstract</h3>
-					
-					<p>
-	The project for the last year in the ISTIA is part of an enrolment as a student in research master degree. The aim of this project is to characterize features in 3D pictures. The result is then used in a robot and allows it to interact with its environment and give feedback information to the operator. This robot is made for a French contest of robotics organized by the DGA (a department of the army) and aim to develop the knowledge in automated mapping of closed area.
-					</p>
-					There are two main objectives:
-					<ul>
-						<li>Isolating and segregating plans (floor and walls)</li>
-						<li>Isolating objects and identifying them from a database</li>
-					</ul>
-					<p>
-	The pictures to process are taken by two sensors. One is a Kinect sensor (color and depth sensor) and the other one is a laser sensor (depth only). Both give a “point cloud” image containing information to deal with.<br />
-	All this work will be developed in C++ with the Qt framework. Prior to it, a state of the art research is done to prepare and extend the research elements.
-					</p>
-					<p><b>Keywords:</b> image recognition, 3D, C++, robotics, research</p>
-				</section>
-			</div>		
-			<footer>
-				<hr />
-				<ul>
-					<li><a href="http://www.univ-angers.fr/"><img src="images/UnivAngers.png" title="Université d'Angers" alt="Logo de l'université d'Angers"/></a></li>
-					<li><a href="http://www.istia.univ-angers.fr/"><img src="images/LogoIstia.png" title="Institut des Sciences et Techniques de l'Ingénieur de l'université d'Angers" alt="Logo de l'ISTIA"/></a></li>
-					<li><a href="http://www.br-automation.com/fr//"><img src="images/BR.jpg" title="B&R Automation" alt="Logo de B&R"/></a></li>
-				</ul>
-			</footer>
+<div class="section" id="section0">
+	<h2>Applications mobiles et domotique</h2>
+	<h1>Serveur REST Node.js</h1>
+	<p>Cette page est une présentation d'un projet de 5ème année à l'ISTIA réalisé par Baptiste Gauduchon et Yann Jajkiewicz, encadré par Sebastien Lagrange et Serge Tahe.</p>
+	<p><b>Mots clé :</b> REST, JSON, Arduino, serveur, commande, web, TCP/IP, NodeJS.</p>
+	<img src="univAngers.png" alt="Université d'Angers" /><img src="istia.png" alt="ISTIA" />
+</div>
+<div class="section" id="section1">
+	<div class="intro">
+		<h2>Résumé</h2>
+		<p>Dans le cadre de la 3ème année du cycle ingénieur de l’ISTIA, le projet réalisé est un serveur REST écris avec NodeJS permettant de lier des clients à des cartes arduino à des fins domotiques. Par URL, les clients peuvent envoyer des commandes avec paramètres au serveur afin de les envoyer à la carte souhaitée. Les cartes arduinos sont connectées au serveur via ethernet et en reçoivent les commandes. Pour réaliser cela, les fonctionnalités du serveur ont été découpées en 3 couches : une interface web pour recevoir les commandes des clients, une couche métier pour transformer les paramètres en une chaîne JSON, et une couche de communication permettant d’enregistrer les différentes cartes arduinos connectées et de leur envoyer les commandes utilisant le protocol TCP/IP. Lorsqu’une commande est reçue, la carte analyse la chaîne JSON pour récupérer les paramètres et effectuer l’action souhaitée. La carte répond alors au serveur avec une chaîne JSON qui est reconstruite et renvoyée au client. L’utilisation de la technologie NodeJS et du format JSON permettent au serveur de respecter une architecture REST tout en étant robuste et capable de gérer un grand nombre de requêtes simultanément.</p>
+	</div>
+</div>
+<div class="section" id="section1">
+	<div class="intro">
+		<h2>Abstract</h2>
+		<p>As part of the 3rd year of engineering studies at ISTIA, the completed industrial project is a REST Server written in NodeJS linking clients and arduino boards for domotic purposes. By URL, clients have to be able to pass commands with parameters to the server in order to send them to the requested board. The arduino boards are connected to the server via ethernet and receive the commands from it. To achieve that, the server’s functionalities have been split in 3 layers: a web interface to receive commands from clients, a work layer that transforms the parameters in a JSON string, and a communication layer allowing to register the different arduino boards connected and to send the commands to them using TCP/IP protocol. When receiving a command, the board analyzes the JSON string to get the parameters and performs the action required. Then the arduino board responds to the server with a JSON string which is rebuild and sent back to the web client. Using the NodeJS technology and the JSON format allows the server to respect the Representational State Transfer architecture while being robust and able to handle a large amount of simultaneous requests.</p>
+	</div>
+</div>
+<div class="section" id="section3">
+    <div class="slide">
+		<img src="schema-application-projet.png" alt="Schéma d'application du projet" />
+		<p>Schéma d'application du projet</p>
+	</div>
+	<div class="slide">
+		<img src="activites-projet.png" alt="Activités du projet" />
+		<p>Activités du projet</p>
+	</div>
+	<div class="slide">
+		<img src="logique-de-validation.png" alt="Logique de validation" />
+		<p>Logique de validation</p>
+	</div>
+	<div class="slide">
+		<img src="schema-serveur-rest.png" alt="Schéma du serveur REST" />
+		<p>Schéma du serveur REST</p>
+	</div>
+	<div class="slide">
+		<img src="schema-donnees-blink.png" alt="Schéma de transit des donnéees pour une requête blink" />
+		<p>Schéma de transit des donnéees pour une requête blink</p>
+	</div>
+	<div class="slide">
+		<img src="schema-donnees-post.png" alt="Schéma de transit des donnéees pour une requête command" />
+		<p>Schéma de transit des donnéees pour une requête command</p>
+	</div>
+</div>
+<div class="section" id="section4">
+		<h2>Liens</h2>
+		<div class="links">
+		<p>
+			<ul>
+				<li>Dépôt Github : http://github.com/yjajkiew/projet-ei5</li>
+				<li>Rapport de projet : </li>
+				<li>Human talk : évènement | présentation | vidéo</li>
+				<li>Site de Baptiste : www.baptistegauduchon.fr</li>
+				<li>Site de Yann : yann.me</li>
+			</ul>
+		</p>
 		</div>
-    </body>
+</div>
+
+
+</body>
 </html>
