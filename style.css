@@ -1,3 +1,4 @@
+
 @CHARSET "ISO-8859-1";
 /* Reset CSS
  * --------------------------------------- */
@@ -70,6 +71,9 @@ p{
 .section{
 	text-align:center;
 }
+#menu {
+	text-align: center;
+}
 #menu li {
 	display:inline-block;
 	margin: 10px;
@@ -117,12 +121,12 @@ p{
 	margin: 20px 50px 0 0px;
 }	
 #section0 h2 {
-	margin-top: 30px;
+	margin-top: 1.5em;
 }
 #section0 p {
 	font-size: 1.5em;
-	margin-top: 2em;
-	margin-bottom: 2em;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
 	margin-left: 20%;
 	margin-right: 20%;
 }
@@ -147,6 +151,14 @@ p{
 	margin: 0 auto;
 	width: 80%;
 	text-align: left;
+}
+
+#section4 .links a, #section4 .links a:visited {
+	color: #0092cf;
+}
+
+#section4 .links a:hover {
+	color: #888;
 }
 
 .intro p{
