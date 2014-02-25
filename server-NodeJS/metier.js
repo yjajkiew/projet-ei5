@@ -141,7 +141,7 @@ function cmd(idArduino, jsonStringArray, callback) {
 				// return result
 				callback(resultArray);
 	    	}  
-	    )
+	    );
 	} catch(err) {
 		errorMessage = '[METIER] Parsing POST JSON failed -> ' + err;
 		util.log(errorMessage);

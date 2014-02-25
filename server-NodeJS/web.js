@@ -22,7 +22,7 @@ var metier 	= require('./metier');
 // Globals Variables
 var BASE_PATH = '/rest/arduinos';
 var PORT 	= process.argv[2] || 8080;
-var server 	= new express();
+var server 	= express();
 
 
 

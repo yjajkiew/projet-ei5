@@ -1,9 +1,10 @@
 {
-  "name": "metier",
-  "description": "Express url parsing handler",
-  "version": "0.0.1",
+  "name": "web",
+  "description": "Server providing REST-like interface to allow client adruino control trough web API",
+  "version": "0.1.2",
   "private": true,
   "dependencies": {
-    "express": "3.x"
+    "express": "latest",
+    "async":"latest"
   }
 }
