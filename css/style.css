@@ -146,21 +146,22 @@ p{
 }
 #section4 h2 {
 	font-size: 2em;
+	margin-bottom: 1em;
 }
 #section4 .links {
 	margin: 0 auto;
 	width: 80%;
 	text-align: left;
 }
-
+#section4 .links ul li {
+	margin: 0.5em;
+}
 #section4 .links a, #section4 .links a:visited {
 	color: #0092cf;
 }
-
 #section4 .links a:hover {
 	color: #888;
 }
-
 .intro p{
 	width: 90%;
 	margin: 0 auto;
