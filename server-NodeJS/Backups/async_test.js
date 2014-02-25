@@ -1,13 +1,15 @@
 /********************************************************************************/
-each(arr, iterator, callback)
---> Applies an iterator function to each item in an array, in parallel. 
-arr -> array to iterate over
-iterator(item, callback) -> A function to apply to each item in the array. The iterator is passed a callback(err) which must be called once it has completed. If no error has occured, the callback should be run without arguments or with an explicit null argument.
-callback(err) -> A callback which is called after all the iterator functions have finished, or an error has occurred.
+
+// each(arr, iterator, callback)
+// --> Applies an iterator function to each item in an array, in parallel. 
+// arr -> array to iterate over
+// iterator(item, callback) -> A function to apply to each item in the array. The iterator is passed a callback(err) which must be called once it has completed. If no error has occured, the callback should be run without arguments or with an explicit null argument.
+// callback(err) -> A callback which is called after all the iterator functions have finished, or an error has occurred.
 
 /********************************************************************************/
-eachSeries(arr, iterator, callback)
--> same as each, but the next iterator is only called once the current one has completed processing
+
+// eachSeries(arr, iterator, callback)
+// -> same as each, but the next iterator is only called once the current one has completed processing
 
 /********************************************************************************/
 

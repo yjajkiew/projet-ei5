@@ -4,16 +4,16 @@
 //-> an arduino object, contaninig propeties and methodes
 
 
-
 /////////////////
 // CONSTRUCTOR //
 /////////////////
 
-function Arduino(id, mac, port, desc) {
-  // Initialize all instance properties
-  this.id = id;
-  this.mac = mac;
+function Arduino(ip, port, mac, id, desc) {
+  // Initialize all properties (automagicaly instanciated by JS)
+  this.ip = ip;
   this.port = port;
+  this.mac = mac;
+  this.id = id;
   this.desc = desc;
 }
 
@@ -22,16 +22,20 @@ function Arduino(id, mac, port, desc) {
 // GETTERS //
 /////////////
 
-Arduino.prototype.getId = function(){
-  return this.id;
+Arduino.prototype.getIp = function(){
+  return this.ip;
+};
+
+Arduino.prototype.getPort = function(){
+  return this.port;
 };
 
 Arduino.prototype.getMacAddress = function(){
   return this.mac;
 };
 
-Arduino.prototype.getPort = function(){
-  return this.port;
+Arduino.prototype.getId = function(){
+  return this.id;
 };
 
 Arduino.prototype.getDescription = function(){
@@ -52,4 +56,6 @@ Arduino.prototype.toString = function() {
 ////////////
 // EXPORT //
 ////////////
+
+// the constructor
 module.exports = Arduino;

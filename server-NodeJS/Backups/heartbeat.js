@@ -1,7 +1,7 @@
 // Acheck arduino state
 function heartbeat(arduino, callback) {
 	// Connect to Arduino server
-	var client = net.connect({host:arduino.id, port:arduino.port},function() { //'connect' listener
+	var client = net.connect({host:arduino.ip, port:arduino.port},function() { //'connect' listener
 		// build json object
 		var jsonObject = {id:"1",ac:"ec",pa:{}};
 		var jsonString = JSON.stringify(jsonObject);
@@ -47,22 +47,22 @@ setInterval(function() {
 }, 5000);
 
 
-// 1st parameter in async.map() is the array of items
-async.each(items,
-  // 2nd parameter is the function that each item is passed into
-  function(item, callback){
-    // Call an asynchronous function (often a save() to MongoDB)
-    item.someAsyncCall(function (){
-      // Async call is done, alert via callback
-      callback();
-    });
-  },
-  // 3rd parameter is the function call when everything is done
-  function(err){
-    // All tasks are done now
-    doSomethingOnceAllAreDone();
-  }
-);
+// // 1st parameter in async.map() is the array of items
+// async.each(items,
+//   // 2nd parameter is the function that each item is passed into
+//   function(item, callback){
+//     // Call an asynchronous function (often a save() to MongoDB)
+//     item.someAsyncCall(function (){
+//       // Async call is done, alert via callback
+//       callback();
+//     });
+//   },
+//   // 3rd parameter is the function call when everything is done
+//   function(err){
+//     // All tasks are done now
+//     doSomethingOnceAllAreDone();
+//   }
+// );
 
 async.each(openFiles, function( file, callback) {
 
