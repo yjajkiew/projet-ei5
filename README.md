@@ -23,19 +23,19 @@ Node.JS REST server - Arduino
 ------------------
  
 We've choosen to separate the server's functionnalities in 3 different 'Layers' :
- * _web.js_ : handle web request ;
- * _metier.js_ (formaly 'service.js') : build JSON from request ;
- * _dao.js_ : Arduino registration & communication ;
+ * *_web.js_* : handle web request ;
+ * *_metier.js_* (formaly 'service.js') : build JSON from request ;
+ * *_dao.js_* : Arduino registration & communication ;
 
 The interfaces :
  
 1. Interface between REST Server / Arduino :
->   * _To Document_
+>_To Document_
 
 2. Interface between REST Server / Client Server (public API):
   * The REST server receive request by URL or POST, like this:
-    * ‘http://ip:port/server-restServer/arduinos‘
-    * ‘http://ip:port/server-restServer/arduinos/cmd_id/arduino_ip/‘ (POST, sending JSON in body)
+    * `http://ip:port/server-restServer/arduinos`
+    * `http://ip:port/server-restServer/arduinos/cmd_id/arduino_ip/` (POST, sending JSON in body)
 
 4 - Authors
 -----------
